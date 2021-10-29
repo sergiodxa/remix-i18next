@@ -5,7 +5,12 @@
   "license": "MIT",
   "main": "./index.js",
   "files": [
-    "build",
+    "backend.d.ts",
+    "index.d.ts",
+    "react.d.ts",
+    "backend.js",
+    "index.js",
+    "react.js",
     "package.json",
     "README.md"
   ],
