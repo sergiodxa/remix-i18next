@@ -1,5 +1,5 @@
 import { pick } from "accept-language-parser";
-import { Backend, Language } from "./backend";
+import type { Backend, Language } from "./backend";
 
 interface RemixI18NextOptions {
   supportedLanguages: string[];

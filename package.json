@@ -2,9 +2,35 @@
   "name": "remix-i18next",
   "version": "0.0.0",
   "description": "The easiest way to translate your Remix apps",
-  "main": "build/index.js",
+  "license": "MIT",
+  "main": "./build/index.js",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "files": [
+    "build",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
-    "test": "jest"
+    "typecheck": "tsc --project tsconfig.json",
+    "lint": "eslint --ext .ts,.tsx src/",
+    "test": "jest --config=config/jest.config.ts --passWithNoTests",
+    "setup": "remix setup",
+    "postinstall": "npm run setup",
+    "// Build": "",
+    "build": "npm run build:types && npm run build:esm && npm run build:cjs",
+    "build:esm": "npm run build:esm:index && npm run build:esm:backend && npm run build:esm:react",
+    "build:cjs": "npm run build:cjs:index && npm run build:cjs:backend && npm run build:cjs:react",
+    "build:types": "tsc src/index.ts --declaration --emitDeclarationOnly --declarationDir build --esModuleInterop",
+    "esbuild": "esbuild --bundle --external:remix --external:i18next --external:react-i18next --external:react --external:accept-language-parser --external:use-consistent-value",
+    "// Build ESM": "",
+    "build:esm:index": "npm run esbuild -- src/index.ts --platform=node --outfile=build/index.mjs",
+    "build:esm:backend": "npm run esbuild -- src/backend.ts --platform=node --outfile=build/backend.mjs",
+    "build:esm:react": "npm run esbuild -- src/react.tsx --platform=neutral --outfile=build/react.mjs",
+    "// Build CSJ": "",
+    "build:cjs:index": "npm run esbuild -- src/index.ts --platform=node --outfile=build/index.js",
+    "build:cjs:backend": "npm run esbuild -- src/backend.ts --platform=node --outfile=build/backend.js",
+    "build:cjs:react": "npm run esbuild -- src/react.tsx --platform=neutral --outfile=build/react.js"
   },
   "repository": {
     "type": "git",
@@ -17,21 +43,63 @@
     "ssr",
     "csr"
   ],
-  "author": "Sergio Xalambrí <hello@sergiodxa.com> (https://sergiodxa.com/)",
-  "license": "MIT",
+  "author": {
+    "name": "Sergio Xalambrí",
+    "email": "hello@sergiodxa.com",
+    "url": "https://sergiodxa.com"
+  },
   "bugs": {
     "url": "https://github.com/sergiodxa/remix-i18next/issues"
   },
   "homepage": "https://github.com/sergiodxa/remix-i18next#readme",
+  "peerDependencies": {
+    "@remix-run/node": "^0.19.2",
+    "@remix-run/react": "^0.19.2",
+    "i18next": "^21.3.3",
+    "react-i18next": "^11.13.0",
+    "react": "^17.0.2",
+    "remix": "^0.19.2"
+  },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
-    "i18next": "^21.3.3",
-    "react": "^17.0.2",
-    "react-i18next": "^11.13.0",
-    "remix": "^0.19.3",
     "use-consistent-value": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^16.11.6"
+    "@babel/core": "^7.14.2",
+    "@babel/preset-env": "^7.14.1",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@remix-run/dev": "^0.19.2",
+    "@remix-run/node": "^0.19.2",
+    "@remix-run/react": "^0.19.2",
+    "@types/accept-language-parser": "^1.5.2",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^16.11.6",
+    "@types/prop-types": "^15.7.4",
+    "@types/react": "^17.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "babel-jest": "^26.6.3",
+    "esbuild": "^0.13.10",
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-cypress": "^2.11.3",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jest-dom": "^3.9.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-testing-library": "^4.3.0",
+    "eslint-plugin-unicorn": "^32.0.1",
+    "i18next": "^21.3.3",
+    "jest": "^26.6.3",
+    "jest-fetch-mock": "^3.0.3",
+    "prettier": "^2.3.2",
+    "react": "^17.0.2",
+    "react-i18next": "^11.13.0",
+    "react-router-dom": "^6.0.0-beta.6",
+    "remix": "^0.19.3",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.3.5"
   }
 }

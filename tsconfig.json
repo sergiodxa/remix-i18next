@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ESNext.Promise"],
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./",
+    "declaration": true,
+    "declarationDir": "./",
+    "jsx": "react-jsx"
+  },
+  "exclude": ["node_modules"],
+  "include": ["config/remix.env.d.ts", "src/**/*.ts", "src/**/*.tsx"]
+}
