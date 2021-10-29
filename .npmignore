@@ -1,0 +1,10 @@
+example
+src
+config
+.github
+.npmrc
+.gitignore
+.eslintrc.js
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+tsconfig.json

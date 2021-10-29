@@ -4,17 +4,6 @@
   "description": "The easiest way to translate your Remix apps",
   "license": "MIT",
   "main": "./index.js",
-  "files": [
-    "./backends",
-    "backend.d.ts",
-    "index.d.ts",
-    "react.d.ts",
-    "backend.js",
-    "index.js",
-    "react.js",
-    "package.json",
-    "README.md"
-  ],
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
