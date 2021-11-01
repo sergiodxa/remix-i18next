@@ -85,10 +85,7 @@ export class RemixI18Next {
   }
 
   private async getTranslation(key: CacheKey): Promise<Language> {
-    let cacheEnabled =
-      this.options.cacheInDevelopment && process.env.NODE_ENV === "development";
-
-    if (cacheEnabled) {
+    if (this.cacheEnabled) {
       let cached = await this.cache.get(key);
       if (cached) return cached;
     }
@@ -98,11 +95,17 @@ export class RemixI18Next {
       key.locale
     );
 
-    if (cacheEnabled) {
+    if (this.cacheEnabled) {
       await this.cache.set(key, translations);
     }
 
     return translations;
+  }
+
+  private get cacheEnabled() {
+    return (
+      this.options.cacheInDevelopment && process.env.NODE_ENV === "development"
+    );
   }
 }
 
