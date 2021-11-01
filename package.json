@@ -36,8 +36,9 @@
     "@remix-run/node": "^0.19.2",
     "@remix-run/react": "^0.19.2",
     "i18next": "^21.3.3",
-    "react-i18next": "^11.13.0",
     "react": "^17.0.2",
+    "react-i18next": "^11.13.0",
+    "react-router-dom": "^6.0.0-beta.6",
     "remix": "^0.19.2"
   },
   "dependencies": {
