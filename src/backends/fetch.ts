@@ -1,7 +1,7 @@
 import { generatePath } from "react-router-dom";
 import { Backend } from "../backend";
 
-interface FetchBackendOptions {
+export interface FetchBackendOptions {
   /**
    * A URL object to be used as a base for generating the final URL.
    */
