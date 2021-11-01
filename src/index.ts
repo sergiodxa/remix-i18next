@@ -2,9 +2,34 @@ import { pick } from "accept-language-parser";
 import type { Backend, Language } from "./backend";
 
 interface RemixI18NextOptions {
+  /**
+   * Define the list of supported languages, this is used to determine if one of
+   * the languages requested by the user is supported by the application.
+   * This should be be same as the supportedLngs in the i18next options.
+   */
   supportedLanguages: string[];
+  /**
+   * Define the fallback language that it's going to be used in the case user
+   * expected language is not supported.
+   * This should be be same as the fallbackLng in the i18next options.
+   */
   fallbackLng: string;
+  /**
+   * A class that implements the Cache interface and is used to store the
+   * languages, in production, between requests to avoid loading them multiple
+   * times, this is used so the user doesn't have to wait for the backend to
+   * retrieve the translations every time.
+   * By default, remix-i18next uses an in memory cache based on an ES Map
+   * instance.
+   */
   cache?: Cache;
+  /**
+   * If enabled, the cache will be used even in development mode.
+   * This is disabled by default so while you code the languages are going to
+   * be requested again on every request and be up-to-date.
+   * Enabling may be useful if you request your translations from a server and
+   * have a quote or rate limit on the number of requests.
+   */
   cacheInDevelopment?: boolean;
 }
 
