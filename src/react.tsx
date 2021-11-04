@@ -20,7 +20,7 @@ export function useRemixI18Next(locale: string) {
 
   let namespaces = useConsistentValue(
     useMatches()
-      .flatMap((match) => (match.data.i18n ?? {}) as Record<string, Language>)
+      .flatMap((match) => (match.data?.i18n ?? {}) as Record<string, Language>)
       // eslint-disable-next-line unicorn/no-array-reduce
       .reduce(
         (messages, routeMessages) => ({ ...messages, ...routeMessages }),
