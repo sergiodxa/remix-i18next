@@ -1,4 +1,5 @@
 import { pick } from "accept-language-parser";
+import type { Cookie } from "remix";
 import type { Backend, Language } from "./backend";
 
 interface RemixI18NextOptions {
@@ -31,6 +32,8 @@ interface RemixI18NextOptions {
    * have a quote or rate limit on the number of requests.
    */
   cacheInDevelopment?: boolean;
+  cookie?: Cookie;
+  cookieKey?: string;
 }
 
 export interface CacheKey {
@@ -54,7 +57,7 @@ export class RemixI18Next {
     request: Request,
     namespaces: string | string[]
   ): Promise<Record<string, Language>> {
-    let locale = this.getLocale(request);
+    let locale = await this.getLocale(request);
 
     if (Array.isArray(namespaces)) {
       let messages = await Promise.all(
@@ -75,28 +78,50 @@ export class RemixI18Next {
     };
   }
 
-  public getLocale(request: Request): string {
-    let url = new URL(request.url);
-    if (url.searchParams.has("lng")) {
-      return this.getFromSupported(url.searchParams.get("lng"));
+  public async getLocale(request: Request): Promise<string> {
+    let locale = this.getLocaleFromSearchParams(request);
+
+    if (this.options.cookie && this.options.cookieKey) {
+      let cookie = this.options.cookie;
+      let { [this.options.cookieKey]: lng } =
+        (await cookie.parse(request.headers.get("Cookie"))) ?? {};
+      if (lng) {
+        let locale = this.getFromSupported(lng);
+        if (locale !== this.options.fallbackLng) return locale;
+      }
     }
 
-    // let cookie = Object.fromEntries(
-    //   request.headers
-    //     .get("Cookie")
-    //     ?.split(";")
-    //     .map((cookie) => cookie.split("=")) ?? []
-    // ) as { i18next?: string };
-
-    // if (cookie.i18next) {
-    //   return this.getFromSupported(cookie.i18next);
-    // }
-
     if (request.headers.has("accept-language")) {
-      return this.getFromSupported(request.headers.get("accept-language"));
+      let locale = this.getFromSupported(
+        request.headers.get("accept-language")
+      );
+      if (locale !== this.options.fallbackLng) return locale;
     }
 
     return this.options.fallbackLng;
+  }
+
+  private getLocaleFromSearchParams(request: Request) {
+    let url = new URL(request.url);
+    if (!url.searchParams.has("lng")) return;
+    return this.getFromSupported(url.searchParams.get("lng"));
+  }
+
+  private async getLocaleFromCookie(request: Request) {
+    if (!this.options.cookie && !this.options.cookieKey) return;
+    if (this.options.cookie && !this.options.cookieKey) {
+      throw new Error("The cookieKey is required if a cookie is provided");
+    }
+
+    let cookie = this.options.cookie;
+
+    let { [this.options.cookieKey]: lng } =
+      (await cookie.parse(request.headers.get("Cookie"))) ?? {};
+
+    if (!lng) return;
+
+    let locale = this.getFromSupported(lng);
+    if (locale !== this.options.fallbackLng) return locale;
   }
 
   private getFromSupported(language: string | null) {
