@@ -33,7 +33,6 @@ interface RemixI18NextOptions {
    */
   cacheInDevelopment?: boolean;
   cookie?: Cookie;
-  cookieKey?: string;
 }
 
 export interface CacheKey {
@@ -112,16 +111,10 @@ export class RemixI18Next {
    */
   private async getLocaleFromCookie(request: Request) {
     if (!this.options.cookie) return;
-    if (!this.options.cookieKey) {
-      throw new Error("The cookieKey is required if a cookie is provided");
-    }
 
     let cookie = this.options.cookie;
 
-    let value = (await cookie.parse(request.headers.get("Cookie"))) ?? {};
-
-    let lng = value[this.options.cookieKey];
-
+    let lng = (await cookie.parse(request.headers.get("Cookie"))) ?? "";
     if (!lng) return;
 
     let locale = this.getFromSupported(lng);
