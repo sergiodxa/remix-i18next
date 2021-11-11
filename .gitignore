@@ -20,9 +20,5 @@ node_modules/
 .env.test
 
 # Build files
-*.d.ts
-!/config/*.d.ts
-/index.js
-/backend.js
-/backends
-/react.js
+/browser
+/build
