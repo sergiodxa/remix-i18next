@@ -122,7 +122,7 @@ import { json, LoaderFunction } from "remix";
 import { useRemixI18Next } from "remix-i18next";
 
 export let loader: LoaderFunction = async (request) => {
-  let locale = i18n.getLocale(request);
+  let locale = await i18n.getLocale(request);
   return json({ locale });
 };
 
