@@ -25,7 +25,7 @@ Then create a `i18n.server.ts` file somewhere in your app and add the following 
 
 ```ts
 import { RemixI18Next } from "remix-i18next";
-import { FileSystemBackend } from "remix-i18next/backend";
+import { FileSystemBackend } from "remix-i18next";
 
 // You will need to provide a backend to load your translations, here we use the
 // file system one and tell it where to find the translations.
@@ -46,7 +46,7 @@ import i18next from "i18next";
 import { hydrate } from "react-dom";
 import { initReactI18next } from "react-i18next";
 import { RemixBrowser } from "remix";
-import { RemixI18NextProvider } from "remix-i18next/react";
+import { RemixI18NextProvider } from "remix-i18next";
 
 // intialize i18next using initReactI18next and configuring it
 i18next
@@ -79,7 +79,7 @@ import { renderToString } from "react-dom/server";
 import { initReactI18next } from "react-i18next";
 import type { EntryContext } from "remix";
 import { RemixServer } from "remix";
-import { RemixI18NextProvider } from "remix-i18next/react";
+import { RemixI18NextProvider } from "remix-i18next";
 
 export default async function handleRequest(
   request: Request,
@@ -119,7 +119,7 @@ Now, in your `root` file create a loader if you don't have one with the followin
 
 ```tsx
 import { json, LoaderFunction } from "remix";
-import { useRemixI18Next } from "remix-i18next/react";
+import { useRemixI18Next } from "remix-i18next";
 
 export let loader: LoaderFunction = async (request) => {
   let locale = i18n.getLocale(request);
