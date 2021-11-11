@@ -48,6 +48,16 @@ interface RemixI18NextOptions {
    * @default "lng"
    */
   sessionKey?: string;
+  /**
+   * The order the library will use to detect the user preferred language.
+   * By default the order is
+   * - searchParams
+   * - cookie
+   * - session
+   * - header
+   * And finally the fallback language.
+   */
+  order?: Array<"searchParams" | "cookie" | "session" | "header">;
 }
 
 export interface CacheKey {
@@ -100,17 +110,34 @@ export class RemixI18Next {
    * fallback language.
    */
   public async getLocale(request: Request): Promise<string> {
-    let locale = this.getLocaleFromSearchParams(request);
-    if (locale) return locale;
+    let order = this.options.order ?? [
+      "searchParams",
+      "cookie",
+      "session",
+      "header",
+    ];
 
-    locale = await this.getLocaleFromCookie(request);
-    if (locale) return locale;
+    for (let method of order) {
+      let locale: string | null = null;
 
-    locale = await this.getLocaleFromSessionStorage(request);
-    if (locale) return locale;
+      if (method === "searchParams") {
+        locale = this.getLocaleFromSearchParams(request);
+      }
 
-    locale = this.getLocaleFromHeader(request);
-    if (locale) return locale;
+      if (method === "cookie") {
+        locale = await this.getLocaleFromCookie(request);
+      }
+
+      if (method === "session") {
+        locale = await this.getLocaleFromSessionStorage(request);
+      }
+
+      if (method === "header") {
+        locale = this.getLocaleFromHeader(request);
+      }
+
+      if (locale) return locale;
+    }
 
     return this.options.fallbackLng;
   }
@@ -120,7 +147,7 @@ export class RemixI18Next {
    */
   private getLocaleFromSearchParams(request: Request) {
     let url = new URL(request.url);
-    if (!url.searchParams.has("lng")) return;
+    if (!url.searchParams.has("lng")) return null;
     return this.getFromSupported(url.searchParams.get("lng"));
   }
 
@@ -128,22 +155,20 @@ export class RemixI18Next {
    * Get the user preferred language from a Cookie.
    */
   private async getLocaleFromCookie(request: Request) {
-    if (!this.options.cookie) return;
+    if (!this.options.cookie) return null;
 
     let cookie = this.options.cookie;
-
     let lng = (await cookie.parse(request.headers.get("Cookie"))) ?? "";
-    if (!lng) return;
+    if (!lng) return null;
 
-    let locale = this.getFromSupported(lng);
-    if (locale !== this.options.fallbackLng) return locale;
+    return this.getFromSupported(lng);
   }
 
   /**
    * Get the user preferred language from the Session.
    */
   private async getLocaleFromSessionStorage(request: Request) {
-    if (!this.options.sessionStorage) return;
+    if (!this.options.sessionStorage) return null;
 
     let session = await this.options.sessionStorage.getSession(
       request.headers.get("Cookie")
@@ -151,10 +176,9 @@ export class RemixI18Next {
 
     let lng = session.get(this.options.sessionKey ?? "lng");
 
-    if (!lng) return;
+    if (!lng) return null;
 
-    let locale = this.getFromSupported(lng);
-    if (locale !== this.options.fallbackLng) return locale;
+    return this.getFromSupported(lng);
   }
 
   /**
@@ -162,19 +186,15 @@ export class RemixI18Next {
    */
   private getLocaleFromHeader(request: Request) {
     let header = request.headers.get("Accept-Language");
-    if (!header) return;
-    let locale = this.getFromSupported(header);
-    if (!locale) return;
-    return locale;
+    if (!header) return null;
+    return this.getFromSupported(header);
   }
 
   private getFromSupported(language: string | null) {
-    return (
-      pick(
-        this.options.supportedLanguages,
-        language ?? this.options.fallbackLng,
-        { loose: true }
-      ) ?? this.options.fallbackLng
+    return pick(
+      this.options.supportedLanguages,
+      language ?? this.options.fallbackLng,
+      { loose: true }
     );
   }
 

@@ -119,16 +119,26 @@ describe(RemixI18Next, () => {
     test("should prefer search params over cookie, session and header", async () => {
       let cookie = createCookie("locale");
 
+      let sessionStorage = createMemorySessionStorage({
+        cookie: { name: "session", secrets: ["s3cr3t"] },
+      });
+
+      let session = await sessionStorage.getSession();
+      session.set("lng", "en");
+
+      let headers = new Headers();
+      headers.set("Accept-Language", "fr");
+      headers.append("Cookie", await cookie.serialize("jp"));
+      headers.append("Cookie", await sessionStorage.commitSession(session));
+
       let request = new Request("https://example.com/dashboard?lng=es", {
-        headers: {
-          "Accept-Language": "fr",
-          Cookie: await cookie.serialize("jp"),
-        },
+        headers,
       });
 
       let i18n = new RemixI18Next(new TestBackend(), {
         supportedLanguages: ["es", "fr", "jp", "en"],
         fallbackLng: "en",
+        sessionStorage,
         cookie,
       });
 
@@ -176,6 +186,36 @@ describe(RemixI18Next, () => {
       });
 
       expect(await i18n.getLocale(request)).toBe("jp");
+    });
+
+    test("allow changing the order", async () => {
+      let cookie = createCookie("locale");
+
+      let sessionStorage = createMemorySessionStorage({
+        cookie: { name: "session", secrets: ["s3cr3t"] },
+      });
+
+      let session = await sessionStorage.getSession();
+      session.set("lng", "en");
+
+      let headers = new Headers();
+      headers.set("Accept-Language", "fr");
+      headers.append("Cookie", await sessionStorage.commitSession(session));
+      headers.append("Cookie", await cookie.serialize("jp"));
+
+      let request = new Request("https://example.com/dashboard?lng=es", {
+        headers,
+      });
+
+      let i18n = new RemixI18Next(new TestBackend(), {
+        supportedLanguages: ["es", "fr", "jp", "en"],
+        fallbackLng: "en",
+        sessionStorage,
+        cookie,
+        order: ["session", "cookie", "header", "searchParams"],
+      });
+
+      expect(await i18n.getLocale(request)).toBe("en");
     });
   });
 });
