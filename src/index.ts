@@ -1,5 +1,5 @@
 import { pick } from "accept-language-parser";
-import type { Cookie } from "remix";
+import type { Cookie, SessionStorage } from "remix";
 import type { Backend, Language } from "./backend";
 
 interface RemixI18NextOptions {
@@ -32,7 +32,22 @@ interface RemixI18NextOptions {
    * have a quote or rate limit on the number of requests.
    */
   cacheInDevelopment?: boolean;
+  /**
+   * If you want to use a cookie to store the user preferred language, you can
+   * pass the Cookie object here.
+   */
   cookie?: Cookie;
+  /**
+   * If you want to use a session to store the user preferred language, you can
+   * pass the SessionStorage object here.
+   */
+  sessionStorage?: SessionStorage;
+  /**
+   * If defined a sessionStorage and want to change the default key used to
+   * store the user preferred language, you can pass the key here.
+   * @default "lng"
+   */
+  sessionKey?: string;
 }
 
 export interface CacheKey {
@@ -91,6 +106,9 @@ export class RemixI18Next {
     locale = await this.getLocaleFromCookie(request);
     if (locale) return locale;
 
+    locale = await this.getLocaleFromSessionStorage(request);
+    if (locale) return locale;
+
     locale = this.getLocaleFromHeader(request);
     if (locale) return locale;
 
@@ -115,6 +133,24 @@ export class RemixI18Next {
     let cookie = this.options.cookie;
 
     let lng = (await cookie.parse(request.headers.get("Cookie"))) ?? "";
+    if (!lng) return;
+
+    let locale = this.getFromSupported(lng);
+    if (locale !== this.options.fallbackLng) return locale;
+  }
+
+  /**
+   * Get the user preferred language from the Session.
+   */
+  private async getLocaleFromSessionStorage(request: Request) {
+    if (!this.options.sessionStorage) return;
+
+    let session = await this.options.sessionStorage.getSession(
+      request.headers.get("Cookie")
+    );
+
+    let lng = session.get(this.options.sessionKey ?? "lng");
+
     if (!lng) return;
 
     let locale = this.getFromSupported(lng);
