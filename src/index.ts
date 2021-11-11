@@ -78,50 +78,65 @@ export class RemixI18Next {
     };
   }
 
+  /**
+   * Get the user preferred language from the HTTP Request. This method will
+   * try to get the language from the Accept-Language header, then the Cookie
+   * and finally the search param `?lng`.
+   * If none of the methods are able to get the language, it will return the
+   * fallback language.
+   */
   public async getLocale(request: Request): Promise<string> {
     let locale = this.getLocaleFromSearchParams(request);
+    if (locale) return locale;
 
-    if (this.options.cookie && this.options.cookieKey) {
-      let cookie = this.options.cookie;
-      let { [this.options.cookieKey]: lng } =
-        (await cookie.parse(request.headers.get("Cookie"))) ?? {};
-      if (lng) {
-        let locale = this.getFromSupported(lng);
-        if (locale !== this.options.fallbackLng) return locale;
-      }
-    }
+    locale = await this.getLocaleFromCookie(request);
+    if (locale) return locale;
 
-    if (request.headers.has("accept-language")) {
-      let locale = this.getFromSupported(
-        request.headers.get("accept-language")
-      );
-      if (locale !== this.options.fallbackLng) return locale;
-    }
+    locale = this.getLocaleFromHeader(request);
+    if (locale) return locale;
 
     return this.options.fallbackLng;
   }
 
+  /**
+   * Get the user preferred language from the search param `?lng`
+   */
   private getLocaleFromSearchParams(request: Request) {
     let url = new URL(request.url);
     if (!url.searchParams.has("lng")) return;
     return this.getFromSupported(url.searchParams.get("lng"));
   }
 
+  /**
+   * Get the user preferred language from a Cookie.
+   */
   private async getLocaleFromCookie(request: Request) {
-    if (!this.options.cookie && !this.options.cookieKey) return;
-    if (this.options.cookie && !this.options.cookieKey) {
+    if (!this.options.cookie) return;
+    if (!this.options.cookieKey) {
       throw new Error("The cookieKey is required if a cookie is provided");
     }
 
     let cookie = this.options.cookie;
 
-    let { [this.options.cookieKey]: lng } =
-      (await cookie.parse(request.headers.get("Cookie"))) ?? {};
+    let value = (await cookie.parse(request.headers.get("Cookie"))) ?? {};
+
+    let lng = value[this.options.cookieKey];
 
     if (!lng) return;
 
     let locale = this.getFromSupported(lng);
     if (locale !== this.options.fallbackLng) return locale;
+  }
+
+  /**
+   * Get the user preferred language from the Accept-Language header.
+   */
+  private getLocaleFromHeader(request: Request) {
+    let header = request.headers.get("Accept-Language");
+    if (!header) return;
+    let locale = this.getFromSupported(header);
+    if (!locale) return;
+    return locale;
   }
 
   private getFromSupported(language: string | null) {
