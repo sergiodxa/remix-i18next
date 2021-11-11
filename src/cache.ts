@@ -1,3 +1,4 @@
+import LRU, { Options } from "lru-cache";
 import { Language } from "./backend";
 
 export interface CacheKey {
@@ -11,8 +12,12 @@ export interface Cache {
   has(key: CacheKey): Promise<boolean>;
 }
 
-export class InMemoryCache implements Cache {
-  private cache = new Map<string, Language>();
+export class InMemoryLRUCache implements Cache {
+  private cache: LRU<string, Language>;
+
+  constructor(options: Options<string, Language> = {}) {
+    this.cache = new LRU<string, Language>(options);
+  }
 
   async set(key: CacheKey, value: Language): Promise<void> {
     this.cache.set(this.serialize(key), value);

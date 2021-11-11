@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
+    "lru-cache": "^6.0.0",
     "use-consistent-value": "^1.0.0"
   },
   "devDependencies": {
@@ -58,6 +59,7 @@
     "@remix-run/react": "^0.20.1",
     "@types/accept-language-parser": "^1.5.2",
     "@types/jest": "^26.0.23",
+    "@types/lru-cache": "^5.1.1",
     "@types/node": "^16.11.6",
     "@types/prop-types": "^15.7.4",
     "@types/react": "^17.0.14",
