@@ -70,8 +70,19 @@ export class RemixI18Next {
   async getTranslations(
     request: Request,
     namespaces: string | string[]
+  ): Promise<Record<string, Language>>;
+  async getTranslations(
+    locale: string,
+    namespaces: string | string[]
+  ): Promise<Record<string, Language>>;
+  async getTranslations(
+    requestOrLocale: Request | string,
+    namespaces: string | string[]
   ): Promise<Record<string, Language>> {
-    let locale = await this.getLocale(request);
+    let locale =
+      typeof requestOrLocale === "string"
+        ? requestOrLocale
+        : await this.getLocale(requestOrLocale);
 
     if (Array.isArray(namespaces)) {
       let messages = await Promise.all(
