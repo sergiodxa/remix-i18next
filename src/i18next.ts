@@ -1,7 +1,7 @@
 import { pick } from "accept-language-parser";
 import type { Cookie, SessionStorage } from "remix";
 import type { Backend, Language } from "./backend";
-import { Cache, CacheKey, InMemoryCache } from "./cache";
+import { Cache, CacheKey, InMemoryLRUCache } from "./cache";
 
 interface RemixI18NextOptions {
   /**
@@ -64,7 +64,7 @@ interface RemixI18NextOptions {
 export class RemixI18Next {
   private cache: Cache;
   constructor(private backend: Backend, private options: RemixI18NextOptions) {
-    this.cache = options.cache ?? new InMemoryCache();
+    this.cache = options.cache ?? new InMemoryLRUCache();
   }
 
   async getTranslations(
