@@ -1,10 +1,12 @@
-example
-src
-config
 .github
-.npmrc
-.gitignore
+example
+config
+src
+test
 .eslintrc.js
+.gitignore
+.npmignore
+.npmrc
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 tsconfig.json

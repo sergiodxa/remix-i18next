@@ -1,5 +1,5 @@
 import fetchMock, { enableFetchMocks } from "jest-fetch-mock";
-import { FetchBackend, FetchBackendOptions } from "../../src/backends/fetch";
+import { FetchBackend, FetchBackendOptions } from "../../src";
 
 enableFetchMocks();
 
