@@ -218,8 +218,10 @@ export class RemixI18Next {
   }
 
   private get cacheEnabled() {
-    return (
-      this.options.cacheInDevelopment && process.env.NODE_ENV === "development"
-    );
+    let env = process.env.NODE_ENV;
+    if (env === "production") return true;
+
+    let { cacheInDevelopment } = this.options;
+    return cacheInDevelopment ?? false;
   }
 }
