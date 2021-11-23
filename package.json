@@ -36,13 +36,13 @@
   },
   "homepage": "https://github.com/sergiodxa/remix-i18next#readme",
   "peerDependencies": {
-    "@remix-run/node": "^0.20.1",
-    "@remix-run/react": "^0.20.1",
+    "@remix-run/node": "^1.0.4",
+    "@remix-run/react": "^1.0.4",
     "i18next": "^21.3.3",
     "react": "^17.0.2",
     "react-i18next": "^11.13.0",
-    "react-router-dom": "^6.0.0-beta.6",
-    "remix": "^0.20.1"
+    "react-router-dom": "^6.0.2",
+    "remix": "^1.0.4"
   },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
@@ -54,9 +54,9 @@
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
-    "@remix-run/dev": "^0.20.1",
-    "@remix-run/node": "^0.20.1",
-    "@remix-run/react": "^0.20.1",
+    "@remix-run/dev": "^1.0.4",
+    "@remix-run/node": "^1.0.4",
+    "@remix-run/react": "^1.0.4",
     "@types/accept-language-parser": "^1.5.2",
     "@types/jest": "^26.0.23",
     "@types/lru-cache": "^5.1.1",
@@ -82,8 +82,8 @@
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-i18next": "^11.13.0",
-    "react-router-dom": "^6.0.0-beta.6",
-    "remix": "^0.19.3",
+    "react-router-dom": "^6.0.2",
+    "remix": "^1.0.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.3.5"
   }
