@@ -1,7 +1,7 @@
+import { useMatches } from "@remix-run/react";
 import { i18n } from "i18next";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 import { I18nextProvider } from "react-i18next";
-import { useMatches } from "remix";
 import useConsistentValue from "use-consistent-value";
 import { Language } from "./backend";
 
