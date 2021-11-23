@@ -3,7 +3,10 @@
   "version": "2.1.2",
   "description": "The easiest way to translate your Remix apps",
   "license": "MIT",
-  "browser": "./browser/index.js",
+  "browser": {
+    "./build": "./browser",
+    "./build/backend": false
+  },
   "main": "./build/index.js",
   "scripts": {
     "build": "npm run build:browser && npm run build:main",
