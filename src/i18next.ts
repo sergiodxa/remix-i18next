@@ -1,5 +1,5 @@
+import type { Cookie, SessionStorage } from "@remix-run/server-runtime";
 import { pick } from "accept-language-parser";
-import type { Cookie, SessionStorage } from "remix";
 import type { Backend, Language } from "./backend";
 import { Cache, CacheKey, InMemoryLRUCache } from "./cache";
 

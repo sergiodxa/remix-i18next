@@ -7,8 +7,9 @@
     "strict": true,
     "skipLibCheck": true,
     "declaration": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "outDir": "./build"
   },
   "exclude": ["node_modules"],
-  "include": ["config/remix.env.d.ts", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
