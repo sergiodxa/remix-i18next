@@ -121,7 +121,7 @@ Now, in your `root` file create a loader if you don't have one with the followin
 import { json, LoaderFunction } from "remix";
 import { useRemixI18Next } from "remix-i18next";
 
-export let loader: LoaderFunction = async (request) => {
+export let loader: LoaderFunction = async ({ request }) => {
   let locale = await i18n.getLocale(request);
   return json({ locale });
 };
