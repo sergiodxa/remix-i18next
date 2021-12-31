@@ -3,6 +3,7 @@
   "version": "2.1.4",
   "description": "The easiest way to translate your Remix apps",
   "license": "MIT",
+  "sideEffects": false,
   "browser": {
     "./build": "./browser",
     "./build/backend": false
