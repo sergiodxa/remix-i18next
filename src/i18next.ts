@@ -1,5 +1,7 @@
 import type { Cookie, SessionStorage } from "@remix-run/server-runtime";
 import { pick } from "accept-language-parser";
+import type { InitOptions, TFunction } from "i18next";
+import { createInstance } from "i18next";
 import type { Backend, Language } from "./backend";
 import { Cache, CacheKey, InMemoryLRUCache } from "./cache";
 
@@ -59,6 +61,7 @@ interface RemixI18NextOptions {
    * And finally the fallback language.
    */
   order?: Array<"searchParams" | "cookie" | "session" | "header">;
+  i18nextOptions?: InitOptions;
 }
 
 export class RemixI18Next {
@@ -141,6 +144,52 @@ export class RemixI18Next {
     }
 
     return this.options.fallbackLng;
+  }
+
+  async getFixedT(
+    locale: string,
+    namespace?: string,
+    options?: InitOptions
+  ): Promise<TFunction>;
+  async getFixedT(
+    request: Request,
+    namespace?: string,
+    options?: InitOptions
+  ): Promise<TFunction>;
+  async getFixedT(
+    requestOrLocale: Request | string,
+    namespace = "common",
+    options: InitOptions = {}
+  ) {
+    let [instance, locale, translations] = await Promise.all([
+      this.createInstance({
+        ...this.options.i18nextOptions,
+        ...options,
+        fallbackNS: namespace,
+        defaultNS: namespace,
+      }),
+      typeof requestOrLocale === "string"
+        ? requestOrLocale
+        : this.getLocale(requestOrLocale),
+      typeof requestOrLocale === "string"
+        ? this.getTranslations(requestOrLocale, namespace)
+        : this.getTranslations(requestOrLocale, namespace),
+      ,
+    ]);
+
+    return instance
+      .addResourceBundle(locale, namespace, translations[namespace])
+      .getFixedT(locale, namespace);
+  }
+
+  private async createInstance(options: InitOptions = {}) {
+    let instance = createInstance();
+    await instance.init({
+      ...options,
+      supportedLngs: this.options.supportedLanguages,
+      fallbackLng: this.options.fallbackLng,
+    });
+    return instance;
   }
 
   /**

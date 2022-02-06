@@ -159,6 +159,48 @@ export default function Component() {
 
 And that's it, repeat the last step for each route you want to translate, remix-i18next will automatically load the translations using the backend you configured and it will automatically inject the translations into your app.
 
+#### Translating text inside loaders or actions
+
+If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get the `t` function.
+
+```ts
+export let loader: LoaderFunction = async ({ request }) => {
+  let t = await i18n.getFixedT(request);
+  let title = t("My page title");
+  return json({ title });
+};
+
+export let meta: MetaFunction = async ({ data }) => {
+  return { title: data.title };
+};
+```
+
+The `getFixedT` function can be called using a combination of parameters:
+
+- `getFixedT(request)`: will use the request to get the locale and default the namespace to `common`
+- `getFixedT("es")`: will use the specified locale and default the namespace to `common`
+- `getFixedT(request, "namespace")` will use the request to get the locale and the specified namespace to get the translations.
+- `getFixedT("es", "namespace")` will use the specified locale and the specified namespace to get the translations.
+- `getFixedT(request, "common", { keySeparator: false })` will use the request to get the locale and the common namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
+- `getFixedT("es", "common", { keySeparator: false })` will use the specified locale and the common namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
+
+If you always need to set the same i18next options, you can pass them to RemixI18Next when creating the new instance.
+
+```ts
+export let i18n = new RemixI18Next(backend, {
+  fallbackLng: "en", // here configure your default (fallback) language
+  supportedLanguages: ["en", "es"], // here configure your supported languages
+  i18nextOptions: { keySeparator: false },
+});
+```
+
+This options will be overwritten by the options provided to `getFixedT`. Additionally, the following options will always be configured and not overwritteable:
+
+- `supportedLngs` it will use the RemixI18Next supported languages.
+- `fallbackLng` it will use the RemixI18Next fallback language.
+- `fallbackNS` it will use the namespace request to `getFixedT`
+- `defaultNS` it will use the namespace request to `getFixedT`
+
 ## Custom Backend
 
 If you don't want, or can't use the FileSystemBackend to load your translations you can easily create your own backend.
