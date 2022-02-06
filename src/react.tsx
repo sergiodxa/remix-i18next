@@ -35,7 +35,7 @@ export function useRemixI18Next(locale: string) {
       )
   );
 
-  const handleLocaleUpdate = useCallback(() => {
+  let handleLocaleUpdate = useCallback(() => {
     i18next.changeLanguage(locale);
     for (let [namespace, messages] of Object.entries(namespaces)) {
       i18next.addResourceBundle(locale, namespace, messages);
