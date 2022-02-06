@@ -14,7 +14,7 @@ import { Language } from "./backend";
 
 let context = createContext<i18n | null>(null);
 
-function useI18NextInstance() {
+function useInstance() {
   let value = useContext(context);
   if (!value) throw new Error("Missing I18Next instance");
   return value;
@@ -23,7 +23,7 @@ function useI18NextInstance() {
 export function useRemixI18Next(locale: string) {
   if (!locale) throw new Error("Missing locale");
 
-  let i18next = useI18NextInstance();
+  let i18next = useInstance();
 
   let namespaces = useConsistentValue(
     useMatches()
@@ -36,7 +36,7 @@ export function useRemixI18Next(locale: string) {
   );
 
   let handleLocaleUpdate = useCallback(() => {
-    i18next.changeLanguage(locale);
+    void i18next.changeLanguage(locale);
     for (let [namespace, messages] of Object.entries(namespaces)) {
       i18next.addResourceBundle(locale, namespace, messages);
     }
