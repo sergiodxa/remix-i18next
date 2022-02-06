@@ -6,7 +6,9 @@ import { Backend, RemixI18Next } from "../src";
 
 class TestBackend implements Backend {
   async getTranslations() {
-    return {};
+    return {
+      "Hello {{name}}": "Hola {{name}}",
+    };
   }
 }
 
@@ -218,6 +220,29 @@ describe(RemixI18Next, () => {
       });
 
       expect(await i18n.getLocale(request)).toBe("en");
+    });
+
+    test("get a fixed T function for server-side usage", async () => {
+      let headers = new Headers();
+      headers.set("Accept-Language", "fr");
+
+      let request = new Request("https://example.com/dashboard?lng=1", {
+        headers,
+      });
+
+      let i18n = new RemixI18Next(new TestBackend(), {
+        supportedLanguages: ["es", "fr", "jp", "en"],
+        fallbackLng: "en",
+        order: ["session", "cookie", "header", "searchParams"],
+        i18nextOptions: {
+          fallbackNS: "common",
+          defaultNS: "common",
+        },
+      });
+
+      let t = await i18n.getFixedT(request, "common");
+
+      expect(t("Hello {{name}}", { name: "Remix" })).toBe("Hola Remix");
     });
   });
 });
