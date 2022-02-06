@@ -1,6 +1,13 @@
 import { useMatches } from "@remix-run/react";
 import { i18n } from "i18next";
-import { createContext, ReactNode, useContext, useMemo } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { I18nextProvider } from "react-i18next";
 import useConsistentValue from "use-consistent-value";
 import { Language } from "./backend";
@@ -28,12 +35,20 @@ export function useRemixI18Next(locale: string) {
       )
   );
 
-  useMemo(() => {
+  let handleLocaleUpdate = useCallback(() => {
     i18next.changeLanguage(locale);
     for (let [namespace, messages] of Object.entries(namespaces)) {
       i18next.addResourceBundle(locale, namespace, messages);
     }
   }, [i18next, namespaces, locale]);
+
+  useMemo(() => {
+    handleLocaleUpdate();
+  }, []);
+
+  useEffect(() => {
+    handleLocaleUpdate();
+  }, [handleLocaleUpdate]);
 }
 
 interface RemixI18NextProvider {
