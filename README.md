@@ -48,7 +48,7 @@ import { initReactI18next } from "react-i18next";
 import { RemixBrowser } from "remix";
 import { RemixI18NextProvider } from "remix-i18next";
 
-// intialize i18next using initReactI18next and configuring it
+// initialize i18next using initReactI18next and configuring it
 i18next
   .use(initReactI18next)
   .init({
@@ -87,7 +87,7 @@ export default async function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-  // Here you also ned to initialize i18next using initReactI18next, you should
+  // Here you also need to initialize i18next using initReactI18next, you should
   // use the same configuration as in your client side.
   await i18next.use(initReactI18next).init({
     supportedLngs: ["en", "es"],
