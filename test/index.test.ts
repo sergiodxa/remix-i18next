@@ -14,6 +14,29 @@ class TestBackend implements Backend {
 
 describe(RemixI18Next, () => {
   describe("getLocale", () => {
+    test("should get the locale from the url path", async () => {
+      const i18n = new RemixI18Next(new TestBackend(), {
+        supportedLanguages: ["en", "fr", "de"],
+        fallbackLng: "en",
+      });
+
+      let request = new Request("https://example.com/fr/dashboard");
+      expect(await i18n.getLocale(request)).toBe("fr");
+
+      request = new Request("https://example.com/de");
+      expect(await i18n.getLocale(request)).toBe("de");
+    });
+
+    test("should fallback if the locale in the url path isn't supported", async () => {
+      const i18n = new RemixI18Next(new TestBackend(), {
+        supportedLanguages: ["en", "fr", "de"],
+        fallbackLng: "en",
+      });
+
+      let request = new Request("https://example.com/nl/dashboard");
+      expect(await i18n.getLocale(request)).toBe("en");
+    });
+
     test("should get the locale from the search param ?lng", async () => {
       let request = new Request("https://example.com/dashboard?lng=es");
 

@@ -60,7 +60,7 @@ interface RemixI18NextOptions {
    * - header
    * And finally the fallback language.
    */
-  order?: Array<"searchParams" | "cookie" | "session" | "header">;
+  order?: Array<"urlPath" | "searchParams" | "cookie" | "session" | "header">;
   i18nextOptions?: InitOptions;
 }
 
@@ -115,6 +115,7 @@ export class RemixI18Next {
    */
   public async getLocale(request: Request): Promise<string> {
     let order = this.options.order ?? [
+      "urlPath",
       "searchParams",
       "cookie",
       "session",
@@ -123,6 +124,10 @@ export class RemixI18Next {
 
     for (let method of order) {
       let locale: string | null = null;
+
+      if (method === "urlPath") {
+        locale = this.getLocaleFromUrlPath(request);
+      }
 
       if (method === "searchParams") {
         locale = this.getLocaleFromSearchParams(request);
@@ -190,6 +195,17 @@ export class RemixI18Next {
       fallbackLng: this.options.fallbackLng,
     });
     return instance;
+  }
+
+  /**
+   * Get the locale from the url path
+   */
+  private getLocaleFromUrlPath(request: Request) {
+    const url = new URL(request.url);
+    const detect = new RegExp("([a-zA-Z_-]+)([^/]*)");
+    const localeInPath = url.pathname.match(detect);
+    if (!localeInPath) return null;
+    return this.getFromSupported(localeInPath[0]);
   }
 
   /**
