@@ -9,12 +9,30 @@ You need to follow the architecture of the app like this
            | - your app here
    | - entry.client.tsx
    | - entry.server.tsx
+   | - i18n.config.ts
+   | - i18n.server.ts
    | - root.tsx
    | - public/
        | - locales/
            | - en/
                | - common.json
 ```
+
+Inside the `i18n.server.ts` you should add the property `order` to force the behaviour of the module.
+
+```ts
+import { FileSystemBackend, RemixI18Next } from "remix-i18next";
+
+const backend = new FileSystemBackend("./public/locales");
+
+export const i18n = new RemixI18Next(backend, {
+  fallbackLng: "en",
+  supportedLanguages: ["en", "fr"],
+  order: ["urlPath"],
+});
+```
+
+---
 
 You should export an async function from `root.tsx`. This function called `loader` and type of `LoaderFunction` will handle the `locale` if this one is not supported (and redirect the visitor).
 
