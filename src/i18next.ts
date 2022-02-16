@@ -5,7 +5,7 @@ import { createInstance } from "i18next";
 import type { Backend, Language } from "./backend";
 import { Cache, CacheKey, InMemoryLRUCache } from "./cache";
 
-interface RemixI18NextOptions {
+export type RemixI18NextOptions = {
   /**
    * Define the list of supported languages, this is used to determine if one of
    * the languages requested by the user is supported by the application.
@@ -54,6 +54,7 @@ interface RemixI18NextOptions {
   /**
    * The order the library will use to detect the user preferred language.
    * By default the order is
+   * - urlPath
    * - searchParams
    * - cookie
    * - session
@@ -61,8 +62,9 @@ interface RemixI18NextOptions {
    * And finally the fallback language.
    */
   order?: Array<"urlPath" | "searchParams" | "cookie" | "session" | "header">;
+
   i18nextOptions?: InitOptions;
-}
+};
 
 export class RemixI18Next {
   private cache: Cache;

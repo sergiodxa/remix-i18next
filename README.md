@@ -230,3 +230,7 @@ export class FetchBackend implements Backend {
 With that, you created a simple backend that can be used with remix-i18next and load the translations from a remote server.
 
 You could use this to load translations from specific services like Locize, Crowdin, Transifex, etc.
+
+## Allow the locale into the url pathname
+
+[See the example](examples/with-locale-in-url/README.md)
