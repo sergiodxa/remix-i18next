@@ -241,10 +241,17 @@ export class RemixI18Next {
   }
 
   private getFromSupported(language: string | null) {
-    return pick(
-      this.options.supportedLanguages,
-      language ?? this.options.fallbackLng,
-      { loose: true }
+    return (
+      pick(
+        this.options.supportedLanguages,
+        language ?? this.options.fallbackLng,
+        { loose: false }
+      ) ||
+      pick(
+        this.options.supportedLanguages,
+        language ?? this.options.fallbackLng,
+        { loose: true }
+      )
     );
   }
 

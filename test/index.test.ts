@@ -244,5 +244,16 @@ describe(RemixI18Next, () => {
 
       expect(t("Hello {{name}}", { name: "Remix" })).toBe("Hola Remix");
     });
+
+    test("return the specific locale if there are multiple variants", async () => {
+      let request = new Request("https://example.com/dashboard?lng=es-MX");
+
+      let i18n = new RemixI18Next(new TestBackend(), {
+        supportedLanguages: ["es", "en", "es-MX"],
+        fallbackLng: "en",
+      });
+
+      expect(await i18n.getLocale(request)).toBe("es-MX");
+    });
   });
 });
