@@ -33,7 +33,7 @@ let backend = new FileSystemBackend("./public/locales");
 
 export let i18n = new RemixI18Next(backend, {
   fallbackLng: "en", // here configure your default (fallback) language
-  supportedLanguages: ["en", "es"], // here configure your supported languages
+  supportedLanguages: ["es", "en"], // here configure your supported languages
 });
 ```
 
@@ -44,15 +44,13 @@ Now in your `entry.client.tsx` replace the code with this:
 ```tsx
 import i18next from "i18next";
 import { hydrate } from "react-dom";
-import { initReactI18next } from "react-i18next";
+import { I18nextProvider, initReactI18next } from "react-i18next";
 import { RemixBrowser } from "remix";
-import { RemixI18NextProvider } from "remix-i18next";
 
-// initialize i18next using initReactI18next and configuring it
 i18next
   .use(initReactI18next)
   .init({
-    supportedLngs: ["en", "es"],
+    supportedLngs: ["es", "en"],
     defaultNS: "common",
     fallbackLng: "en",
     // I recommend you to always disable react.useSuspense for i18next
@@ -61,9 +59,9 @@ i18next
   .then(() => {
     // then hydrate your app wrapped in the RemixI18NextProvider
     return hydrate(
-      <RemixI18NextProvider i18n={i18next}>
+      <I18nextProvider i18n={i18next}>
         <RemixBrowser />
-      </RemixI18NextProvider>,
+      </I18nextProvider>,
       document
     );
   });
@@ -76,10 +74,9 @@ And in your `entry.server.tsx` replace the code with this:
 ```tsx
 import i18next from "i18next";
 import { renderToString } from "react-dom/server";
-import { initReactI18next } from "react-i18next";
+import { I18nextProvider, initReactI18next } from "react-i18next";
 import type { EntryContext } from "remix";
 import { RemixServer } from "remix";
-import { RemixI18NextProvider } from "remix-i18next";
 
 export default async function handleRequest(
   request: Request,
@@ -89,8 +86,11 @@ export default async function handleRequest(
 ) {
   // Here you also need to initialize i18next using initReactI18next, you should
   // use the same configuration as in your client side.
-  await i18next.use(initReactI18next).init({
-    supportedLngs: ["en", "es"],
+  // create an instance so every request will have a copy and don't re-use the
+  // i18n object
+  let i18n = createInstance();
+  await i18n.use(initReactI18next).init({
+    supportedLngs: ["es", "en"],
     defaultNS: "common",
     fallbackLng: "en",
     react: { useSuspense: false },
@@ -99,9 +99,9 @@ export default async function handleRequest(
   // Then you can render your app wrapped in the RemixI18NextProvider as in the
   // entry.client file
   let markup = renderToString(
-    <RemixI18NextProvider i18n={i18next}>
+    <I18nextProvider i18n={i18n}>
       <RemixServer context={remixContext} url={request.url} />
-    </RemixI18NextProvider>
+    </I18nextProvider>
   );
 
   responseHeaders.set("Content-Type", "text/html");
@@ -119,7 +119,7 @@ Now, in your `root` file create a loader if you don't have one with the followin
 
 ```tsx
 import { json, LoaderFunction } from "remix";
-import { useRemixI18Next } from "remix-i18next";
+import { useSetupTranslations } from "remix-i18next";
 
 export let loader: LoaderFunction = async ({ request }) => {
   let locale = await i18n.getLocale(request);
@@ -128,7 +128,7 @@ export let loader: LoaderFunction = async ({ request }) => {
 
 export default function Root() {
   let { locale } = useLoaderData<{ locale: string }>();
-  useRemixI18Next(locale);
+  useSetupTranslations(locale);
 
   return (
     <Document>

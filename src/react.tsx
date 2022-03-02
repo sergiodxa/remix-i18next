@@ -1,29 +1,18 @@
 import { useMatches } from "@remix-run/react";
-import { i18n } from "i18next";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
-import { I18nextProvider } from "react-i18next";
+import { useCallback, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import useConsistentValue from "use-consistent-value";
 import { Language } from "./backend";
 
-let context = createContext<i18n | null>(null);
-
-function useInstance() {
-  let value = useContext(context);
-  if (!value) throw new Error("Missing I18Next instance");
-  return value;
-}
-
-export function useRemixI18Next(locale: string) {
+/**
+ * Get the translations from the i18n key returned by the loaders and pass them
+ * to i18next to be used by the components.
+ * @param locale The locale to use.
+ */
+export function useSetupTranslations(locale: string) {
   if (!locale) throw new Error("Missing locale");
 
-  let i18next = useInstance();
+  let { i18n } = useTranslation();
 
   let namespaces = useConsistentValue(
     useMatches()
@@ -36,11 +25,11 @@ export function useRemixI18Next(locale: string) {
   );
 
   let handleLocaleUpdate = useCallback(() => {
-    void i18next.changeLanguage(locale);
+    void i18n.changeLanguage(locale);
     for (let [namespace, messages] of Object.entries(namespaces)) {
-      i18next.addResourceBundle(locale, namespace, messages);
+      i18n.addResourceBundle(locale, namespace, messages);
     }
-  }, [i18next, namespaces, locale]);
+  }, [i18n, namespaces, locale]);
 
   useMemo(() => {
     handleLocaleUpdate();
@@ -49,17 +38,4 @@ export function useRemixI18Next(locale: string) {
   useEffect(() => {
     handleLocaleUpdate();
   }, [handleLocaleUpdate]);
-}
-
-interface RemixI18NextProvider {
-  children: ReactNode;
-  i18n: i18n;
-}
-
-export function RemixI18NextProvider({ children, i18n }: RemixI18NextProvider) {
-  return (
-    <context.Provider value={i18n}>
-      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
-    </context.Provider>
-  );
 }

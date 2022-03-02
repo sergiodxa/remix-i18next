@@ -149,17 +149,17 @@ export class RemixI18Next {
   async getFixedT(
     locale: string,
     namespace?: string,
-    options?: InitOptions
+    options?: Omit<InitOptions, "react">
   ): Promise<TFunction>;
   async getFixedT(
     request: Request,
     namespace?: string,
-    options?: InitOptions
+    options?: Omit<InitOptions, "react">
   ): Promise<TFunction>;
   async getFixedT(
     requestOrLocale: Request | string,
     namespace = "common",
-    options: InitOptions = {}
+    options: Omit<InitOptions, "react"> = {}
   ) {
     let [instance, locale, translations] = await Promise.all([
       this.createInstance({
@@ -182,7 +182,7 @@ export class RemixI18Next {
       .getFixedT(locale, namespace);
   }
 
-  private async createInstance(options: InitOptions = {}) {
+  private async createInstance(options: Omit<InitOptions, "react"> = {}) {
     let instance = createInstance();
     await instance.init({
       ...options,
