@@ -72,7 +72,7 @@ i18next
 And in your `entry.server.tsx` replace the code with this:
 
 ```tsx
-import i18next from "i18next";
+import { createInstance } from "i18next";
 import { renderToString } from "react-dom/server";
 import { I18nextProvider, initReactI18next } from "react-i18next";
 import type { EntryContext } from "remix";
