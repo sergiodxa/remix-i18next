@@ -115,10 +115,11 @@ export default async function handleRequest(
 
 ### Usage
 
-Now, in your `root` file create a loader if you don't have one with the following code and also run the `useRemixI18Next` hook on the Root component.
+Now, in your `root` file create a loader if you don't have one with the following code and also run the `useSetupTranslations` hook on the Root component.
 
 ```tsx
 import { json, LoaderFunction } from "remix";
+import { i18n } from "~/i18n.server.ts";
 import { useSetupTranslations } from "remix-i18next";
 
 export let loader: LoaderFunction = async ({ request }) => {
@@ -142,7 +143,7 @@ Finally, in any route you want to translate you can do this:
 
 ```tsx
 import { json, LoaderFunction } from "remix";
-import i18n from "~/i18n.server.ts"; // this is the first file you created
+import { i18n } from "~/i18n.server.ts"; // this is the first file you created
 import { useTranslation } from "react-i18next";
 
 export let loader: LoaderFunction = async ({ request }) => {
