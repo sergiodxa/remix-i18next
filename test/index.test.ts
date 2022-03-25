@@ -1,7 +1,4 @@
-import {
-  createCookie,
-  createMemorySessionStorage,
-} from "@remix-run/server-runtime";
+import { createCookie, createMemorySessionStorage } from "@remix-run/node";
 import { Backend, RemixI18Next } from "../src";
 
 class TestBackend implements Backend {

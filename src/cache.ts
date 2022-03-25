@@ -15,8 +15,8 @@ export interface Cache {
 export class InMemoryLRUCache implements Cache {
   private cache: LRU<string, Language>;
 
-  constructor(options: Options<string, Language> = {}) {
-    this.cache = new LRU<string, Language>(options);
+  constructor(options: Partial<Options<string, Language>> = {}) {
+    this.cache = new LRU<string, Language>({ max: 100, ...options });
   }
 
   async set(key: CacheKey, value: Language): Promise<void> {
