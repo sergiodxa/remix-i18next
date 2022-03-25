@@ -2,6 +2,7 @@ import type { Cookie, SessionStorage } from "@remix-run/server-runtime";
 import { pick } from "accept-language-parser";
 import type { InitOptions, TFunction } from "i18next";
 import { createInstance } from "i18next";
+import { getClientLocales } from "remix-utils";
 import type { Backend, Language } from "./backend";
 import { Cache, CacheKey, InMemoryLRUCache } from "./cache";
 
@@ -235,9 +236,10 @@ export class RemixI18Next {
    * Get the user preferred language from the Accept-Language header.
    */
   private getLocaleFromHeader(request: Request) {
-    let header = request.headers.get("Accept-Language");
-    if (!header) return null;
-    return this.getFromSupported(header);
+    let locales = getClientLocales(request);
+    if (!locales) return null;
+    if (Array.isArray(locales)) return this.getFromSupported(locales.join(","));
+    return this.getFromSupported(locales);
   }
 
   private getFromSupported(language: string | null) {
