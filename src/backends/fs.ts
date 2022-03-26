@@ -7,9 +7,8 @@ export class FileSystemBackend implements Backend {
 
   async getTranslations(namespace: string, locale: string) {
     const data = await fs.readFile(
-      path.resolve(path.join(this.basePath, locale, `${namespace}.json`)),
-      "utf-8"
+      path.resolve(path.join(this.basePath, locale, `${namespace}.json`))
     );
-    return JSON.parse(data);
+    return JSON.parse(data.toString("utf8"));
   }
 }
