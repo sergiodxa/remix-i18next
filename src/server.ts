@@ -34,6 +34,7 @@ export interface LanguageDetectorOption {
   /**
    * If you want to use a session to store the user preferred language, you can
    * pass the SessionStorage object here.
+   * When this is not defined, getting the locale will ignore the session.
    */
   sessionStorage?: SessionStorage;
   /**
@@ -55,8 +56,15 @@ export interface LanguageDetectorOption {
 }
 
 export interface RemixI18NextOption {
-  backend?: NewableModule<BackendModule<unknown>>;
+  /**
+   * The i18next options used to initialize the internal i18next instance.
+   */
   i18next?: Omit<InitOptions, "react" | "detection"> | null;
+  /**
+   * The i18next backend module used to load the translations when creating a
+   * new TFunction.
+   */
+  backend?: NewableModule<BackendModule<unknown>>;
   detection: LanguageDetectorOption;
 }
 
@@ -65,10 +73,32 @@ export class RemixI18Next {
 
   private detector = new LanguageDetector(this.options.detection);
 
+  /**
+   * Detect the current locale by following the order defined in the
+   * `detection.order` option.
+   * By default the order is
+   * - searchParams
+   * - cookie
+   * - session
+   * - header
+   * And finally the fallback language.
+   */
   public async getLocale(request: Request): Promise<string> {
     return this.detector.detect(request);
   }
 
+  /**
+   * Get the namespaces required by the routes which are going to be rendered
+   * when doing SSR.
+   *
+   * @param context The EntryContext object received by `handleRequest` in entry.server
+   *
+   * @example
+   * await instance.init({
+   *   ns: i18n.getRouteNamespaces(context),
+   *   // ...more options
+   * });
+   */
   public getRouteNamespaces(context: EntryContext): string[] {
     let namespaces = Object.values(context.routeModules)
       .filter((route) => route.handle?.i18n !== undefined)
@@ -83,6 +113,14 @@ export class RemixI18Next {
     return [...new Set(namespaces)];
   }
 
+  /**
+   * Return a TFunction that can be used to translate strings server-side.
+   * This function is fixed to a specific namespace.
+   *
+   * @param requestOrLocale The request object or the locale string already detected
+   * @param namespace The namespace to use for the T function
+   * @param options The i18next init options
+   */
   async getFixedT(
     locale: string,
     namespace?: string,
@@ -127,7 +165,33 @@ export class RemixI18Next {
 }
 
 class LanguageDetector {
-  constructor(private options: LanguageDetectorOption) {}
+  constructor(private options: LanguageDetectorOption) {
+    this.isSessionOnly(options);
+  }
+
+  private isSessionOnly(options: LanguageDetectorOption) {
+    if (
+      options.order?.length === 1 &&
+      options.order[0] === "session" &&
+      !options.sessionStorage
+    ) {
+      throw new Error(
+        "You need a sessionStorage if you want to only get the locale from the session"
+      );
+    }
+  }
+
+  private isCookieOnly(options: LanguageDetectorOption) {
+    if (
+      options.order?.length === 1 &&
+      options.order[0] === "cookie" &&
+      !options.cookie
+    ) {
+      throw new Error(
+        "You need a cookie if you want to only get the locale from the cookie"
+      );
+    }
+  }
 
   public async detect(request: Request): Promise<string> {
     let order = this.options.order ?? [
