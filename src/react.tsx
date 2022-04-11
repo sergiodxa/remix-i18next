@@ -2,7 +2,21 @@ import { useMatches } from "@remix-run/react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export function PreloadTranslations() {
+export interface PreloadTranslationsProps {
+  loadPath: string;
+}
+
+/**
+ * Preload the translations files for the current language and the namespaces
+ * required by the routes.
+ *
+ * It receives a single `loadPath` prop with the path to the translation files.
+ *
+ * @example
+ * <PreloadTranslations loadPath="/locales/{{lng}}/{{ns}}.json" />
+ *
+ */
+export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
   let { i18n } = useTranslation();
 
   let namespaces = [
@@ -23,7 +37,9 @@ export function PreloadTranslations() {
             key={namespace}
             rel="preload"
             as="fetch"
-            href={`/locales/${lang}/${namespace}.json`}
+            href={loadPath
+              .replace("{{lng}}", lang)
+              .replace("{{ns}}", namespace)}
           />
         );
       })}
@@ -31,6 +47,12 @@ export function PreloadTranslations() {
   );
 }
 
+/**
+ * Get the locale returned by the root route loader under the `locale` key.
+ * @example
+ * let locale = useLocale()
+ * let formattedDate = date.toLocaleDateString(locale);
+ */
 export function useLocale(): string {
   let [rootMatch] = useMatches();
   let { locale } = rootMatch.data ?? {};
@@ -39,6 +61,11 @@ export function useLocale(): string {
   throw new Error("Invalid locale returned by the root loader.");
 }
 
+/**
+ * Detect when the locale returned by the root route loader changes and call
+ * `i18n.changeLanguage` with the new locale.
+ * This will ensure translations are loaded automatically.
+ */
 export function useChangeLanguage() {
   let locale = useLocale();
   let { i18n } = useTranslation();
