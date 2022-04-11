@@ -1,5 +1,5 @@
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
-import { Backend, RemixI18Next } from "../src";
+import { RemixI18Next } from "../src";
 
 class TestBackend implements Backend {
   async getTranslations() {
