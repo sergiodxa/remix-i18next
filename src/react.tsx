@@ -1,34 +1,48 @@
 import { useMatches } from "@remix-run/react";
-import { useSSR } from "react-i18next";
-import useConsistentValue from "use-consistent-value";
-import { Language } from "./backend";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-/**
- * Get the translations from the i18n key returned by the loaders and pass them
- * to i18next to be used by the components.
- * @param locale The locale to use.
- */
-export function useSetupTranslations(locale: string) {
-  let namespaces = useNamespaces(locale);
-  useSSR(namespaces, locale);
+export function PreloadTranslations() {
+  let { i18n } = useTranslation();
+
+  let namespaces = [
+    ...new Set(
+      useMatches()
+        .filter((route) => route.handle?.i18n !== undefined)
+        .flatMap((route) => route.handle.i18n as string | string[])
+    ),
+  ];
+
+  let lang = i18n.language;
+
+  return (
+    <>
+      {namespaces.map((namespace) => {
+        return (
+          <link
+            key={namespace}
+            rel="preload"
+            as="fetch"
+            href={`/locales/${lang}/${namespace}.json`}
+          />
+        );
+      })}
+    </>
+  );
 }
 
-/**
- * Get the namespaces from the loaders data.
- * Returns them as expected by useSSR from React i18next.
- * @param locale The locale to use.
- */
-export function useNamespaces(locale: string) {
-  if (!locale) throw new Error("Missing locale");
+export function useLocale(): string {
+  let [rootMatch] = useMatches();
+  let { locale } = rootMatch.data ?? {};
+  if (!locale) throw new Error("Missing locale returned by the root loader.");
+  if (typeof locale === "string") return locale;
+  throw new Error("Invalid locale returned by the root loader.");
+}
 
-  let matches = useMatches();
-  let data = matches.map(
-    (match) => (match.data?.i18n ?? {}) as Record<string, Language>
-  );
-  let namespaces: Record<string, Language> = {};
-  for (let item of data) {
-    namespaces = { ...namespaces, ...item };
-  }
-
-  return useConsistentValue({ [locale]: namespaces });
+export function useChangeLanguage() {
+  let locale = useLocale();
+  let { i18n } = useTranslation();
+  useEffect(() => {
+    i18n.changeLanguage(locale);
+  }, [locale, i18n]);
 }

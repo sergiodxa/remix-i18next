@@ -16,7 +16,7 @@
 The first step is to install it in your project with
 
 ```sh
-npm install remix-i18next i18next react-i18next
+npm install remix-i18next i18next react-i18next i18next-http-backend
 ```
 
 ### Configuration
