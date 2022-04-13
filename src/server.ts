@@ -167,6 +167,7 @@ export class RemixI18Next {
 class LanguageDetector {
   constructor(private options: LanguageDetectorOption) {
     this.isSessionOnly(options);
+    this.isCookieOnly(options);
   }
 
   private isSessionOnly(options: LanguageDetectorOption) {
