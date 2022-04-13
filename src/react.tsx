@@ -66,8 +66,7 @@ export function useLocale(): string {
  * `i18n.changeLanguage` with the new locale.
  * This will ensure translations are loaded automatically.
  */
-export function useChangeLanguage() {
-  let locale = useLocale();
+export function useChangeLanguage(locale: string) {
   let { i18n } = useTranslation();
   useEffect(() => {
     i18n.changeLanguage(locale);
