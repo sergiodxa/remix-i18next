@@ -1,7 +1,8 @@
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
+import { describe, expect, test } from "vitest";
 import { RemixI18Next } from "../src";
 
-describe(RemixI18Next, () => {
+describe(RemixI18Next.name, () => {
   describe("getLocale", () => {
     test("should get the locale from the search param ?lng", async () => {
       let request = new Request("https://example.com/dashboard?lng=es");
