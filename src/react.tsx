@@ -1,41 +1,74 @@
 import { useMatches } from "@remix-run/react";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import useConsistentValue from "use-consistent-value";
-import { Language } from "./backend";
+
+export interface PreloadTranslationsProps {
+  loadPath: string;
+}
 
 /**
- * Get the translations from the i18n key returned by the loaders and pass them
- * to i18next to be used by the components.
- * @param locale The locale to use.
+ * Preload the translations files for the current language and the namespaces
+ * required by the routes.
+ *
+ * It receives a single `loadPath` prop with the path to the translation files.
+ *
+ * @example
+ * <PreloadTranslations loadPath="/locales/{{lng}}/{{ns}}.json" />
+ *
  */
-export function useSetupTranslations(locale: string) {
-  if (!locale) throw new Error("Missing locale");
-
+export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
   let { i18n } = useTranslation();
 
-  let namespaces = useConsistentValue(
-    useMatches()
-      .flatMap((match) => (match.data?.i18n ?? {}) as Record<string, Language>)
-      // eslint-disable-next-line unicorn/no-array-reduce
-      .reduce(
-        (messages, routeMessages) => ({ ...messages, ...routeMessages }),
-        {}
-      )
+  let namespaces = [
+    ...new Set(
+      useMatches()
+        .filter((route) => route.handle?.i18n !== undefined)
+        .flatMap((route) => route.handle.i18n as string | string[])
+    ),
+  ];
+
+  let lang = i18n.language;
+
+  return (
+    <>
+      {namespaces.map((namespace) => {
+        return (
+          <link
+            key={namespace}
+            rel="preload"
+            as="fetch"
+            href={loadPath
+              .replace("{{lng}}", lang)
+              .replace("{{ns}}", namespace)}
+          />
+        );
+      })}
+    </>
   );
+}
 
-  let handleLocaleUpdate = useCallback(() => {
-    void i18n.changeLanguage(locale);
-    for (let [namespace, messages] of Object.entries(namespaces)) {
-      i18n.addResourceBundle(locale, namespace, messages);
-    }
-  }, [i18n, namespaces, locale]);
+/**
+ * Get the locale returned by the root route loader under the `locale` key.
+ * @example
+ * let locale = useLocale()
+ * let formattedDate = date.toLocaleDateString(locale);
+ */
+export function useLocale(): string {
+  let [rootMatch] = useMatches();
+  let { locale } = rootMatch.data ?? {};
+  if (!locale) throw new Error("Missing locale returned by the root loader.");
+  if (typeof locale === "string") return locale;
+  throw new Error("Invalid locale returned by the root loader.");
+}
 
-  useMemo(() => {
-    handleLocaleUpdate();
-  }, []);
-
+/**
+ * Detect when the locale returned by the root route loader changes and call
+ * `i18n.changeLanguage` with the new locale.
+ * This will ensure translations are loaded automatically.
+ */
+export function useChangeLanguage(locale: string) {
+  let { i18n } = useTranslation();
   useEffect(() => {
-    handleLocaleUpdate();
-  }, [handleLocaleUpdate]);
+    i18n.changeLanguage(locale);
+  }, [locale, i18n]);
 }

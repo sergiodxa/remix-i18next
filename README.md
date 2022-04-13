@@ -16,7 +16,7 @@
 The first step is to install it in your project with
 
 ```sh
-npm install remix-i18next i18next react-i18next
+npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend
 ```
 
 ### Configuration
@@ -24,40 +24,72 @@ npm install remix-i18next i18next react-i18next
 Then create a `i18n.server.ts` file somewhere in your app and add the following code:
 
 ```ts
-import { RemixI18Next } from "remix-i18next";
-import { FileSystemBackend } from "remix-i18next";
+import Backend from "i18next-fs-backend";
+import { resolve } from "node:path";
+import { RemixI18Next } from "~/lib/i18next/server";
 
-// You will need to provide a backend to load your translations, here we use the
-// file system one and tell it where to find the translations.
-let backend = new FileSystemBackend("./public/locales");
-
-export let i18n = new RemixI18Next(backend, {
-  fallbackLng: "en", // here configure your default (fallback) language
-  supportedLanguages: ["es", "en"], // here configure your supported languages
+export let i18n = new RemixI18Next({
+  detection: {
+    // This is the list of languages your application supports
+    supportedLanguages: ["es", "en"],
+    // This is the language you want to use in case the user language is not
+    // listed above
+    fallbackLanguage: "en",
+  },
+  // This is the configuration for i18next used when translating messages server
+  // side only
+  i18next: {
+    backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
+  },
+  // The backend you want to use to load the translations
+  // Tip: You could pass `resources` to the `i18next` configuration and avoid
+  // a backend here
+  backend: Backend,
 });
 ```
 
 ### Client-side configuration
 
-Now in your `entry.client.tsx` replace the code with this:
+Now in your `entry.client.tsx` replace the default code with this:
 
 ```tsx
+import { RemixBrowser } from "@remix-run/react";
 import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import Backend from "i18next-http-backend";
 import { hydrate } from "react-dom";
 import { I18nextProvider, initReactI18next } from "react-i18next";
-import { RemixBrowser } from "remix";
+import { getNamespaces } from "./lib/i18next/client";
 
 i18next
-  .use(initReactI18next)
+  .use(initReactI18next) // Tell i18next to use the react-i18next plugin
+  .use(LanguageDetector) // Setup a client-side language detector
+  .use(Backend) // Setup your backend
   .init({
+    // This is normal i18next config, except a few things
     supportedLngs: ["es", "en"],
     defaultNS: "common",
     fallbackLng: "en",
-    // I recommend you to always disable react.useSuspense for i18next
+    // Disabling suspense is recommended
     react: { useSuspense: false },
+    // This function detects the namespaces your routes rendered while SSR use
+    // and pass them here to load the translations
+    ns: getNamespaces(),
+    backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
+    detection: {
+      // Here only enable htmlTag detection, we'll detect the language only
+      // server-side with remix-i18next, by using the `<html lang>` attribute
+      // we can communicate to the client the language detected server-side
+      order: ["htmlTag"],
+      // Because we only use htmlTag, there's no reason to cache the language
+      // on the browser, so we disable it
+      caches: [],
+    },
   })
   .then(() => {
-    // then hydrate your app wrapped in the RemixI18NextProvider
+    // After i18next has been initialized, we can hydrate the app
+    // We need to wait to ensure translations are loaded before the hydration
+    // Here wrap RemixBrowser in I18nextProvider from react-i18next
     return hydrate(
       <I18nextProvider i18n={i18next}>
         <RemixBrowser />
@@ -72,43 +104,60 @@ i18next
 And in your `entry.server.tsx` replace the code with this:
 
 ```tsx
+import { RemixServer } from "@remix-run/react";
+import type { EntryContext } from "@remix-run/server-runtime";
 import { createInstance } from "i18next";
+import Backend from "i18next-fs-backend";
+import { resolve } from "node:path";
 import { renderToString } from "react-dom/server";
 import { I18nextProvider, initReactI18next } from "react-i18next";
-import type { EntryContext } from "remix";
-import { RemixServer } from "remix";
+import { i18n } from "./services/i18n.server";
 
 export default async function handleRequest(
   request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext
+  statusCode: number,
+  headers: Headers,
+  context: EntryContext
 ) {
-  // Here you also need to initialize i18next using initReactI18next, you should
-  // use the same configuration as in your client side.
-  // create an instance so every request will have a copy and don't re-use the
-  // i18n object
-  let i18n = createInstance();
-  await i18n.use(initReactI18next).init({
-    supportedLngs: ["es", "en"],
-    defaultNS: "common",
-    fallbackLng: "en",
-    react: { useSuspense: false },
-  });
+  // First, we create a new instance of i18next so every request will have a
+  // completely unique instance and not share any state
+  let instance = createInstance();
 
-  // Then you can render your app wrapped in the RemixI18NextProvider as in the
+  // Then we could detect locale from the request
+  let lng = await i18n.getLocale(request);
+  // And here we detect what namespaces the routes about to render want to use
+  let ns = i18n.getRouteNamespaces(context);
+
+  await instance
+    .use(initReactI18next) // Tell our instance to use react-i18next
+    .use(Backend) // Setup our backend
+    .init({
+      // And configure i18next as usual
+      supportedLngs: ["es", "en"],
+      defaultNS: "common",
+      fallbackLng: "en",
+      // Disable suspense again here
+      react: { useSuspense: false },
+      lng, // The locale we detected above
+      ns, // The namespaces the routes about to render want to use
+      backend: {
+        loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
+      },
+    });
+
+  // Then you can render your app wrapped in the I18nextProvider as in the
   // entry.client file
   let markup = renderToString(
-    <I18nextProvider i18n={i18n}>
-      <RemixServer context={remixContext} url={request.url} />
+    <I18nextProvider i18n={instance}>
+      <RemixServer context={context} url={request.url} />
     </I18nextProvider>
   );
 
-  responseHeaders.set("Content-Type", "text/html");
+  headers.set("Content-Type", "text/html");
 
   return new Response("<!DOCTYPE html>" + markup, {
-    status: responseStatusCode,
-    headers: responseHeaders,
+    status: statusCode,
+    headers: headers,
   });
 }
 ```
@@ -118,23 +167,56 @@ export default async function handleRequest(
 Now, in your `root` file create a loader if you don't have one with the following code and also run the `useSetupTranslations` hook on the Root component.
 
 ```tsx
-import { json, LoaderFunction } from "remix";
+import { json, LoaderFunction } from "@remix-run/node";
+import {
+  Links,
+  LiveReload,
+  Meta,
+  Scripts,
+  ScrollRestoration,
+} from "@remix-run/react";
 import { i18n } from "~/i18n.server.ts";
-import { useSetupTranslations } from "remix-i18next";
+import { useChangeLanguage } from "remix-i18next";
+import { useTranslation } from "react-i18next";
+
+type LoaderData = { locale: string };
 
 export let loader: LoaderFunction = async ({ request }) => {
   let locale = await i18n.getLocale(request);
-  return json({ locale });
+  return json<LoaderData>({ locale });
+};
+
+export let handle = {
+  // In the handle export, we could add a i18n key with namespaces our route
+  // will need to load. This key can be a single string or an array of strings.
+  i18n: ["translations", "root"],
 };
 
 export default function Root() {
-  let { locale } = useLoaderData<{ locale: string }>();
-  useSetupTranslations(locale);
+  // Get the locale from the loader
+  let { locale } = useLoaderData<LoaderData>();
+
+  let { i18n } = useTranslation();
+
+  // This hook will change the i18n instance language to the current locale
+  // detected by the loader, this way, when we do something to change the
+  // language, this locale will change and i18next will load the correct
+  // translation files
+  useChangeLanguage(locale);
 
   return (
-    <Document>
-      <Outlet />
-    </Document>
+    <html lang={lang} dir={i18n.dir()}>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
   );
 }
 ```
@@ -142,27 +224,24 @@ export default function Root() {
 Finally, in any route you want to translate you can do this:
 
 ```tsx
-import { json, LoaderFunction } from "remix";
-import { i18n } from "~/i18n.server.ts"; // this is the first file you created
+import { json, LoaderFunction } from "@remix-run/node";
 import { useTranslation } from "react-i18next";
 
-export let loader: LoaderFunction = async ({ request }) => {
-  return json({
-    i18n: await i18n.getTranslations(request, ["common", "index"]),
-  });
+export let handle = {
+  i18n: "home",
 };
 
 export default function Component() {
-  let { t } = useTranslation("index");
+  let { t } = useTranslation("home");
   return <h1>{t("title")}</h1>;
 }
 ```
 
-And that's it, repeat the last step for each route you want to translate, remix-i18next will automatically load the translations using the backend you configured and it will automatically inject the translations into your app.
+And that's it, repeat the last step for each route you want to translate, remix-i18next will automatically let i18next what namespaces and language to use and this one will load the correct translation files using your configured backend.
 
 #### Translating text inside loaders or actions
 
-If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get the `t` function.
+If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get a `t` function.
 
 ```ts
 export let loader: LoaderFunction = async ({ request }) => {
@@ -188,46 +267,15 @@ The `getFixedT` function can be called using a combination of parameters:
 If you always need to set the same i18next options, you can pass them to RemixI18Next when creating the new instance.
 
 ```ts
-export let i18n = new RemixI18Next(backend, {
-  fallbackLng: "en", // here configure your default (fallback) language
-  supportedLanguages: ["en", "es"], // here configure your supported languages
-  i18nextOptions: { keySeparator: false },
+export let i18n = new RemixI18Next({
+  detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
+  // The config here will be used for getFixedT
+  i18next: {
+    backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
+  },
+  // This backend will be used by getFixedT
+  backend: Backend,
 });
 ```
 
-This options will be overwritten by the options provided to `getFixedT`. Additionally, the following options will always be configured and not overwritteable:
-
-- `supportedLngs` it will use the RemixI18Next supported languages.
-- `fallbackLng` it will use the RemixI18Next fallback language.
-- `fallbackNS` it will use the namespace request to `getFixedT`
-- `defaultNS` it will use the namespace request to `getFixedT`
-
-## Custom Backend
-
-If you don't want, or can't use the FileSystemBackend to load your translations you can easily create your own backend.
-
-> An example on when you couldn't use the FileSystemBackend is when you are deploying your app to Cloudflare Workers and you can't read from the FS.
-
-```ts
-import type { Backend } from "remix-i18next/backend";
-
-export class FetchBackend implements Backend {
-  private url: URL;
-
-  constructor(url: string) {
-    this.url = new URL(url);
-  }
-
-  async getTranslations(namespace: string, locale: string) {
-    let url = new URL(`${locale}/${namespace}.json`, this.url);
-    let response = await fetch(url.toString(), {
-      headers: { accept: "application/json" },
-    });
-    return response.json();
-  }
-}
-```
-
-With that, you created a simple backend that can be used with remix-i18next and load the translations from a remote server.
-
-You could use this to load translations from specific services like Locize, Crowdin, Transifex, etc.
+This options will be overwritten by the options provided to `getFixedT`.
