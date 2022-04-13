@@ -26,7 +26,7 @@ Then create a `i18n.server.ts` file somewhere in your app and add the following 
 ```ts
 import Backend from "i18next-fs-backend";
 import { resolve } from "node:path";
-import { RemixI18Next } from "~/lib/i18next/server";
+import { RemixI18Next } from "remix-i18next";
 
 export let i18n = new RemixI18Next({
   detection: {
@@ -59,7 +59,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import { hydrate } from "react-dom";
 import { I18nextProvider, initReactI18next } from "react-i18next";
-import { getNamespaces } from "./lib/i18next/client";
+import { getInitialNamespaces } from "remix-i18next";
 
 i18next
   .use(initReactI18next) // Tell i18next to use the react-i18next plugin
@@ -74,7 +74,7 @@ i18next
     react: { useSuspense: false },
     // This function detects the namespaces your routes rendered while SSR use
     // and pass them here to load the translations
-    ns: getNamespaces(),
+    ns: getInitialNamespaces(),
     backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
     detection: {
       // Here only enable htmlTag detection, we'll detect the language only
@@ -205,7 +205,7 @@ export default function Root() {
   useChangeLanguage(locale);
 
   return (
-    <html lang={lang} dir={i18n.dir()}>
+    <html lang={locale} dir={i18n.dir()}>
       <head>
         <Meta />
         <Links />
