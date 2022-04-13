@@ -25,7 +25,7 @@ export interface LanguageDetectorOption {
    * expected language is not supported.
    * This should be be same as the fallbackLng in the i18next options.
    */
-  fallbackLng: string;
+  fallbackLanguage: string;
   /**
    * If you want to use a cookie to store the user preferred language, you can
    * pass the Cookie object here.
@@ -69,9 +69,11 @@ export interface RemixI18NextOption {
 }
 
 export class RemixI18Next {
-  constructor(private options: RemixI18NextOption) {}
+  private detector: LanguageDetector;
 
-  private detector = new LanguageDetector(this.options.detection);
+  constructor(private options: RemixI18NextOption) {
+    this.detector = new LanguageDetector(this.options.detection);
+  }
 
   /**
    * Detect the current locale by following the order defined in the
@@ -155,11 +157,9 @@ export class RemixI18Next {
   }
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {
-    if (!this.options.backend) {
-      throw new Error("You can't call getFixedT without a backend");
-    }
     let instance = createInstance();
-    await instance.use(this.options.backend).init(options);
+    if (this.options.backend) instance = instance.use(this.options.backend);
+    await instance.init(options);
     return instance;
   }
 }
@@ -224,7 +224,7 @@ class LanguageDetector {
       if (locale) return locale;
     }
 
-    return this.options.fallbackLng;
+    return this.options.fallbackLanguage;
   }
 
   private async fromSearchParams(request: Request): Promise<string | null> {
@@ -268,12 +268,12 @@ class LanguageDetector {
     return (
       pick(
         this.options.supportedLanguages,
-        language ?? this.options.fallbackLng,
+        language ?? this.options.fallbackLanguage,
         { loose: false }
       ) ||
       pick(
         this.options.supportedLanguages,
-        language ?? this.options.fallbackLng,
+        language ?? this.options.fallbackLanguage,
         { loose: true }
       )
     );

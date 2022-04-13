@@ -1,22 +1,16 @@
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
 import { RemixI18Next } from "../src";
 
-class TestBackend implements Backend {
-  async getTranslations() {
-    return {
-      "Hello {{name}}": "Hola {{name}}",
-    };
-  }
-}
-
 describe(RemixI18Next, () => {
   describe("getLocale", () => {
     test("should get the locale from the search param ?lng", async () => {
       let request = new Request("https://example.com/dashboard?lng=es");
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -29,10 +23,12 @@ describe(RemixI18Next, () => {
         headers: { Cookie: await cookie.serialize("es") },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
-        cookie,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+          cookie,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -50,10 +46,12 @@ describe(RemixI18Next, () => {
         headers: { Cookie: await sessionStorage.commitSession(session) },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
-        sessionStorage,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+          sessionStorage,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -72,11 +70,13 @@ describe(RemixI18Next, () => {
         headers: { Cookie: await sessionStorage.commitSession(session) },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
-        sessionStorage,
-        sessionKey,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+          sessionStorage,
+          sessionKey,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -87,9 +87,11 @@ describe(RemixI18Next, () => {
         headers: { "Accept-Language": "es" },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -98,9 +100,11 @@ describe(RemixI18Next, () => {
     test("should use the fallback language if search param, cookie and request headers are not there", async () => {
       let request = new Request("https://example.com/dashboard");
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("en");
@@ -109,9 +113,11 @@ describe(RemixI18Next, () => {
     test("should use the fallback language if the expected one is not supported", async () => {
       let request = new Request("https://example.com/dashboard?lng=fr");
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en"],
-        fallbackLng: "en",
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en"],
+          fallbackLanguage: "en",
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("en");
@@ -136,11 +142,13 @@ describe(RemixI18Next, () => {
         headers,
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "fr", "jp", "en"],
-        fallbackLng: "en",
-        sessionStorage,
-        cookie,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "fr", "jp", "en"],
+          fallbackLanguage: "en",
+          sessionStorage,
+          cookie,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("es");
@@ -156,10 +164,12 @@ describe(RemixI18Next, () => {
         },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "fr", "jp", "en"],
-        fallbackLng: "en",
-        cookie,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "fr", "jp", "en"],
+          fallbackLanguage: "en",
+          cookie,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("jp");
@@ -180,10 +190,12 @@ describe(RemixI18Next, () => {
         },
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "fr", "jp", "en"],
-        fallbackLng: "en",
-        sessionStorage,
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "fr", "jp", "en"],
+          fallbackLanguage: "en",
+          sessionStorage,
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("jp");
@@ -208,17 +220,34 @@ describe(RemixI18Next, () => {
         headers,
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "fr", "jp", "en"],
-        fallbackLng: "en",
-        sessionStorage,
-        cookie,
-        order: ["session", "cookie", "header", "searchParams"],
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "fr", "jp", "en"],
+          fallbackLanguage: "en",
+          sessionStorage,
+          cookie,
+          order: ["session", "cookie", "header", "searchParams"],
+        },
       });
 
       expect(await i18n.getLocale(request)).toBe("en");
     });
 
+    test("return the specific locale if there are multiple variants", async () => {
+      let request = new Request("https://example.com/dashboard?lng=es-MX");
+
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "en", "es-MX"],
+          fallbackLanguage: "en",
+        },
+      });
+
+      expect(await i18n.getLocale(request)).toBe("es-MX");
+    });
+  });
+
+  describe("getFixedT", () => {
     test("get a fixed T function for server-side usage", async () => {
       let headers = new Headers();
       headers.set("Accept-Language", "fr");
@@ -227,30 +256,28 @@ describe(RemixI18Next, () => {
         headers,
       });
 
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "fr", "jp", "en"],
-        fallbackLng: "en",
-        order: ["session", "cookie", "header", "searchParams"],
-        i18nextOptions: {
+      let i18n = new RemixI18Next({
+        detection: {
+          supportedLanguages: ["es", "fr", "jp", "en"],
+          fallbackLanguage: "en",
+          order: ["session", "cookie", "header", "searchParams"],
+        },
+        i18next: {
           fallbackNS: "common",
           defaultNS: "common",
+          resources: {
+            fr: {
+              common: {
+                "Hello {{name}}": "Hola {{name}}",
+              },
+            },
+          },
         },
       });
 
       let t = await i18n.getFixedT(request, "common");
 
       expect(t("Hello {{name}}", { name: "Remix" })).toBe("Hola Remix");
-    });
-
-    test("return the specific locale if there are multiple variants", async () => {
-      let request = new Request("https://example.com/dashboard?lng=es-MX");
-
-      let i18n = new RemixI18Next(new TestBackend(), {
-        supportedLanguages: ["es", "en", "es-MX"],
-        fallbackLng: "en",
-      });
-
-      expect(await i18n.getLocale(request)).toBe("es-MX");
     });
   });
 });
