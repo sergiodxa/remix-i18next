@@ -16,7 +16,7 @@
 The first step is to install it in your project with
 
 ```sh
-npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend
+npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend i18next-browser-languagedetector
 ```
 
 ### Configuration
