@@ -120,30 +120,35 @@ export class RemixI18Next {
    * This function is fixed to a specific namespace.
    *
    * @param requestOrLocale The request object or the locale string already detected
-   * @param namespace The namespace to use for the T function
+   * @param namespaces The namespaces to use for the T function. (Default: `translation`).
    * @param options The i18next init options
    */
   async getFixedT(
     locale: string,
-    namespace?: string,
+    namespaces?: string | readonly string[],
     options?: Omit<InitOptions, "react">
   ): Promise<TFunction>;
   async getFixedT(
     request: Request,
-    namespace?: string,
+    namespaces?: string | readonly string[],
     options?: Omit<InitOptions, "react">
   ): Promise<TFunction>;
   async getFixedT(
     requestOrLocale: Request | string,
-    namespace = "translation",
+    namespaces?: string | readonly string[],
     options: Omit<InitOptions, "react"> = {}
   ) {
+    // Make sure there's at least one namespace
+    if (!namespaces || namespaces.length === 0) {
+      namespaces = "translation";
+    }
+
     let [instance, locale] = await Promise.all([
       this.createInstance({
         ...this.options.i18next,
         ...options,
-        fallbackNS: namespace,
-        defaultNS: namespace,
+        fallbackNS: namespaces,
+        defaultNS: typeof namespaces === "string" ? namespaces : namespaces[0],
       }),
       typeof requestOrLocale === "string"
         ? requestOrLocale
@@ -151,9 +156,9 @@ export class RemixI18Next {
     ]);
 
     await instance.changeLanguage(locale);
-    await instance.loadNamespaces(namespace);
+    await instance.loadNamespaces(namespaces);
 
-    return instance.getFixedT(locale, namespace);
+    return instance.getFixedT(locale, namespaces);
   }
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {
