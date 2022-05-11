@@ -11,7 +11,7 @@ import {
   NewableModule,
   TFunction,
 } from "i18next";
-import { getClientLocales } from "remix-utils";
+import { getClientLocales } from "./lib/get-client-locales";
 
 export interface LanguageDetectorOption {
   /**
