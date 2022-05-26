@@ -140,7 +140,7 @@ export class RemixI18Next {
   ) {
     // Make sure there's at least one namespace
     if (!namespaces || namespaces.length === 0) {
-      namespaces = "translation";
+      namespaces = this.options.i18next?.defaultNS || "translation";
     }
 
     let [instance, locale] = await Promise.all([

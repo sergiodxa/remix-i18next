@@ -257,12 +257,12 @@ export let meta: MetaFunction = async ({ data }) => {
 
 The `getFixedT` function can be called using a combination of parameters:
 
-- `getFixedT(request)`: will use the request to get the locale and default the namespace to `common`
-- `getFixedT("es")`: will use the specified locale and default the namespace to `common`
-- `getFixedT(request, "namespace")` will use the request to get the locale and the specified namespace to get the translations.
-- `getFixedT("es", "namespace")` will use the specified locale and the specified namespace to get the translations.
-- `getFixedT(request, "common", { keySeparator: false })` will use the request to get the locale and the common namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
-- `getFixedT("es", "common", { keySeparator: false })` will use the specified locale and the common namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
+- `getFixedT(request)`: will use the request to get the locale and the `defaultNS` set in the config or `translation` (the [i18next default namespace](https://www.i18next.com/overview/configuration-options#languages-namespaces-resources))
+- `getFixedT("es")`: will use the specified `es` locale and the `defaultNS` set in config, or `translation` (the [i18next default namespace](https://www.i18next.com/overview/configuration-options#languages-namespaces-resources))
+- `getFixedT(request, "common")` will use the request to get the locale and the specified `common` namespace to get the translations.
+- `getFixedT("es", "common")` will use the specified `es` locale and the specified `common` namespace to get the translations.
+- `getFixedT(request, "common", { keySeparator: false })` will use the request to get the locale and the `common` namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
+- `getFixedT("es", "common", { keySeparator: false })` will use the specified `es` locale and the `common` namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
 
 If you always need to set the same i18next options, you can pass them to RemixI18Next when creating the new instance.
 
