@@ -250,7 +250,7 @@ export let loader: LoaderFunction = async ({ request }) => {
   return json({ title });
 };
 
-export let meta: MetaFunction = async ({ data }) => {
+export let meta: MetaFunction = ({ data }) => {
   return { title: data.title };
 };
 ```
