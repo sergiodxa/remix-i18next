@@ -19,6 +19,12 @@ The first step is to install it in your project with
 npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend i18next-browser-languagedetector
 ```
 
+If you're going to use TypeScript it is recommended to install `@types/i18next-fs-backend` as well:
+
+```sh
+npm install --save-dev @types/i18next-fs-backend
+```
+
 ### Configuration
 
 Then create a `i18n.server.ts` file somewhere in your app and add the following code:
