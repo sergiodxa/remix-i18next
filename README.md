@@ -255,14 +255,7 @@ export let handle = {
   i18n: "home",
 };
 
-// Example 1: use the "home" namespace prefix
-export default function Prefix() {
-  let { t } = useTranslation();
-  return <h1>{t("home:title")}</h1>;
-}
-
-// Example 2: pass the "home" namespace, and not use a prefix
-export default function WithoutPrefix() {
+export default function Component() {
   let { t } = useTranslation("home");
   return <h1>{t("title")}</h1>;
 }
