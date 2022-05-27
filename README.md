@@ -38,7 +38,7 @@ export default {
     // This is the list of languages your application supports
     supportedLngs: ['en', 'es'],
     // This is the language you want to use in case
-    // if the browser language is not in the supportedLngs
+    // if the user language is not in the supportedLngs
     fallbackLng: 'en',
     // The default namespace of i18next is "translation", but you can customize it here
     defaultNS: 'common',
@@ -53,7 +53,7 @@ And then create a file named `i18next.server.ts` with the following code:
 import Backend from 'i18next-fs-backend';
 import { resolve } from 'node:path';
 import { RemixI18Next } from 'remix-i18next';
-import i18n from './i18n'; // your i18n configuration file
+import i18n from '~/i18n'; // your i18n configuration file
 
 let i18next = new RemixI18Next({
   detection: {
@@ -208,7 +208,7 @@ export let loader: LoaderFunction = async ({ request }) => {
 };
 
 export let handle = {
-  // In the handle export, we scan add a i18n key with namespaces our route
+  // In the handle export, we can add a i18n key with namespaces our route
   // will need to load. This key can be a single string or an array of strings.
   // TIP: In most cases, you should set this to your defaultNS from your i18n config
   // or if you did not set one, set it to the i18next default namespace "translation"
