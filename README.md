@@ -27,7 +27,24 @@ npm install --save-dev @types/i18next-fs-backend
 
 ### Configuration
 
-First, set your [i18next configuration](https://www.i18next.com/overview/configuration-options).
+First let's create some translation files
+
+`public/locales/en/common.json`:
+
+```json
+{
+  "greeting": "Hello"
+}
+```
+
+`public/locales/es/common.json`:
+```json
+{
+  "greeting": "Hola"
+}
+```
+
+Next, set your [i18next configuration](https://www.i18next.com/overview/configuration-options).
 
 These two files can go somewhere in your app folder.
 
@@ -246,10 +263,37 @@ export default function Root() {
 }
 ```
 
-Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t).
+Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t) and use translations from the default namespace.
 
 ```tsx
-import { json, LoaderFunction } from "@remix-run/node";
+import { useTranslation } from "react-i18next";
+
+export default function Component() {
+  let { t } = useTranslation();
+  return <h1>{t("greeting")}</h1>;
+}
+```
+
+If you wish to split up your translation files, you create new translation files
+like:
+
+`public/locales/en/home.json`
+```json
+{
+  "title": "remix-i18n is awesome"
+}
+```
+
+`public/locales/es/home.json`
+```json
+{
+  "title": "remix-i18n es increíble"
+}
+```
+
+and use them in your routes:
+
+```tsx
 import { useTranslation } from "react-i18next";
 
 // This tells remix to load the "home" namespace
