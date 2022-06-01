@@ -235,7 +235,6 @@ export default function Root() {
         <Links />
       </head>
       <body>
-        {children}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
