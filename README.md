@@ -150,9 +150,9 @@ export default async function handleRequest(
   let instance = createInstance();
 
   // Then we could detect locale from the request
-  let lng = await i18n.getLocale(request);
+  let lng = await i18next.getLocale(request);
   // And here we detect what namespaces the routes about to render want to use
-  let ns = i18n.getRouteNamespaces(context);
+  let ns = i18next.getRouteNamespaces(context);
 
   await instance
     .use(initReactI18next) // Tell our instance to use react-i18next
