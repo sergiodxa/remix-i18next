@@ -195,10 +195,11 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
-import i18next from "~/i18n.server.ts";
+import i18next from "~/i18next.server";
 
 type LoaderData = { locale: string };
 
