@@ -202,7 +202,7 @@ export default async function handleRequest(
 
 ### Usage
 
-Now, in your `root` file create a loader if you don't have one with the following code and also run the `useSetupTranslations` hook on the Root component.
+Now, in your `app/root.tsx` file create a loader if you don't have one with the following code.
 
 ```tsx
 import { json, LoaderFunction } from "@remix-run/node";
