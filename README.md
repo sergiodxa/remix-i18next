@@ -202,7 +202,7 @@ export default async function handleRequest(
 
 ### Usage
 
-Now, in your `app/root.tsx` file create a loader if you don't have one with the following code.
+Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't have one with the following code.
 
 ```tsx
 import { json, LoaderFunction } from "@remix-run/node";
@@ -291,7 +291,7 @@ like:
 }
 ```
 
-and use them in your routes:
+And use them in your routes:
 
 ```tsx
 import { useTranslation } from "react-i18next";
