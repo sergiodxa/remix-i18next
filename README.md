@@ -27,7 +27,24 @@ npm install --save-dev @types/i18next-fs-backend
 
 ### Configuration
 
-First, set your [i18next configuration](https://www.i18next.com/overview/configuration-options).
+First let's create some translation files
+
+`public/locales/en/common.json`:
+
+```json
+{
+  "greeting": "Hello"
+}
+```
+
+`public/locales/es/common.json`:
+```json
+{
+  "greeting": "Hola"
+}
+```
+
+Next, set your [i18next configuration](https://www.i18next.com/overview/configuration-options).
 
 These two files can go somewhere in your app folder.
 
@@ -150,9 +167,9 @@ export default async function handleRequest(
   let instance = createInstance();
 
   // Then we could detect locale from the request
-  let lng = await i18n.getLocale(request);
+  let lng = await i18next.getLocale(request);
   // And here we detect what namespaces the routes about to render want to use
-  let ns = i18n.getRouteNamespaces(context);
+  let ns = i18next.getRouteNamespaces(context);
 
   await instance
     .use(initReactI18next) // Tell our instance to use react-i18next
@@ -185,7 +202,7 @@ export default async function handleRequest(
 
 ### Usage
 
-Now, in your `root` file create a loader if you don't have one with the following code and also run the `useSetupTranslations` hook on the Root component.
+Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't have one with the following code.
 
 ```tsx
 import { json, LoaderFunction } from "@remix-run/node";
@@ -195,10 +212,12 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  Outlet,
 } from "@remix-run/react";
 import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
-import i18next from "~/i18n.server.ts";
+import i18next from "~/i18next.server";
 
 type LoaderData = { locale: string };
 
@@ -212,7 +231,7 @@ export let handle = {
   // will need to load. This key can be a single string or an array of strings.
   // TIP: In most cases, you should set this to your defaultNS from your i18n config
   // or if you did not set one, set it to the i18next default namespace "translation"
-  i18n: "translation",
+  i18n: "common",
 };
 
 export default function Root() {
@@ -234,7 +253,7 @@ export default function Root() {
         <Links />
       </head>
       <body>
-        {children}
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -244,10 +263,37 @@ export default function Root() {
 }
 ```
 
-Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t).
+Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t) and use translations from the default namespace.
 
 ```tsx
-import { json, LoaderFunction } from "@remix-run/node";
+import { useTranslation } from "react-i18next";
+
+export default function Component() {
+  let { t } = useTranslation();
+  return <h1>{t("greeting")}</h1>;
+}
+```
+
+If you wish to split up your translation files, you create new translation files
+like:
+
+`public/locales/en/home.json`
+```json
+{
+  "title": "remix-i18n is awesome"
+}
+```
+
+`public/locales/es/home.json`
+```json
+{
+  "title": "remix-i18n es increíble"
+}
+```
+
+And use them in your routes:
+
+```tsx
 import { useTranslation } from "react-i18next";
 
 // This tells remix to load the "home" namespace
