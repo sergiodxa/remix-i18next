@@ -80,6 +80,7 @@ let i18next = new RemixI18Next({
   // This is the configuration for i18next used
   // when translating messages server-side only
   i18next: {
+    ...i18n,
     backend: {
       loadPath: resolve('./public/locales/{{lng}}/{{ns}}.json'),
     },
