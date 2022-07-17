@@ -2,8 +2,6 @@
 
 ## Setup
 
-Create an environment variable called `REMIX_TOKEN` with your [Remix install token](https://remix.run/dashboard).
-
 Run `npm install` to install the dependencies.
 
 Run the tests with `npm run test`.
