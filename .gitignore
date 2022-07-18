@@ -22,3 +22,9 @@ node_modules/
 # Build files
 /browser
 /build
+
+# System Files
+.DS_Store
+Thumbs.db
+UserInterfaceState.xcuserstate
+$RECYCLE.BIN/
