@@ -158,7 +158,7 @@ export class RemixI18Next {
     await instance.changeLanguage(locale);
     await instance.loadNamespaces(namespaces);
 
-    return instance.getFixedT(locale, namespaces);
+    return instance.getFixedT(locale, namespaces as string | string[]);
   }
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {

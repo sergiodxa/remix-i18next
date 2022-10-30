@@ -23,7 +23,7 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
     ...new Set(
       useMatches()
         .filter((route) => route.handle?.i18n !== undefined)
-        .flatMap((route) => route.handle.i18n as string | string[])
+        .flatMap((route) => route.handle?.i18n as string | string[])
     ),
   ];
 

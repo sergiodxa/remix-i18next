@@ -10,10 +10,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Use Node 14
-        uses: actions/setup-node@v1
+      - name: Use Node 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
@@ -28,10 +29,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Use Node 14
-        uses: actions/setup-node@v1
+      - name: Use Node 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
@@ -46,10 +48,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Use Node 14
-        uses: actions/setup-node@v1
+      - name: Use Node 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
@@ -64,16 +67,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Use Node 14
-        uses: actions/setup-node@v1
+      - name: Use Node 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
-
-      - name: Build
-        run: npm run build
 
       - name: Lint
         run: npm run lint
