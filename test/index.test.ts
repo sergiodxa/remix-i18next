@@ -269,7 +269,7 @@ describe(RemixI18Next.name, () => {
           resources: {
             fr: {
               common: {
-                "Hello {{name}}": "Hola {{name}}",
+                "Hello {{name}}": "Bonjour {{name}}",
               },
             },
           },
@@ -278,7 +278,7 @@ describe(RemixI18Next.name, () => {
 
       let t = await i18n.getFixedT(request, "common");
 
-      expect(t("Hello {{name}}", { name: "Remix" })).toBe("Hola Remix");
+      expect(t("Hello {{name}}", { name: "Remix" })).toBe("Bonjour Remix");
     });
   });
 });
