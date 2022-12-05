@@ -19,12 +19,6 @@ The first step is to install it in your project with
 npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend i18next-browser-languagedetector
 ```
 
-If you're going to use TypeScript it is recommended to install `@types/i18next-fs-backend` as well:
-
-```sh
-npm install --save-dev @types/i18next-fs-backend
-```
-
 ### Configuration
 
 First let's create some translation files
@@ -38,6 +32,7 @@ First let's create some translation files
 ```
 
 `public/locales/es/common.json`:
+
 ```json
 {
   "greeting": "Hola"
@@ -206,7 +201,8 @@ export default async function handleRequest(
 Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't have one with the following code.
 
 ```tsx
-import { json, LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -220,11 +216,9 @@ import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
 import i18next from "~/i18next.server";
 
-type LoaderData = { locale: string };
-
-export let loader: LoaderFunction = async ({ request }) => {
+export let loader = async ({ request }: LoaderArgs) => {
   let locale = await i18next.getLocale(request);
-  return json<LoaderData>({ locale });
+  return json({ locale });
 };
 
 export let handle = {
@@ -237,7 +231,7 @@ export let handle = {
 
 export default function Root() {
   // Get the locale from the loader
-  let { locale } = useLoaderData<LoaderData>();
+  let { locale } = useLoaderData<typeof loader>();
 
   let { i18n } = useTranslation();
 
@@ -279,6 +273,7 @@ If you wish to split up your translation files, you create new translation files
 like:
 
 `public/locales/en/home.json`
+
 ```json
 {
   "title": "remix-i18n is awesome"
@@ -286,6 +281,7 @@ like:
 ```
 
 `public/locales/es/home.json`
+
 ```json
 {
   "title": "remix-i18n es increíble"
@@ -315,7 +311,7 @@ And that's it, repeat the last step for each route you want to translate, remix-
 If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get a `t` function.
 
 ```ts
-export let loader: LoaderFunction = async ({ request }) => {
+export let loader = async ({ request }: LoaderArgs) => {
   let t = await i18n.getFixedT(request);
   let title = t("My page title");
   return json({ title });
