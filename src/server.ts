@@ -14,6 +14,8 @@ import {
 } from "i18next";
 import { getClientLocales } from "./lib/get-client-locales";
 
+const DEFAULT_NS: Namespace = "translation";
+
 export interface LanguageDetectorOption {
   /**
    * Define the list of supported languages, this is used to determine if one of
@@ -139,7 +141,7 @@ export class RemixI18Next {
     namespaces?: N,
     options: Omit<InitOptions, "react"> = {}
   ) {
-    let parsedNamespaces = namespaces ?? ("translation" as N);
+    let parsedNamespaces = namespaces ?? DEFAULT_NS;
     // Make sure there's at least one namespace
     if (!namespaces || namespaces.length === 0) {
       parsedNamespaces = (this.options.i18next?.defaultNS ||
