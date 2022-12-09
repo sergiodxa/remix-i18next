@@ -40,9 +40,9 @@
   "peerDependencies": {
     "@remix-run/react": "^1.0.0",
     "@remix-run/server-runtime": "^1.0.0",
-    "i18next": "^21.3.3 || ^22.0.3",
+    "i18next": "^22.0.3",
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-    "react-i18next": "^11.13.0 || ^12.0.0"
+    "react-i18next": "^12.0.0"
   },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
