@@ -16,13 +16,13 @@
 The first step is to install it in your project with
 
 ```sh
-npm install remix-i18next i18next react-i18next i18next-http-backend i18next-fs-backend i18next-browser-languagedetector
+npm install remix-i18next i18next react-i18next i18next-browser-languagedetector
 ```
 
-If you're going to use TypeScript it is recommended to install `@types/i18next-fs-backend` as well:
+You will need to configure an i18next backend and language detector, in that case you can install them too, for the rest of the setup guide we'll use the http and fs backends.
 
 ```sh
-npm install --save-dev @types/i18next-fs-backend
+npm install i18next-http-backend i18next-fs-backend
 ```
 
 ### Configuration
@@ -243,11 +243,9 @@ import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
 import i18next from "~/i18next.server";
 
-type LoaderData = { locale: string };
-
 export async function loader({ request }: LoaderArgs) {
   let locale = await i18next.getLocale(request);
-  return json<LoaderData>({ locale });
+  return json({ locale });
 }
 
 export let handle = {
@@ -260,7 +258,7 @@ export let handle = {
 
 export default function Root() {
   // Get the locale from the loader
-  let { locale } = useLoaderData<LoaderData>();
+  let { locale } = useLoaderData<typeof loader>();
 
   let { i18n } = useTranslation();
 

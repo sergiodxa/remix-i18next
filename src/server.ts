@@ -10,8 +10,11 @@ import {
   InitOptions,
   NewableModule,
   TFunction,
+  Namespace,
 } from "i18next";
 import { getClientLocales } from "./lib/get-client-locales";
+
+const DEFAULT_NS: Namespace = "translation";
 
 export interface LanguageDetectorOption {
   /**
@@ -123,32 +126,37 @@ export class RemixI18Next {
    * @param namespaces The namespaces to use for the T function. (Default: `translation`).
    * @param options The i18next init options
    */
-  async getFixedT(
+  async getFixedT<N extends Namespace>(
     locale: string,
-    namespaces?: string | readonly string[],
+    namespaces?: N,
     options?: Omit<InitOptions, "react">
-  ): Promise<TFunction>;
-  async getFixedT(
+  ): Promise<TFunction<N>>;
+  async getFixedT<N extends Namespace>(
     request: Request,
-    namespaces?: string | readonly string[],
+    namespaces?: N,
     options?: Omit<InitOptions, "react">
-  ): Promise<TFunction>;
-  async getFixedT(
+  ): Promise<TFunction<N>>;
+  async getFixedT<N extends Namespace>(
     requestOrLocale: Request | string,
-    namespaces?: string | readonly string[],
+    namespaces?: N,
     options: Omit<InitOptions, "react"> = {}
   ) {
+    let parsedNamespaces = namespaces ?? DEFAULT_NS;
     // Make sure there's at least one namespace
     if (!namespaces || namespaces.length === 0) {
-      namespaces = this.options.i18next?.defaultNS || "translation";
+      parsedNamespaces = (this.options.i18next?.defaultNS ||
+        "translation") as N;
     }
 
     let [instance, locale] = await Promise.all([
       this.createInstance({
         ...this.options.i18next,
         ...options,
-        fallbackNS: namespaces,
-        defaultNS: typeof namespaces === "string" ? namespaces : namespaces[0],
+        fallbackNS: parsedNamespaces,
+        defaultNS:
+          typeof parsedNamespaces === "string"
+            ? parsedNamespaces
+            : parsedNamespaces[0],
       }),
       typeof requestOrLocale === "string"
         ? requestOrLocale
@@ -156,9 +164,9 @@ export class RemixI18Next {
     ]);
 
     await instance.changeLanguage(locale);
-    await instance.loadNamespaces(namespaces);
+    await instance.loadNamespaces(parsedNamespaces);
 
-    return instance.getFixedT(locale, namespaces);
+    return instance.getFixedT(locale, parsedNamespaces);
   }
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {

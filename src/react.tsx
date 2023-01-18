@@ -23,7 +23,7 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
     ...new Set(
       useMatches()
         .filter((route) => route.handle?.i18n !== undefined)
-        .flatMap((route) => route.handle.i18n as string | string[])
+        .flatMap((route) => route.handle?.i18n as string | string[])
     ),
   ];
 
@@ -52,10 +52,13 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
  * @example
  * let locale = useLocale()
  * let formattedDate = date.toLocaleDateString(locale);
+ * @example
+ * let locale = useLocale("language")
+ * let formattedDate = date.toLocaleDateString(locale);
  */
-export function useLocale(): string {
+export function useLocale(localeKey = "locale"): string {
   let [rootMatch] = useMatches();
-  let { locale } = rootMatch.data ?? {};
+  let { [localeKey]: locale } = rootMatch.data ?? {};
   if (!locale) throw new Error("Missing locale returned by the root loader.");
   if (typeof locale === "string") return locale;
   throw new Error("Invalid locale returned by the root loader.");
