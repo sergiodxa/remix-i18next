@@ -38,6 +38,7 @@ First let's create some translation files
 ```
 
 `public/locales/es/common.json`:
+
 ```json
 {
   "greeting": "Hola"
@@ -52,25 +53,25 @@ For this example, we will create `app/i18n.ts`:
 
 ```ts
 export default {
-    // This is the list of languages your application supports
-    supportedLngs: ['en', 'es'],
-    // This is the language you want to use in case
-    // if the user language is not in the supportedLngs
-    fallbackLng: 'en',
-    // The default namespace of i18next is "translation", but you can customize it here
-    defaultNS: 'common',
-    // Disabling suspense is recommended
-    react: {useSuspense: false},
+  // This is the list of languages your application supports
+  supportedLngs: ["en", "es"],
+  // This is the language you want to use in case
+  // if the user language is not in the supportedLngs
+  fallbackLng: "en",
+  // The default namespace of i18next is "translation", but you can customize it here
+  defaultNS: "common",
+  // Disabling suspense is recommended
+  react: { useSuspense: false },
 };
 ```
 
 And then create a file named `i18next.server.ts` with the following code:
 
 ```ts
-import Backend from 'i18next-fs-backend';
-import { resolve } from 'node:path';
-import { RemixI18Next } from 'remix-i18next';
-import i18n from '~/i18n'; // your i18n configuration file
+import Backend from "i18next-fs-backend";
+import { resolve } from "node:path";
+import { RemixI18Next } from "remix-i18next";
+import i18n from "~/i18n"; // your i18n configuration file
 
 let i18next = new RemixI18Next({
   detection: {
@@ -82,7 +83,7 @@ let i18next = new RemixI18Next({
   i18next: {
     ...i18n,
     backend: {
-      loadPath: resolve('./public/locales/{{lng}}/{{ns}}.json'),
+      loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
     },
   },
   // The backend you want to use to load the translations
@@ -109,8 +110,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import { getInitialNamespaces } from "remix-i18next";
 
-const hydrate = () => {
-  i18next
+async function hydrate() {
+  await i18next
     .use(initReactI18next) // Tell i18next to use the react-i18next plugin
     .use(LanguageDetector) // Setup a client-side language detector
     .use(Backend) // Setup your backend
@@ -118,9 +119,7 @@ const hydrate = () => {
       ...i18n, // spread the configuration
       // This function detects the namespaces your routes rendered while SSR use
       ns: getInitialNamespaces(),
-      backend: {
-        loadPath: "/locales/{{lng}}/{{ns}}.json",
-      },
+      backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
       detection: {
         // Here only enable htmlTag detection, we'll detect the language only
         // server-side with remix-i18next, by using the `<html lang>` attribute
@@ -130,20 +129,19 @@ const hydrate = () => {
         // on the browser, so we disable it
         caches: [],
       },
-    })
-    .then(() => {
-      startTransition(() => {
-        hydrateRoot(
-          document,
-          <I18nextProvider i18n={i18next}>
-            <StrictMode>
-              <RemixBrowser />
-            </StrictMode>
-          </I18nextProvider>
-        );
-      });
     });
-};
+
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <I18nextProvider i18n={i18next}>
+        <StrictMode>
+          <RemixBrowser />
+        </StrictMode>
+      </I18nextProvider>
+    );
+  });
+}
 
 if (window.requestIdleCallback) {
   window.requestIdleCallback(hydrate);
@@ -174,68 +172,64 @@ import { resolve } from "node:path";
 
 const ABORT_DELAY = 5000;
 
-export default function handleRequest(
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-  const callbackName = isbot(request.headers.get("user-agent"))
+  let callbackName = isbot(request.headers.get("user-agent"))
     ? "onAllReady"
     : "onShellReady";
-  const initTranslate = async () => {
-    let didError = false;
-    let instance = createInstance();
-    let lng = await i18next.getLocale(request);
-    let ns = i18next.getRouteNamespaces(remixContext);
 
-    await instance
-      .use(initReactI18next) // Tell our instance to use react-i18next
-      .use(Backend) // Setup our backend
-      .init({
-        ...i18n, // spread the configuration
-        lng, // The locale we detected above
-        ns, // The namespaces the routes about to render wants to use
-        backend: {
-          loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
-        },
-      });
-    return { instance, didError };
-  };
-  return new Promise((resolve, reject) => {
-    initTranslate().then(({ instance, didError }) => {
-      const { pipe, abort } = renderToPipeableStream(
-        <I18nextProvider i18n={instance}>
-          <RemixServer context={remixContext} url={request.url} />
-        </I18nextProvider>,
-        {
-          [callbackName]: () => {
-            const body = new PassThrough();
+  let instance = createInstance();
+  let lng = await i18next.getLocale(request);
+  let ns = i18next.getRouteNamespaces(remixContext);
 
-            responseHeaders.set("Content-Type", "text/html");
-
-            resolve(
-              new Response(body, {
-                headers: responseHeaders,
-                status: didError ? 500 : responseStatusCode,
-              })
-            );
-
-            pipe(body);
-          },
-          onShellError: (err: unknown) => {
-            reject(err);
-          },
-          onError: (error: unknown) => {
-            didError = true;
-
-            console.error(error);
-          },
-        }
-      );
-
-      setTimeout(abort, ABORT_DELAY);
+  await instance
+    .use(initReactI18next) // Tell our instance to use react-i18next
+    .use(Backend) // Setup our backend
+    .init({
+      ...i18n, // spread the configuration
+      lng, // The locale we detected above
+      ns, // The namespaces the routes about to render wants to use
+      backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
     });
+
+  return new Promise((resolve, reject) => {
+    let didError = false;
+
+    let { pipe, abort } = renderToPipeableStream(
+      <I18nextProvider i18n={instance}>
+        <RemixServer context={remixContext} url={request.url} />
+      </I18nextProvider>,
+      {
+        [callbackName]: () => {
+          let body = new PassThrough();
+
+          responseHeaders.set("Content-Type", "text/html");
+
+          resolve(
+            new Response(body, {
+              headers: responseHeaders,
+              status: didError ? 500 : responseStatusCode,
+            })
+          );
+
+          pipe(body);
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          didError = true;
+
+          console.error(error);
+        },
+      }
+    );
+
+    setTimeout(abort, ABORT_DELAY);
   });
 }
 ```
@@ -245,26 +239,16 @@ export default function handleRequest(
 Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't have one with the following code.
 
 ```tsx
-import { json, LoaderFunction } from "@remix-run/node";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-  Outlet,
-} from "@remix-run/react";
 import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
 import i18next from "~/i18next.server";
 
 type LoaderData = { locale: string };
 
-export let loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   let locale = await i18next.getLocale(request);
   return json<LoaderData>({ locale });
-};
+}
 
 export let handle = {
   // In the handle export, we can add a i18n key with namespaces our route
@@ -318,6 +302,7 @@ If you wish to split up your translation files, you create new translation files
 like:
 
 `public/locales/en/home.json`
+
 ```json
 {
   "title": "remix-i18n is awesome"
@@ -325,6 +310,7 @@ like:
 ```
 
 `public/locales/es/home.json`
+
 ```json
 {
   "title": "remix-i18n es increíble"
@@ -337,9 +323,7 @@ And use them in your routes:
 import { useTranslation } from "react-i18next";
 
 // This tells remix to load the "home" namespace
-export let handle = {
-  i18n: "home",
-};
+export let handle = { i18n: "home" };
 
 export default function Component() {
   let { t } = useTranslation("home");
@@ -354,11 +338,11 @@ And that's it, repeat the last step for each route you want to translate, remix-
 If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get a `t` function.
 
 ```ts
-export let loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   let t = await i18n.getFixedT(request);
   let title = t("My page title");
   return json({ title });
-};
+}
 
 export let meta: MetaFunction = ({ data }) => {
   return { title: data.title };
