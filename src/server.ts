@@ -47,6 +47,13 @@ export interface LanguageDetectorOption {
    */
   sessionKey?: string;
   /**
+   * If you want to use search parameters for language detection and want to
+   * change the default key used to for the parameter name,
+   * you can pass the key here.
+   * @default "lng"
+   */
+  searchParamKey?: string;
+  /**
    * The order the library will use to detect the user preferred language.
    * By default the order is
    * - searchParams
@@ -242,8 +249,10 @@ class LanguageDetector {
 
   private async fromSearchParams(request: Request): Promise<string | null> {
     let url = new URL(request.url);
-    if (!url.searchParams.has("lng")) return null;
-    return this.fromSupported(url.searchParams.get("lng"));
+    if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) return null;
+    return this.fromSupported(
+      url.searchParams.get(this.options.searchParamKey ?? "lng")
+    );
   }
 
   private async fromCookie(request: Request): Promise<string | null> {
