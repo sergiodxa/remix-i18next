@@ -249,7 +249,9 @@ class LanguageDetector {
 
   private async fromSearchParams(request: Request): Promise<string | null> {
     let url = new URL(request.url);
-    if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) return null;
+    if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) {
+      return null;
+    }
     return this.fromSupported(
       url.searchParams.get(this.options.searchParamKey ?? "lng")
     );
