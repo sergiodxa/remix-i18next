@@ -9,6 +9,17 @@
     "./build/backend": false
   },
   "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "jsnext:main": "./browser/index.js",
+  "module": "./browser/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./browser/index.js",
+      "require": "./build/index.js"
+    }
+  },
   "scripts": {
     "build": "npm run build:browser && npm run build:main",
     "build:browser": "tsc --project tsconfig.json --module ESNext --outDir ./browser",
