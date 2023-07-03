@@ -185,7 +185,7 @@ export class RemixI18Next {
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {
     let instance = createInstance();
-    const plugins = [
+    let plugins = [
       ...(this.options.backend ? [this.options.backend] : []),
       ...(this.options.plugins || []),
     ];

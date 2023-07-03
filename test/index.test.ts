@@ -250,7 +250,7 @@ describe(RemixI18Next.name, () => {
   });
 
   describe("getFixedT", () => {
-    const backendPlugin: BackendModule = {
+    let backendPlugin: BackendModule = {
       type: "backend",
       init: () => null,
       read: (_language, _namespace, callback) => {
@@ -259,7 +259,8 @@ describe(RemixI18Next.name, () => {
         });
       },
     };
-    const formatterPlugin: FormatterModule = {
+
+    let formatterPlugin: FormatterModule = {
       type: "formatter",
       init: () => null,
       add: () => null,
