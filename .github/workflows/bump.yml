@@ -12,26 +12,22 @@ jobs:
     name: Bump version
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Check out source
+        uses: actions/checkout@v2
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-
-      - name: Use Node 16
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: '16'
           cache: 'npm'
-
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
-
       - name: Setup Git
         run: |
           git config user.name 'Sergio Xalambrí'
           git config user.email 'hello@sergiodxa.com'
-
-      - name: Bump version
+      - name: bump version
         run: npm version ${{ github.event.inputs.version }}
 
       - name: Push latest version
