@@ -5,6 +5,7 @@ import type {
 } from "@remix-run/server-runtime";
 import { pick } from "accept-language-parser";
 import {
+  Module,
   BackendModule,
   createInstance,
   InitOptions,
@@ -71,10 +72,16 @@ export interface RemixI18NextOption {
    */
   i18next?: Omit<InitOptions, "react" | "detection"> | null;
   /**
+   * @deprecated Use `plugins` instead.
    * The i18next backend module used to load the translations when creating a
    * new TFunction.
    */
-  backend?: NewableModule<BackendModule<unknown>>;
+  backend?: NewableModule<BackendModule<unknown>> | BackendModule<unknown>;
+  /**
+   * The i18next plugins used to extend the internal i18next instance
+   * when creating a new TFunction.
+   */
+  plugins?: NewableModule<Module>[] | Module[];
   detection: LanguageDetectorOption;
 }
 
@@ -178,7 +185,11 @@ export class RemixI18Next {
 
   private async createInstance(options: Omit<InitOptions, "react"> = {}) {
     let instance = createInstance();
-    if (this.options.backend) instance = instance.use(this.options.backend);
+    let plugins = [
+      ...(this.options.backend ? [this.options.backend] : []),
+      ...(this.options.plugins || []),
+    ];
+    for (const plugin of plugins) instance.use(plugin);
     await instance.init(options);
     return instance;
   }

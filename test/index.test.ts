@@ -1,6 +1,7 @@
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
 import { describe, expect, test } from "vitest";
 import { RemixI18Next } from "../src";
+import { BackendModule, FormatterModule } from "i18next";
 
 describe(RemixI18Next.name, () => {
   describe("getLocale", () => {
@@ -249,6 +250,26 @@ describe(RemixI18Next.name, () => {
   });
 
   describe("getFixedT", () => {
+    let backendPlugin: BackendModule = {
+      type: "backend",
+      init: () => null,
+      read: (_language, _namespace, callback) => {
+        callback(null, {
+          hello: "Hello {{name, uppercase}}",
+        });
+      },
+    };
+
+    let formatterPlugin: FormatterModule = {
+      type: "formatter",
+      init: () => null,
+      add: () => null,
+      addCached: () => null,
+      format: (value, format) => {
+        if (format === "uppercase") return value.toUpperCase();
+      },
+    };
+
     test("get a fixed T function for server-side usage", async () => {
       let headers = new Headers();
       headers.set("Accept-Language", "fr");
@@ -279,6 +300,71 @@ describe(RemixI18Next.name, () => {
       let t = await i18n.getFixedT(request, "common");
 
       expect(t("Hello {{name}}", { name: "Remix" })).toBe("Bonjour Remix");
+    });
+
+    test("get a fixed T function set with `backend`", async () => {
+      let request = new Request("https://example.com/dashboard?lng=1");
+
+      let i18n = new RemixI18Next({
+        backend: backendPlugin,
+        detection: {
+          supportedLanguages: ["en"],
+          fallbackLanguage: "en",
+        },
+      });
+
+      let t = await i18n.getFixedT(request, "common");
+
+      expect(t("hello", { name: "Remix" })).toBe("Hello Remix");
+    });
+
+    test("get a fixed T function set with single `plugins`", async () => {
+      let request = new Request("https://example.com/dashboard?lng=1");
+
+      let i18n = new RemixI18Next({
+        plugins: [backendPlugin],
+        detection: {
+          supportedLanguages: ["en"],
+          fallbackLanguage: "en",
+        },
+      });
+
+      let t = await i18n.getFixedT(request, "common");
+
+      expect(t("hello", { name: "Remix" })).toBe("Hello Remix");
+    });
+
+    test("get a fixed T function set with multiple `plugins`", async () => {
+      let request = new Request("https://example.com/dashboard?lng=1");
+
+      let i18n = new RemixI18Next({
+        plugins: [backendPlugin, formatterPlugin],
+        detection: {
+          supportedLanguages: ["en"],
+          fallbackLanguage: "en",
+        },
+      });
+
+      let t = await i18n.getFixedT(request, "common");
+
+      expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
+    });
+
+    test("get a fixed T function set with `backend` and `plugins`", async () => {
+      let request = new Request("https://example.com/dashboard?lng=1");
+
+      let i18n = new RemixI18Next({
+        backend: backendPlugin,
+        plugins: [formatterPlugin],
+        detection: {
+          supportedLanguages: ["en"],
+          fallbackLanguage: "en",
+        },
+      });
+
+      let t = await i18n.getFixedT(request, "common");
+
+      expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
     });
   });
 });
