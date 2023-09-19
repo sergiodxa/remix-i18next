@@ -22,8 +22,11 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
   let namespaces = [
     ...new Set(
       useMatches()
-        .filter((route) => route.handle?.i18n !== undefined)
-        .flatMap((route) => route.handle?.i18n as string | string[])
+        .filter(
+          (route) =>
+            (route.handle as { i18n?: string | string[] })?.i18n !== undefined
+        )
+        .flatMap((route) => (route.handle as { i18n: string | string[] }).i18n)
     ),
   ];
 
@@ -58,7 +61,8 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
  */
 export function useLocale(localeKey = "locale"): string {
   let [rootMatch] = useMatches();
-  let { [localeKey]: locale } = rootMatch.data ?? {};
+  let { [localeKey]: locale } =
+    (rootMatch.data as Record<string, string>) ?? {};
   if (!locale) throw new Error("Missing locale returned by the root loader.");
   if (typeof locale === "string") return locale;
   throw new Error("Invalid locale returned by the root loader.");
