@@ -10,8 +10,11 @@
 export function getInitialNamespaces(): string[] {
   let namespaces = new Set(
     Object.values(window.__remixRouteModules)
-      .filter((route) => route.handle?.i18n !== undefined)
-      .flatMap((route) => route.handle.i18n)
+      .filter(
+        (route) =>
+          (route.handle as { i18n?: string | string[] })?.i18n !== undefined
+      )
+      .flatMap((route) => (route.handle as { i18n: string | string[] }).i18n)
   );
 
   return [...namespaces];

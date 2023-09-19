@@ -120,9 +120,12 @@ export class RemixI18Next {
    */
   public getRouteNamespaces(context: EntryContext): string[] {
     let namespaces = Object.values(context.routeModules)
-      .filter((route) => route.handle?.i18n !== undefined)
+      .filter(
+        (route) =>
+          (route.handle as { i18n?: string | string[] })?.i18n !== undefined
+      )
       .flatMap((route) => {
-        let i18n = route.handle.i18n;
+        let i18n = (route.handle as { i18n: string | string[] }).i18n;
         if (typeof i18n === "string") return i18n;
         if (!Array.isArray(i18n)) return [];
         if (i18n.every((ns) => typeof ns === "string")) return i18n as string[];
