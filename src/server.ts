@@ -13,7 +13,7 @@ import {
   TFunction,
   Namespace,
 } from "i18next";
-import { getClientLocales } from "./lib/get-client-locales";
+import { getClientLocales } from "./lib/get-client-locales.js";
 
 const DEFAULT_NS: Namespace = "translation";
 

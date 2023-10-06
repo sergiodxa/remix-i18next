@@ -1,14 +1,19 @@
 {
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "esModuleInterop": true,
-    "moduleResolution": "Node",
-    "target": "ES2019",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "react-jsx",
+    "module": "NodeNext",
+    "target": "ES2022",
+    "moduleResolution": "NodeNext",
+    
+    "rootDir": "./src",
+    "outDir": "dist",
+
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
-    "jsx": "react-jsx",
-    "outDir": "./build"
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules"],
   "include": ["src/**/*.ts", "src/**/*.tsx"]

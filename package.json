@@ -4,27 +4,12 @@
   "description": "The easiest way to translate your Remix apps",
   "license": "MIT",
   "sideEffects": false,
-  "browser": {
-    "./build": "./browser",
-    "./build/backend": false
-  },
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
-  "jsnext:main": "./browser/index.js",
-  "module": "./browser/index.js",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./build/index.d.ts",
-      "import": "./browser/index.js",
-      "require": "./build/index.js"
-    }
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "prepare": "npm run build",
-    "build": "npm run build:browser && npm run build:main",
-    "build:browser": "tsc --project tsconfig.json --module ESNext --outDir ./browser",
-    "build:main": "tsc --project tsconfig.json --module CommonJS --outDir ./build",
+    "prepare": "tshy",
+    "build": "tshy",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint --ext .ts,.tsx src/",
     "test": "vitest"
@@ -87,7 +72,32 @@
     "react": "^18.2.0",
     "react-i18next": "^13.0.0",
     "ts-node": "^10.9.1",
+    "tshy": "^1.2.2",
     "typescript": "^5.1.0",
     "vitest": "^0.25.3"
-  }
+  },
+  "tshy": {
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts"
+    },
+    "selfLink": false,
+    "main": true
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
+    }
+  },
+  "type": "module",
+  "main": "./dist/commonjs/index.js",
+  "types": "./dist/commonjs/index.d.ts"
 }
