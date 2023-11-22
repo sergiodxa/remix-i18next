@@ -8,8 +8,10 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "tshy",
-    "build": "tshy",
+    "prepare": "npm run build",
+    "build": "npm run build:esm && npm run build:commonjs",
+    "build:esm": "tsc --project tsconfig.json --outDir ./dist/esm",
+    "build:commonjs": "tsc --project tsconfig.json --module CommonJS --moduleResolution Node --outDir ./dist/commonjs",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint --ext .ts,.tsx src/",
     "test": "vitest"
@@ -72,17 +74,8 @@
     "react": "^18.2.0",
     "react-i18next": "^13.0.0",
     "ts-node": "^10.9.1",
-    "tshy": "^1.2.2",
     "typescript": "^5.1.0",
     "vitest": "^0.25.3"
-  },
-  "tshy": {
-    "exports": {
-      "./package.json": "./package.json",
-      ".": "./src/index.ts"
-    },
-    "selfLink": false,
-    "main": true
   },
   "exports": {
     "./package.json": "./package.json",
