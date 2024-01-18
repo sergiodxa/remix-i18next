@@ -55,6 +55,13 @@ export interface LanguageDetectorOption {
    */
   searchParamKey?: string;
   /**
+   * If you want to use path parameters for language detection and want to
+   * change the default key used to for the parameter name,
+   * you can pass the key here.
+   * @default "lng"
+   */
+  pathParamKey?: string;
+  /**
    * The order the library will use to detect the user preferred language.
    * By default the order is
    * - searchParams
@@ -63,7 +70,7 @@ export interface LanguageDetectorOption {
    * - header
    * And finally the fallback language.
    */
-  order?: Array<"searchParams" | "cookie" | "session" | "header">;
+  order?: Array<"searchParams" | "pathParams" | "cookie" | "session" | "header">;
 }
 
 export interface RemixI18NextOption {
@@ -231,6 +238,7 @@ class LanguageDetector {
   public async detect(request: Request): Promise<string> {
     let order = this.options.order ?? [
       "searchParams",
+      "pathParams",
       "cookie",
       "session",
       "header",
@@ -241,6 +249,10 @@ class LanguageDetector {
 
       if (method === "searchParams") {
         locale = await this.fromSearchParams(request);
+      }
+
+      if (method === "pathParams") {
+        locale = await this.fromPathParams(request);
       }
 
       if (method === "cookie") {
@@ -268,6 +280,17 @@ class LanguageDetector {
     }
     return this.fromSupported(
       url.searchParams.get(this.options.searchParamKey ?? "lng")
+    );
+  }
+
+  private async fromPathParams(request: Request): Promise<string | null> {
+    let url = new URL(request.url);
+    let lang=url.pathname.split('/')[1];
+    if (lang==null) {
+      return null;
+    }
+    return this.fromSupported(
+        lang
     );
   }
 
