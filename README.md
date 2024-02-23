@@ -158,8 +158,10 @@ And in your `entry.server.tsx` replace the code with this:
 
 ```tsx
 import { PassThrough } from "stream";
-import type { EntryContext } from "@remix-run/node";
-import { Response } from "@remix-run/node";
+import {
+  createReadableStreamFromReadable,
+  type EntryContext,
+} from '@remix-run/node';
 import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
@@ -206,11 +208,11 @@ export default async function handleRequest(
       {
         [callbackName]: () => {
           let body = new PassThrough();
-
+          const stream = createReadableStreamFromReadable(body);
           responseHeaders.set("Content-Type", "text/html");
-
+          
           resolve(
-            new Response(body, {
+            new Response(stream, {
               headers: responseHeaders,
               status: didError ? 500 : responseStatusCode,
             })
@@ -285,7 +287,7 @@ export default function Root() {
 }
 ```
 
-> **Warning** In latest versions you may find an error with `useChangeLanguage` hook, (see [#107](https://github.com/sergiodxa/remix-i18next/issues/107)), to solve it, copy the code of `useChangeLanguage` to your own app and use it instead of the one provided by `remix-i18next`.
+> **Warning** In latest versions you may find an error with `useChangeLanguage` hook, (see [#107](https://github.com/sergiodxa/remix-i18next/issues/107)), to solve it, you can deep import it from the package with `import { useChangeLanguage } from 'node_modules/remix-i18next/browser/react';`, or copy the code of `useChangeLanguage` to your own app and use it instead of the one provided by `remix-i18next`.
 
 ```ts
 export function useChangeLanguage(locale: string) {
