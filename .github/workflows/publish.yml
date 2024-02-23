@@ -9,20 +9,17 @@ jobs:
     name: "Publish to npm"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun run build
+      - run: bun run test:exports
 
-      - name: Use Node 16
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: 'npm'
+          node-version: "lts/*"
           registry-url: https://registry.npmjs.org/
 
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-
-      - name: Publish
-        run: npm publish --access public
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
