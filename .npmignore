@@ -1,12 +1,14 @@
 .github
-example
-config
+scripts
 src
 test
-.eslintrc.js
+.eslintrc.cjs
 .gitignore
 .npmignore
 .npmrc
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
+prettier.config.js
 tsconfig.json
+vitest.config.ts
+vitest.setup.ts
