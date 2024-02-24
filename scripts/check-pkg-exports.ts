@@ -14,7 +14,7 @@ async function main() {
 	const text = await new Response(proc.stdout).text();
 
 	const entrypointLines = text
-		.slice(text.indexOf('"remix-utils/'))
+		.slice(text.indexOf('"remix-i18next/'))
 		.split("\n")
 		.filter(Boolean)
 		.filter((line) => !line.includes("─"))
