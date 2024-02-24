@@ -47,8 +47,7 @@
   ],
   "dependencies": {
     "accept-language-parser": "^1.5.0",
-    "intl-parse-accept-language": "^1.0.0",
-    "use-consistent-value": "^1.0.0"
+    "intl-parse-accept-language": "^1.0.0"
   },
   "peerDependencies": {
     "@remix-run/cloudflare": "^2.0.0",
@@ -98,7 +97,6 @@
     "eslint-plugin-testing-library": "^6.2.0",
     "eslint-plugin-unicorn": "^51.0.1",
     "i18next": "^23.10.0",
-    "lru-cache": "^10.2.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-i18next": "^14.0.5",
