@@ -11,6 +11,9 @@
 
 ## Setup
 
+> [!TIP]
+> If you're using Remix with Vite, check https://github.com/sergiodxa/remix-vite-i18next for an example application, if you have an issue compare your setup with the example.
+
 ### Installation
 
 The first step is to install it in your project with
