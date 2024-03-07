@@ -288,17 +288,6 @@ export default function Root() {
 }
 ```
 
-> **Warning** In latest versions you may find an error with `useChangeLanguage` hook, (see [#107](https://github.com/sergiodxa/remix-i18next/issues/107)), to solve it, you can deep import it from the package with `import { useChangeLanguage } from 'node_modules/remix-i18next/browser/react';`, or copy the code of `useChangeLanguage` to your own app and use it instead of the one provided by `remix-i18next`.
-
-```ts
-export function useChangeLanguage(locale: string) {
-	let { i18n } = useTranslation();
-	useEffect(() => {
-		i18n.changeLanguage(locale);
-	}, [locale, i18n]);
-}
-```
-
 Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t) and use translations from the default namespace.
 
 ```tsx
