@@ -199,7 +199,12 @@ export class RemixI18Next {
 	}
 }
 
-class LanguageDetector {
+/**
+ * The LanguageDetector contains the logic to detect the user preferred language
+ * fully server-side by using a SessionStorage, Cookie, URLSearchParams, or
+ * Headers.
+ */
+export class LanguageDetector {
 	constructor(private options: LanguageDetectorOption) {
 		this.isSessionOnly(options);
 		this.isCookieOnly(options);
@@ -241,7 +246,7 @@ class LanguageDetector {
 			let locale: string | null = null;
 
 			if (method === "searchParams") {
-				locale = await this.fromSearchParams(request);
+				locale = this.fromSearchParams(request);
 			}
 
 			if (method === "cookie") {
@@ -253,7 +258,7 @@ class LanguageDetector {
 			}
 
 			if (method === "header") {
-				locale = await this.fromHeader(request);
+				locale = this.fromHeader(request);
 			}
 
 			if (locale) return locale;
@@ -262,7 +267,7 @@ class LanguageDetector {
 		return this.options.fallbackLanguage;
 	}
 
-	private async fromSearchParams(request: Request): Promise<string | null> {
+	private fromSearchParams(request: Request): string | null {
 		let url = new URL(request.url);
 		if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) {
 			return null;
@@ -276,8 +281,8 @@ class LanguageDetector {
 		if (!this.options.cookie) return null;
 
 		let cookie = this.options.cookie;
-		let lng = (await cookie.parse(request.headers.get("Cookie"))) ?? "";
-		if (!lng) return null;
+		let lng = await cookie.parse(request.headers.get("Cookie"));
+		if (typeof lng !== "string" || !lng) return null;
 
 		return this.fromSupported(lng);
 	}
@@ -296,7 +301,7 @@ class LanguageDetector {
 		return this.fromSupported(lng);
 	}
 
-	private async fromHeader(request: Request): Promise<string | null> {
+	private fromHeader(request: Request): string | null {
 		let locales = getClientLocales(request);
 		if (!locales) return null;
 		if (Array.isArray(locales)) return this.fromSupported(locales.join(","));
