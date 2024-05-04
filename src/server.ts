@@ -188,13 +188,7 @@ export class RemixI18Next {
 		await instance.changeLanguage(locale);
 		await instance.loadNamespaces(parsedNamespaces);
 
-		let tFunction = instance.getFixedT(locale, parsedNamespaces);
-
-		if (keyPrefix) {
-			return (key, options) => tFunction(`${keyPrefix}.${key}`, options);
-		}
-
-		return tFunction;
+		return instance.getFixedT(locale, parsedNamespaces, options?.keyPrefix);
 	}
 
 	private async createInstance(options: Omit<InitOptions, "react"> = {}) {
