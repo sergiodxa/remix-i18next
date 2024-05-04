@@ -143,21 +143,25 @@ export class RemixI18Next {
 	 * @param requestOrLocale The request object or the locale string already detected
 	 * @param namespaces The namespaces to use for the T function. (Default: `translation`).
 	 * @param options The i18next init options
+	 * @param keyPrefix An optional key prefix to prepend to translation keys.
 	 */
 	async getFixedT<N extends Namespace>(
 		locale: string,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react">,
+		keyPrefix?: string,
 	): Promise<TFunction<N>>;
 	async getFixedT<N extends Namespace>(
 		request: Request,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react">,
+		keyPrefix?: string,
 	): Promise<TFunction<N>>;
 	async getFixedT<N extends Namespace>(
 		requestOrLocale: Request | string,
 		namespaces?: N,
 		options: Omit<InitOptions, "react"> = {},
+		keyPrefix?: string,
 	) {
 		let parsedNamespaces = namespaces ?? DEFAULT_NS;
 		// Make sure there's at least one namespace
@@ -184,7 +188,13 @@ export class RemixI18Next {
 		await instance.changeLanguage(locale);
 		await instance.loadNamespaces(parsedNamespaces);
 
-		return instance.getFixedT(locale, parsedNamespaces);
+		let tFunction = instance.getFixedT(locale, parsedNamespaces);
+
+		if (keyPrefix) {
+			return (key, options) => tFunction(`${keyPrefix}.${key}`, options);
+		}
+
+		return tFunction;
 	}
 
 	private async createInstance(options: Omit<InitOptions, "react"> = {}) {
