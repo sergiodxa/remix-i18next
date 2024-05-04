@@ -384,7 +384,7 @@ Here's how you can use it:
 ```ts
 export async function loader({ request }: LoaderArgs) {
   // Assuming "greetings" namespace and "welcome" keyPrefix
-  let t = await i18n.getFixedT(request, "greetings", undefined, "welcome");
+  let t = await i18n.getFixedT(request, "greetings", { keyPrefix: "welcome" });
   let message = t("user"); // This will look for the "welcome.user" key in your "greetings" namespace
   return json({ message });
 }
