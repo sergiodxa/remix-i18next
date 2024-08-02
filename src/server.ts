@@ -5,13 +5,13 @@ import type {
 } from "@remix-run/server-runtime";
 import { pick } from "accept-language-parser";
 import {
-	Module,
-	BackendModule,
+	type BackendModule,
+	type InitOptions,
+	type Module,
+	type Namespace,
+	type NewableModule,
+	type TFunction,
 	createInstance,
-	InitOptions,
-	NewableModule,
-	TFunction,
-	Namespace,
 } from "i18next";
 import { getClientLocales } from "./lib/get-client-locales.js";
 

@@ -60,7 +60,9 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
  * let formattedDate = date.toLocaleDateString(locale);
  */
 export function useLocale(localeKey = "locale"): string {
-	let [rootMatch] = useMatches();
+	let matches = useMatches();
+	// biome-ignore lint/style/noNonNullAssertion: There's always a root match
+	let rootMatch = matches.at(0)!;
 	let { [localeKey]: locale } =
 		(rootMatch.data as Record<string, string>) ?? {};
 	if (!locale) throw new Error("Missing locale returned by the root loader.");

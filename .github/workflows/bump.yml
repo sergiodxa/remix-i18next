@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Semver type of new version (major / minor / patch)"
+        description: "Type of version to bump"
         required: true
         type: choice
         options:
@@ -21,8 +21,8 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
-      - uses: oven-sh/setup-bun@v1
-      - run: bun install
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
 
       - uses: actions/setup-node@v4
         with:
@@ -33,4 +33,5 @@ jobs:
           git config user.email 'hello@sergiodxa.com'
 
       - run: npm version ${{ github.event.inputs.version }}
+      - run: bun run quality:fix
       - run: git push origin main --follow-tags

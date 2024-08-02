@@ -1,7 +1,7 @@
+import { describe, expect, test } from "bun:test";
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
-import { describe, expect, test } from "vitest";
-import { RemixI18Next } from "../src/server.js";
 import { BackendModule, FormatterModule } from "i18next";
+import { RemixI18Next } from "../src/server.js";
 
 describe(RemixI18Next.name, () => {
 	describe("getLocale", () => {
