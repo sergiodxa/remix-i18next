@@ -20,11 +20,7 @@
 		"typecheck": "tsc --noEmit",
 		"quality": "biome check .",
 		"quality:fix": "biome check . --write --unsafe",
-		"exports": "bun run ./scripts/exports.ts",
-		"test": "vitest --run",
-		"test:watch": "vitest",
-		"test:coverage": "vitest --coverage",
-		"test:exports": "bun scripts/check-pkg-exports.ts"
+		"exports": "bun run ./scripts/exports.ts"
 	},
 	"author": {
 		"name": "Sergio Xalambrí",
