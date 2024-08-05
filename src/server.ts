@@ -3,7 +3,6 @@ import type {
 	EntryContext,
 	SessionStorage,
 } from "@remix-run/server-runtime";
-import { pick } from "accept-language-parser";
 import {
 	type BackendModule,
 	type InitOptions,
@@ -13,6 +12,7 @@ import {
 	type TFunction,
 	createInstance,
 } from "i18next";
+import { pick } from "./lib/accept-language-parser.js";
 import { getClientLocales } from "./lib/get-client-locales.js";
 
 const DEFAULT_NS: Namespace = "translation";

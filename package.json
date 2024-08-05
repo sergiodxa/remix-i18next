@@ -37,7 +37,6 @@
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
 	"dependencies": {
-		"accept-language-parser": "^1.5.0",
 		"intl-parse-accept-language": "^1.0.0"
 	},
 	"peerDependencies": {
