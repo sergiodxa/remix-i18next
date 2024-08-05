@@ -1,4 +1,5 @@
-import { parseAcceptLanguage } from "intl-parse-accept-language";
+import { formatLanguageString } from "./format-language-string.js";
+import { parse, pick } from "./parser.js";
 
 export type Locales = string | string[] | undefined;
 
@@ -27,17 +28,16 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
 	// if the header is not defined, return undefined
 	if (!acceptLanguage) return undefined;
 
-	let locales = parseAcceptLanguage(acceptLanguage, {
-		validate: Intl.DateTimeFormat.supportedLocalesOf,
-		ignoreWildcard: true,
-	});
+	let locale = pick(
+		Intl.DateTimeFormat.supportedLocalesOf(
+			parse(acceptLanguage)
+				.filter((lang) => lang.code !== "*")
+				.map(formatLanguageString),
+		),
+		acceptLanguage,
+	);
 
-	// if there are no locales found, return undefined
-	if (locales.length === 0) return undefined;
-	// if there is only one locale, return it
-	if (locales.length === 1) return locales[0];
-	// if there are multiple locales, return the array
-	return locales;
+	return locale ?? undefined;
 }
 
 /**
@@ -46,9 +46,6 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
  * If it's a Headers returns the object directly.
  */
 function getHeaders(requestOrHeaders: Request | Headers): Headers {
-	if (requestOrHeaders instanceof Request) {
-		return requestOrHeaders.headers;
-	}
-
+	if (requestOrHeaders instanceof Request) return requestOrHeaders.headers;
 	return requestOrHeaders;
 }

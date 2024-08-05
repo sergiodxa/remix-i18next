@@ -12,8 +12,8 @@ import {
 	type TFunction,
 	createInstance,
 } from "i18next";
-import { pick } from "./lib/accept-language-parser.js";
 import { getClientLocales } from "./lib/get-client-locales.js";
+import { pick } from "./lib/parser.js";
 
 const DEFAULT_NS: Namespace = "translation";
 

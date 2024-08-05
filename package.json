@@ -1,27 +1,6 @@
 {
 	"name": "remix-i18next",
 	"version": "6.1.1",
-	"description": "The easiest way to translate your Remix apps",
-	"license": "MIT",
-	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"engines": {
-		"node": ">=20.0.0"
-	},
-	"type": "module",
-	"exports": {
-		"./package.json": "./package.json",
-		"./client": "./build/client.js",
-		"./server": "./build/server.js",
-		"./react": "./build/react.js"
-	},
-	"sideEffects": false,
-	"scripts": {
-		"build": "tsc",
-		"typecheck": "tsc --noEmit",
-		"quality": "biome check .",
-		"quality:fix": "biome check . --write --unsafe",
-		"exports": "bun run ./scripts/exports.ts"
-	},
 	"author": {
 		"name": "Sergio Xalambrí",
 		"url": "https://sergiodxa.com",
@@ -30,34 +9,6 @@
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sergiodxa/remix-i18next.git"
-	},
-	"bugs": {
-		"url": "https://github.com/sergiodxa/remix-i18next/issues"
-	},
-	"funding": "https://github.com/sponsors/sergiodxa",
-	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
-	"dependencies": {
-		"intl-parse-accept-language": "^1.0.0"
-	},
-	"peerDependencies": {
-		"@remix-run/cloudflare": "^2.0.0",
-		"@remix-run/deno": "^2.0.0",
-		"@remix-run/node": "^2.0.0",
-		"@remix-run/react": "^2.0.0",
-		"i18next": "^23.1.0",
-		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0"
-	},
-	"peerDependenciesMeta": {
-		"@remix-run/cloudflare": {
-			"optional": true
-		},
-		"@remix-run/deno": {
-			"optional": true
-		},
-		"@remix-run/node": {
-			"optional": true
-		}
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.15.3",
@@ -79,5 +30,51 @@
 		"typedoc": "^0.26.5",
 		"typedoc-plugin-mdn-links": "^3.2.6",
 		"typescript": "^5.5.4"
-	}
+	},
+	"peerDependencies": {
+		"@remix-run/cloudflare": "^2.0.0",
+		"@remix-run/deno": "^2.0.0",
+		"@remix-run/node": "^2.0.0",
+		"@remix-run/react": "^2.0.0",
+		"i18next": "^23.1.0",
+		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		"./client": "./build/client.js",
+		"./server": "./build/server.js",
+		"./react": "./build/react.js"
+	},
+	"bugs": {
+		"url": "https://github.com/sergiodxa/remix-i18next/issues"
+	},
+	"description": "The easiest way to translate your Remix apps",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"funding": "https://github.com/sponsors/sergiodxa",
+	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
+	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
+	"license": "MIT",
+	"peerDependenciesMeta": {
+		"@remix-run/cloudflare": {
+			"optional": true
+		},
+		"@remix-run/deno": {
+			"optional": true
+		},
+		"@remix-run/node": {
+			"optional": true
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"typecheck": "tsc --noEmit",
+		"quality": "biome check .",
+		"quality:fix": "biome check . --write --unsafe",
+		"exports": "bun run ./scripts/exports.ts"
+	},
+	"sideEffects": false,
+	"type": "module"
 }

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import * as parser from "../src/lib/accept-language-parser.js";
+import * as parser from "../src/lib/parser.js";
 
 describe(parser.parse.name, () => {
 	test("should correctly parse the language with quality", () => {

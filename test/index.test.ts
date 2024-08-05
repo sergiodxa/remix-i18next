@@ -86,7 +86,9 @@ describe(RemixI18Next.name, () => {
 
 		test("should get the locale from the request header", async () => {
 			let request = new Request("https://example.com/dashboard", {
-				headers: { "Accept-Language": "es" },
+				headers: {
+					"Accept-Language": "es-AR,es;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5",
+				},
 			});
 
 			let i18n = new RemixI18Next({

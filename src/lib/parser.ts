@@ -1,3 +1,5 @@
+import { formatLanguageString } from "./format-language-string.js";
+
 let REGEX = /((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;q=[0-1](\.[0-9]+)?)?)*/g;
 
 export interface Language {
@@ -95,13 +97,4 @@ export function pick<T extends string>(
 	}
 
 	return null;
-}
-
-function formatLanguageString(
-	language: Pick<Language, "code" | "region" | "script">,
-): string {
-	let parts = [language.code];
-	if (language.script) parts.push(language.script);
-	if (language.region) parts.push(language.region);
-	return parts.join("-");
 }
