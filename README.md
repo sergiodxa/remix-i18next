@@ -374,3 +374,20 @@ export let i18n = new RemixI18Next({
 ```
 
 This options will be overwritten by the options provided to `getFixedT`.
+
+#### Using the `keyPrefix` option with `getFixedT`
+
+The `getFixedT` function now supports a `keyPrefix` option, allowing you to prepend a prefix to your translation keys. This is particularly useful when you want to namespace your translations without having to specify the full key path every time.
+
+Here's how you can use it:
+
+```ts
+export async function loader({ request }: LoaderArgs) {
+  // Assuming "greetings" namespace and "welcome" keyPrefix
+  let t = await i18n.getFixedT(request, "greetings", { keyPrefix: "welcome" });
+  let message = t("user"); // This will look for the "welcome.user" key in your "greetings" namespace
+  return json({ message });
+}
+```
+
+This feature simplifies working with deeply nested translation keys and enhances the organization of your translation files.

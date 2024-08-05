@@ -142,23 +142,23 @@ export class RemixI18Next {
 	 *
 	 * @param requestOrLocale The request object or the locale string already detected
 	 * @param namespaces The namespaces to use for the T function. (Default: `translation`).
-	 * @param options The i18next init options
+	 * @param options The i18next init options and the key prefix to prepend to translation keys.
 	 */
-	async getFixedT<N extends Namespace>(
+	async getFixedT<N extends Namespace, KPrefix extends string>(
 		locale: string,
 		namespaces?: N,
-		options?: Omit<InitOptions, "react">,
-	): Promise<TFunction<N>>;
-	async getFixedT<N extends Namespace>(
+		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
+	): Promise<TFunction<N, KPrefix>>;
+	async getFixedT<N extends Namespace, KPrefix extends string>(
 		request: Request,
 		namespaces?: N,
-		options?: Omit<InitOptions, "react">,
-	): Promise<TFunction<N>>;
-	async getFixedT<N extends Namespace>(
+		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
+	): Promise<TFunction<N, KPrefix>>;
+	async getFixedT<N extends Namespace, KPrefix extends string>(
 		requestOrLocale: Request | string,
 		namespaces?: N,
-		options: Omit<InitOptions, "react"> = {},
-	) {
+		options: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix } = {},
+	): Promise<TFunction<N, KPrefix>> {
 		let parsedNamespaces = namespaces ?? DEFAULT_NS;
 		// Make sure there's at least one namespace
 		if (!namespaces || namespaces.length === 0) {
@@ -184,7 +184,7 @@ export class RemixI18Next {
 		await instance.changeLanguage(locale);
 		await instance.loadNamespaces(parsedNamespaces);
 
-		return instance.getFixedT(locale, parsedNamespaces);
+		return instance.getFixedT(locale, parsedNamespaces, options?.keyPrefix);
 	}
 
 	private async createInstance(options: Omit<InitOptions, "react"> = {}) {
