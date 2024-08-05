@@ -30,6 +30,6 @@ export function useLocale(localeKey = "locale"): string {
 export function useChangeLanguage(locale: string) {
 	let { i18n } = useTranslation();
 	React.useEffect(() => {
-		i18n.changeLanguage(locale);
+		if (i18n.language !== locale) i18n.changeLanguage(locale);
 	}, [locale, i18n]);
 }
