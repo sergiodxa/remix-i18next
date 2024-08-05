@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "includeVersion": true,
+  "entryPoints": ["./src/client.ts", "./src/react.tsx", "./src/server.ts"],
+  "out": "docs",
+  "json": "docs/index.json",
+  "cleanOutputDir": true,
+  "plugin": ["typedoc-plugin-mdn-links"],
+  "categorizeByGroup": false
+}
