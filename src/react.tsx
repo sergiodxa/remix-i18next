@@ -2,54 +2,6 @@ import { useMatches } from "@remix-run/react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 
-export interface PreloadTranslationsProps {
-	loadPath: string;
-}
-
-/**
- * Preload the translations files for the current language and the namespaces
- * required by the routes.
- *
- * It receives a single `loadPath` prop with the path to the translation files.
- *
- * @example
- * <PreloadTranslations loadPath="/locales/{{lng}}/{{ns}}.json" />
- *
- */
-export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
-	let { i18n } = useTranslation();
-
-	let namespaces = [
-		...new Set(
-			useMatches()
-				.filter(
-					(route) =>
-						(route.handle as { i18n?: string | string[] })?.i18n !== undefined,
-				)
-				.flatMap((route) => (route.handle as { i18n: string | string[] }).i18n),
-		),
-	];
-
-	let lang = i18n.language;
-
-	return (
-		<>
-			{namespaces.map((namespace) => {
-				return (
-					<link
-						key={namespace}
-						rel="preload"
-						as="fetch"
-						href={loadPath
-							.replace("{{lng}}", lang)
-							.replace("{{ns}}", namespace)}
-					/>
-				);
-			})}
-		</>
-	);
-}
-
 /**
  * Get the locale returned by the root route loader under the `locale` key.
  * @example
@@ -60,14 +12,14 @@ export function PreloadTranslations({ loadPath }: PreloadTranslationsProps) {
  * let formattedDate = date.toLocaleDateString(locale);
  */
 export function useLocale(localeKey = "locale"): string {
-	let matches = useMatches();
-	// biome-ignore lint/style/noNonNullAssertion: There's always a root match
-	let rootMatch = matches.at(0)!;
-	let { [localeKey]: locale } =
-		(rootMatch.data as Record<string, string>) ?? {};
-	if (!locale) throw new Error("Missing locale returned by the root loader.");
-	if (typeof locale === "string") return locale;
-	throw new Error("Invalid locale returned by the root loader.");
+  let matches = useMatches();
+  // biome-ignore lint/style/noNonNullAssertion: There's always a root match
+  let rootMatch = matches.at(0)!;
+  let { [localeKey]: locale } =
+    (rootMatch.data as Record<string, string>) ?? {};
+  if (!locale) throw new Error("Missing locale returned by the root loader.");
+  if (typeof locale === "string") return locale;
+  throw new Error("Invalid locale returned by the root loader.");
 }
 
 /**
@@ -76,8 +28,8 @@ export function useLocale(localeKey = "locale"): string {
  * This will ensure translations are loaded automatically.
  */
 export function useChangeLanguage(locale: string) {
-	let { i18n } = useTranslation();
-	React.useEffect(() => {
-		i18n.changeLanguage(locale);
-	}, [locale, i18n]);
+  let { i18n } = useTranslation();
+  React.useEffect(() => {
+    i18n.changeLanguage(locale);
+  }, [locale, i18n]);
 }
