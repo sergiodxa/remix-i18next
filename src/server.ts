@@ -144,17 +144,17 @@ export class RemixI18Next {
 	 * @param namespaces The namespaces to use for the T function. (Default: `translation`).
 	 * @param options The i18next init options and the key prefix to prepend to translation keys.
 	 */
-	async getFixedT<N extends Namespace, KPrefix extends string>(
+	async getFixedT<N extends Namespace, KPrefix extends string = "">(
 		locale: string,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
 	): Promise<TFunction<N, KPrefix>>;
-	async getFixedT<N extends Namespace, KPrefix extends string>(
+	async getFixedT<N extends Namespace, KPrefix extends string = "">(
 		request: Request,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
 	): Promise<TFunction<N, KPrefix>>;
-	async getFixedT<N extends Namespace, KPrefix extends string>(
+	async getFixedT<N extends Namespace, KPrefix extends string = "">(
 		requestOrLocale: Request | string,
 		namespaces?: N,
 		options: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix } = {},
