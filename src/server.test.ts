@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createCookie, createMemorySessionStorage } from "@remix-run/node";
-import { BackendModule, FormatterModule } from "i18next";
-import { RemixI18Next } from "../src/server.js";
+import type { BackendModule, FormatterModule } from "i18next";
+import { RemixI18Next } from "./server.js";
 
 describe(RemixI18Next.name, () => {
 	describe("getLocale", () => {
@@ -9,10 +9,7 @@ describe(RemixI18Next.name, () => {
 			let request = new Request("https://example.com/dashboard?lng=es");
 
 			let i18n = new RemixI18Next({
-				detection: {
-					supportedLanguages: ["es", "en"],
-					fallbackLanguage: "en",
-				},
+				detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
 			});
 
 			expect(await i18n.getLocale(request)).toBe("es");
@@ -382,6 +379,20 @@ describe(RemixI18Next.name, () => {
 			let t = await i18n.getFixedT(request, "common", { keyPrefix: "user" });
 
 			expect(t("age", { number: 25 })).toBe("My age is 25");
+		});
+
+		test("get a fixed T that uses instance fallback language", async () => {
+			let request = new Request("https://example.com/dashboard?lng=1");
+
+			let i18n = new RemixI18Next({
+				backend: backendPlugin,
+				plugins: [formatterPlugin],
+				detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
+			});
+
+			let t = await i18n.getFixedT(request, "common");
+
+			expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
 		});
 	});
 });
