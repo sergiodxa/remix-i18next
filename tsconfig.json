@@ -1,7 +1,12 @@
 {
 	/* Change to `@total-typescript/tsconfig/tsc/dom/library` for DOM usage */
 	"extends": "@total-typescript/tsconfig/tsc/dom/library",
-	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"include": [
+		"src/client.ts",
+		"src/react.tsx",
+		"src/server.ts",
+		"src/lib/**/*.tsx"
+	],
 	"compilerOptions": {
 		"outDir": "./build",
 		"jsx": "react"
