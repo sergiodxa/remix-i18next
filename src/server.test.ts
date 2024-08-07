@@ -252,7 +252,7 @@ describe(RemixI18Next.name, () => {
 		let backendPlugin: BackendModule = {
 			type: "backend",
 			init: () => null,
-			read: (_language, _namespace, callback) => {
+			read(_language, _namespace, callback) {
 				callback(null, {
 					hello: "Hello {{name, uppercase}}",
 					user: { age: "My age is {{number}}" },
@@ -265,7 +265,7 @@ describe(RemixI18Next.name, () => {
 			init: () => null,
 			add: () => null,
 			addCached: () => null,
-			format: (value, format) => {
+			format(value, format) {
 				if (format === "uppercase") return value.toUpperCase();
 			},
 		};
@@ -299,6 +299,7 @@ describe(RemixI18Next.name, () => {
 
 			let t = await i18n.getFixedT(request, "common");
 
+			// @ts-expect-error - We're not using the typed resources here
 			expect(t("Hello {{name}}", { name: "Remix" })).toBe("Bonjour Remix");
 		});
 
@@ -396,3 +397,14 @@ describe(RemixI18Next.name, () => {
 		});
 	});
 });
+
+declare module "i18next" {
+	interface CustomTypeOptions {
+		resources: {
+			common: {
+				hello: string;
+				user: { age: string };
+			};
+		};
+	}
+}

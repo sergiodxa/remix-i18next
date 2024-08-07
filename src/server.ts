@@ -5,7 +5,10 @@ import type {
 } from "@remix-run/server-runtime";
 import {
 	type BackendModule,
+	type DefaultNamespace,
+	type FlatNamespace,
 	type InitOptions,
+	type KeyPrefix,
 	type Module,
 	type Namespace,
 	type NewableModule,
@@ -15,7 +18,11 @@ import {
 import { getClientLocales } from "./lib/get-client-locales.js";
 import { pick } from "./lib/parser.js";
 
-const DEFAULT_NS: Namespace = "translation";
+type FallbackNs<Ns> = Ns extends undefined
+	? DefaultNamespace
+	: Ns extends Namespace
+		? Ns
+		: DefaultNamespace;
 
 export interface LanguageDetectorOption {
 	/**
@@ -144,47 +151,55 @@ export class RemixI18Next {
 	 * @param namespaces The namespaces to use for the T function. (Default: `translation`).
 	 * @param options The i18next init options and the key prefix to prepend to translation keys.
 	 */
-	async getFixedT<N extends Namespace, KPrefix extends string = "">(
+	async getFixedT<
+		N extends
+			| FlatNamespace
+			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
+	>(
 		locale: string,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
-	): Promise<TFunction<N, KPrefix>>;
-	async getFixedT<N extends Namespace, KPrefix extends string = "">(
+	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
+	async getFixedT<
+		N extends
+			| FlatNamespace
+			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
+	>(
 		request: Request,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
-	): Promise<TFunction<N, KPrefix>>;
-	async getFixedT<N extends Namespace, KPrefix extends string = "">(
+	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
+	async getFixedT<
+		N extends
+			| FlatNamespace
+			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
+	>(
 		requestOrLocale: Request | string,
 		namespaces?: N,
 		options: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix } = {},
-	): Promise<TFunction<N, KPrefix>> {
-		let parsedNamespaces = namespaces ?? DEFAULT_NS;
-		// Make sure there's at least one namespace
-		if (!namespaces || namespaces.length === 0) {
-			parsedNamespaces = (this.options.i18next?.defaultNS ||
-				"translation") as N;
-		}
-
+	): Promise<TFunction<FallbackNs<N>, KPrefix>> {
 		let [instance, locale] = await Promise.all([
-			this.createInstance({
-				...this.options.i18next,
-				...options,
-				fallbackNS: parsedNamespaces,
-				defaultNS:
-					typeof parsedNamespaces === "string"
-						? parsedNamespaces
-						: parsedNamespaces[0],
-			}),
+			this.createInstance({ ...this.options.i18next, ...options }),
 			typeof requestOrLocale === "string"
 				? requestOrLocale
 				: this.getLocale(requestOrLocale),
 		]);
 
 		await instance.changeLanguage(locale);
-		await instance.loadNamespaces(parsedNamespaces);
 
-		return instance.getFixedT(locale, parsedNamespaces, options?.keyPrefix);
+		if (namespaces) await instance.loadNamespaces(namespaces);
+		else if (instance.options.defaultNS) {
+			await instance.loadNamespaces(instance.options.defaultNS);
+		} else await instance.loadNamespaces("translation" as DefaultNamespace);
+
+		return instance.getFixedT<N, KPrefix, N>(
+			locale,
+			namespaces,
+			options?.keyPrefix,
+		);
 	}
 
 	private async createInstance(options: Omit<InitOptions, "react"> = {}) {

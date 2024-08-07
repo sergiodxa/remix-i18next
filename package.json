@@ -55,13 +55,7 @@
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": [
-		"remix",
-		"i18n",
-		"i18next",
-		"ssr",
-		"csr"
-	],
+	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
 	"license": "MIT",
 	"peerDependenciesMeta": {
 		"@remix-run/cloudflare": {
