@@ -85,6 +85,15 @@ describe(parser.parse.name, () => {
 			{ code: "en", quality: 0.4, script: null },
 			{ code: "*", quality: 0.1, script: null },
 		]);
+
+		let result2 = parser.parse("zh-CN, zh; q=0.9, en; q=0.8, ko; q=0.7");
+
+		expect(result2).toEqual([
+			{ code: "zh", region: "CN", quality: 1.0, script: null },
+			{ code: "zh", quality: 0.9, script: null },
+			{ code: "en", quality: 0.8, script: null },
+			{ code: "ko", quality: 0.7, script: null },
+		]);
 	});
 
 	test("should sort based on quality value", () => {
