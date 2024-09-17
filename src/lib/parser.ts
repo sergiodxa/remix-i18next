@@ -1,6 +1,6 @@
 import { formatLanguageString } from "./format-language-string.js";
 
-let REGEX = /((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;q=[0-1](\.[0-9]+)?)?)*/g;
+let REGEX = /[ ]*((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;[ ]*q=[0-1](\.[0-9]+)?[ ]*)?)*/g;
 
 export interface Language {
 	code: string;
@@ -25,6 +25,9 @@ export function parse(acceptLanguage?: string): Language[] {
 
 	for (let m of strings) {
 		if (!m) continue;
+
+		m = m.trim();
+
 		let bits = m.split(";");
 		let ietf = bits[0]?.split("-") ?? [];
 		let hasScript = ietf.length === 3;

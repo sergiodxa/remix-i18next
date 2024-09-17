@@ -28,11 +28,25 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
 	// if the header is not defined, return undefined
 	if (!acceptLanguage) return undefined;
 
+	let parsedLocales = parse(acceptLanguage)
+	.filter((lang) => lang.code !== "*")
+	.map(formatLanguageString);
+
+	let validLocales: string[] = []
+
+	for (let locale of parsedLocales) {
+		try {
+			// This will throw on invalid locales
+			new Intl.Locale(locale);
+
+			// If we get here, the locale is valid
+			validLocales.push(locale);
+		} catch {}
+	}
+
 	let locale = pick(
 		Intl.DateTimeFormat.supportedLocalesOf(
-			parse(acceptLanguage)
-				.filter((lang) => lang.code !== "*")
-				.map(formatLanguageString),
+			validLocales,
 		),
 		acceptLanguage,
 	);
