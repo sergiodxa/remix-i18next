@@ -1,6 +1,6 @@
 {
 	"name": "remix-i18next",
-	"version": "6.3.0",
+	"version": "6.3.1",
 	"author": {
 		"name": "Sergio Xalambrí",
 		"url": "https://sergiodxa.com",
@@ -55,7 +55,13 @@
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
+	"keywords": [
+		"remix",
+		"i18n",
+		"i18next",
+		"ssr",
+		"csr"
+	],
 	"license": "MIT",
 	"peerDependenciesMeta": {
 		"@remix-run/cloudflare": {
