@@ -68,9 +68,18 @@ export interface LanguageDetectorOption {
 	 * - cookie
 	 * - session
 	 * - header
+	 * If customized, a an extra `custom` option can be added to the order.
 	 * And finally the fallback language.
 	 */
-	order?: Array<"searchParams" | "cookie" | "session" | "header">;
+	order?: Array<"searchParams" | "cookie" | "session" | "header" | "custom">;
+	/**
+	 * A function that can be used to find the locale based on the request object
+	 * using any custom logic you want.
+	 * This can be useful to get the locale from the URL pathname, or to query it
+	 * from the database or fetch it from an API.
+	 * @param request The request object received by the server.
+	 */
+	findLocale?(request: Request): Promise<string | Array<string> | null>;
 }
 
 export interface RemixI18NextOption {
@@ -250,12 +259,7 @@ export class LanguageDetector {
 	}
 
 	public async detect(request: Request): Promise<string> {
-		let order = this.options.order ?? [
-			"searchParams",
-			"cookie",
-			"session",
-			"header",
-		];
+		let order = this.options.order ?? this.defaultOrder;
 
 		for (let method of order) {
 			let locale: string | null = null;
@@ -276,10 +280,22 @@ export class LanguageDetector {
 				locale = this.fromHeader(request);
 			}
 
+			if (method === "custom") {
+				locale = await this.fromCustom(request);
+			}
+
 			if (locale) return locale;
 		}
 
 		return this.options.fallbackLanguage;
+	}
+
+	private get defaultOrder() {
+		let order: Array<
+			"searchParams" | "cookie" | "session" | "header" | "custom"
+		> = ["searchParams", "cookie", "session", "header"];
+		if (this.options.findLocale) order.unshift("custom");
+		return order;
 	}
 
 	private fromSearchParams(request: Request): string | null {
@@ -318,6 +334,18 @@ export class LanguageDetector {
 
 	private fromHeader(request: Request): string | null {
 		let locales = getClientLocales(request);
+		if (!locales) return null;
+		if (Array.isArray(locales)) return this.fromSupported(locales.join(","));
+		return this.fromSupported(locales);
+	}
+
+	private async fromCustom(request: Request): Promise<string | null> {
+		if (!this.options.findLocale) {
+			throw new ReferenceError(
+				"You tried to find a locale using `findLocale` but it iss not defined. Change your order to not include `custom` or provide a findLocale functions.",
+			);
+		}
+		let locales = await this.options.findLocale(request);
 		if (!locales) return null;
 		if (Array.isArray(locales)) return this.fromSupported(locales.join(","));
 		return this.fromSupported(locales);

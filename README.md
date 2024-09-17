@@ -36,7 +36,7 @@ First let's create some translation files
 
 ```json
 {
-	"greeting": "Hello"
+  "greeting": "Hello"
 }
 ```
 
@@ -44,7 +44,7 @@ First let's create some translation files
 
 ```json
 {
-	"greeting": "Hola"
+  "greeting": "Hola"
 }
 ```
 
@@ -56,13 +56,13 @@ For this example, we will create `app/i18n.ts`:
 
 ```ts
 export default {
-	// This is the list of languages your application supports
-	supportedLngs: ["en", "es"],
-	// This is the language you want to use in case
-	// if the user language is not in the supportedLngs
-	fallbackLng: "en",
-	// The default namespace of i18next is "translation", but you can customize it here
-	defaultNS: "common",
+  // This is the list of languages your application supports
+  supportedLngs: ["en", "es"],
+  // This is the language you want to use in case
+  // if the user language is not in the supportedLngs
+  fallbackLng: "en",
+  // The default namespace of i18next is "translation", but you can customize it here
+  defaultNS: "common",
 };
 ```
 
@@ -75,22 +75,22 @@ import { RemixI18Next } from "remix-i18next/server";
 import i18n from "~/i18n"; // your i18n configuration file
 
 let i18next = new RemixI18Next({
-	detection: {
-		supportedLanguages: i18n.supportedLngs,
-		fallbackLanguage: i18n.fallbackLng,
-	},
-	// This is the configuration for i18next used
-	// when translating messages server-side only
-	i18next: {
-		...i18n,
-		backend: {
-			loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
-		},
-	},
-	// The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.
-	// E.g. The Backend plugin for loading translations from the file system
-	// Tip: You could pass `resources` to the `i18next` configuration and avoid a backend here
-	plugins: [Backend],
+  detection: {
+    supportedLanguages: i18n.supportedLngs,
+    fallbackLanguage: i18n.fallbackLng,
+  },
+  // This is the configuration for i18next used
+  // when translating messages server-side only
+  i18next: {
+    ...i18n,
+    backend: {
+      loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
+    },
+  },
+  // The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.
+  // E.g. The Backend plugin for loading translations from the file system
+  // Tip: You could pass `resources` to the `i18next` configuration and avoid a backend here
+  plugins: [Backend],
 });
 
 export default i18next;
@@ -112,44 +112,44 @@ import Backend from "i18next-http-backend";
 import { getInitialNamespaces } from "remix-i18next/client";
 
 async function hydrate() {
-	await i18next
-		.use(initReactI18next) // Tell i18next to use the react-i18next plugin
-		.use(LanguageDetector) // Setup a client-side language detector
-		.use(Backend) // Setup your backend
-		.init({
-			...i18n, // spread the configuration
-			// This function detects the namespaces your routes rendered while SSR use
-			ns: getInitialNamespaces(),
-			backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
-			detection: {
-				// Here only enable htmlTag detection, we'll detect the language only
-				// server-side with remix-i18next, by using the `<html lang>` attribute
-				// we can communicate to the client the language detected server-side
-				order: ["htmlTag"],
-				// Because we only use htmlTag, there's no reason to cache the language
-				// on the browser, so we disable it
-				caches: [],
-			},
-		});
+  await i18next
+    .use(initReactI18next) // Tell i18next to use the react-i18next plugin
+    .use(LanguageDetector) // Setup a client-side language detector
+    .use(Backend) // Setup your backend
+    .init({
+      ...i18n, // spread the configuration
+      // This function detects the namespaces your routes rendered while SSR use
+      ns: getInitialNamespaces(),
+      backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
+      detection: {
+        // Here only enable htmlTag detection, we'll detect the language only
+        // server-side with remix-i18next, by using the `<html lang>` attribute
+        // we can communicate to the client the language detected server-side
+        order: ["htmlTag"],
+        // Because we only use htmlTag, there's no reason to cache the language
+        // on the browser, so we disable it
+        caches: [],
+      },
+    });
 
-	startTransition(() => {
-		hydrateRoot(
-			document,
-			<I18nextProvider i18n={i18next}>
-				<StrictMode>
-					<RemixBrowser />
-				</StrictMode>
-			</I18nextProvider>,
-		);
-	});
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <I18nextProvider i18n={i18next}>
+        <StrictMode>
+          <RemixBrowser />
+        </StrictMode>
+      </I18nextProvider>
+    );
+  });
 }
 
 if (window.requestIdleCallback) {
-	window.requestIdleCallback(hydrate);
+  window.requestIdleCallback(hydrate);
 } else {
-	// Safari doesn't support requestIdleCallback
-	// https://caniuse.com/requestidlecallback
-	window.setTimeout(hydrate, 1);
+  // Safari doesn't support requestIdleCallback
+  // https://caniuse.com/requestidlecallback
+  window.setTimeout(hydrate, 1);
 }
 ```
 
@@ -160,8 +160,8 @@ And in your `entry.server.tsx` replace the code with this:
 ```tsx
 import { PassThrough } from "stream";
 import {
-	createReadableStreamFromReadable,
-	type EntryContext,
+  createReadableStreamFromReadable,
+  type EntryContext,
 } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
@@ -176,64 +176,64 @@ import { resolve } from "node:path";
 const ABORT_DELAY = 5000;
 
 export default async function handleRequest(
-	request: Request,
-	responseStatusCode: number,
-	responseHeaders: Headers,
-	remixContext: EntryContext,
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  remixContext: EntryContext
 ) {
-	let callbackName = isbot(request.headers.get("user-agent"))
-		? "onAllReady"
-		: "onShellReady";
+  let callbackName = isbot(request.headers.get("user-agent"))
+    ? "onAllReady"
+    : "onShellReady";
 
-	let instance = createInstance();
-	let lng = await i18next.getLocale(request);
-	let ns = i18next.getRouteNamespaces(remixContext);
+  let instance = createInstance();
+  let lng = await i18next.getLocale(request);
+  let ns = i18next.getRouteNamespaces(remixContext);
 
-	await instance
-		.use(initReactI18next) // Tell our instance to use react-i18next
-		.use(Backend) // Setup our backend
-		.init({
-			...i18n, // spread the configuration
-			lng, // The locale we detected above
-			ns, // The namespaces the routes about to render wants to use
-			backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
-		});
+  await instance
+    .use(initReactI18next) // Tell our instance to use react-i18next
+    .use(Backend) // Setup our backend
+    .init({
+      ...i18n, // spread the configuration
+      lng, // The locale we detected above
+      ns, // The namespaces the routes about to render wants to use
+      backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
+    });
 
-	return new Promise((resolve, reject) => {
-		let didError = false;
+  return new Promise((resolve, reject) => {
+    let didError = false;
 
-		let { pipe, abort } = renderToPipeableStream(
-			<I18nextProvider i18n={instance}>
-				<RemixServer context={remixContext} url={request.url} />
-			</I18nextProvider>,
-			{
-				[callbackName]: () => {
-					let body = new PassThrough();
-					const stream = createReadableStreamFromReadable(body);
-					responseHeaders.set("Content-Type", "text/html");
+    let { pipe, abort } = renderToPipeableStream(
+      <I18nextProvider i18n={instance}>
+        <RemixServer context={remixContext} url={request.url} />
+      </I18nextProvider>,
+      {
+        [callbackName]: () => {
+          let body = new PassThrough();
+          const stream = createReadableStreamFromReadable(body);
+          responseHeaders.set("Content-Type", "text/html");
 
-					resolve(
-						new Response(stream, {
-							headers: responseHeaders,
-							status: didError ? 500 : responseStatusCode,
-						}),
-					);
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: didError ? 500 : responseStatusCode,
+            })
+          );
 
-					pipe(body);
-				},
-				onShellError(error: unknown) {
-					reject(error);
-				},
-				onError(error: unknown) {
-					didError = true;
+          pipe(body);
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          didError = true;
 
-					console.error(error);
-				},
-			},
-		);
+          console.error(error);
+        },
+      }
+    );
 
-		setTimeout(abort, ABORT_DELAY);
-	});
+    setTimeout(abort, ABORT_DELAY);
+  });
 }
 ```
 
@@ -247,44 +247,44 @@ import { useTranslation } from "react-i18next";
 import i18next from "~/i18next.server";
 
 export async function loader({ request }: LoaderArgs) {
-	let locale = await i18next.getLocale(request);
-	return json({ locale });
+  let locale = await i18next.getLocale(request);
+  return json({ locale });
 }
 
 export let handle = {
-	// In the handle export, we can add a i18n key with namespaces our route
-	// will need to load. This key can be a single string or an array of strings.
-	// TIP: In most cases, you should set this to your defaultNS from your i18n config
-	// or if you did not set one, set it to the i18next default namespace "translation"
-	i18n: "common",
+  // In the handle export, we can add a i18n key with namespaces our route
+  // will need to load. This key can be a single string or an array of strings.
+  // TIP: In most cases, you should set this to your defaultNS from your i18n config
+  // or if you did not set one, set it to the i18next default namespace "translation"
+  i18n: "common",
 };
 
 export default function Root() {
-	// Get the locale from the loader
-	let { locale } = useLoaderData<typeof loader>();
+  // Get the locale from the loader
+  let { locale } = useLoaderData<typeof loader>();
 
-	let { i18n } = useTranslation();
+  let { i18n } = useTranslation();
 
-	// This hook will change the i18n instance language to the current locale
-	// detected by the loader, this way, when we do something to change the
-	// language, this locale will change and i18next will load the correct
-	// translation files
-	useChangeLanguage(locale);
+  // This hook will change the i18n instance language to the current locale
+  // detected by the loader, this way, when we do something to change the
+  // language, this locale will change and i18next will load the correct
+  // translation files
+  useChangeLanguage(locale);
 
-	return (
-		<html lang={locale} dir={i18n.dir()}>
-			<head>
-				<Meta />
-				<Links />
-			</head>
-			<body>
-				<Outlet />
-				<ScrollRestoration />
-				<Scripts />
-				<LiveReload />
-			</body>
-		</html>
-	);
+  return (
+    <html lang={locale} dir={i18n.dir()}>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <Outlet />
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
+  );
 }
 ```
 
@@ -294,8 +294,8 @@ Finally, in any route you want to translate, you can use the `t()` function, as 
 import { useTranslation } from "react-i18next";
 
 export default function Component() {
-	let { t } = useTranslation();
-	return <h1>{t("greeting")}</h1>;
+  let { t } = useTranslation();
+  return <h1>{t("greeting")}</h1>;
 }
 ```
 
@@ -306,7 +306,7 @@ like:
 
 ```json
 {
-	"title": "remix-i18n is awesome"
+  "title": "remix-i18n is awesome"
 }
 ```
 
@@ -314,7 +314,7 @@ like:
 
 ```json
 {
-	"title": "remix-i18n es increíble"
+  "title": "remix-i18n es increíble"
 }
 ```
 
@@ -327,8 +327,8 @@ import { useTranslation } from "react-i18next";
 export let handle = { i18n: "home" };
 
 export default function Component() {
-	let { t } = useTranslation("home");
-	return <h1>{t("title")}</h1>;
+  let { t } = useTranslation("home");
+  return <h1>{t("title")}</h1>;
 }
 ```
 
@@ -340,13 +340,13 @@ If you need to get translated texts inside a loader or action function, for exam
 
 ```ts
 export async function loader({ request }: LoaderArgs) {
-	let t = await i18n.getFixedT(request);
-	let title = t("My page title");
-	return json({ title });
+  let t = await i18n.getFixedT(request);
+  let title = t("My page title");
+  return json({ title });
 }
 
 export let meta: MetaFunction = ({ data }) => {
-	return { title: data.title };
+  return { title: data.title };
 };
 ```
 
@@ -363,13 +363,13 @@ If you always need to set the same i18next options, you can pass them to RemixI1
 
 ```ts
 export let i18n = new RemixI18Next({
-	detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
-	// The config here will be used for getFixedT
-	i18next: {
-		backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
-	},
-	// This backend will be used by getFixedT
-	backend: Backend,
+  detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
+  // The config here will be used for getFixedT
+  i18next: {
+    backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
+  },
+  // This backend will be used by getFixedT
+  backend: Backend,
 });
 ```
 
@@ -391,3 +391,47 @@ export async function loader({ request }: LoaderArgs) {
 ```
 
 This feature simplifies working with deeply nested translation keys and enhances the organization of your translation files.
+
+#### Finding the locale from the request URL pathname
+
+If you want to keep the user locale on the pathname, you have two possible options.
+
+First option is to pass the param from the loader/action params to `getFixedT`. This way you will stop using the language detection features of remix-i18next.
+
+Second options is to pass a `findLocale` function to the detection options in RemixI18Next.
+
+```ts
+export let i18n = new RemixI18Next({
+  detection: {
+    supportedLanguages: ["es", "en"],
+    fallbackLanguage: "en",
+    async findLocale(request) {
+      let locale = request.url.pathname.split("/").at(1);
+      return locale;
+    },
+  },
+});
+```
+
+The locale returned by `findLocale` will be validated against the list of supported locales, in case it's not valid the fallback locale will be used.
+
+#### Querying the locale from the database
+
+If your application stores the user locale in the database, you can use `findLocale` function to query the database and return the locale.
+
+```ts
+export let i18n = new RemixI18Next({
+  detection: {
+    supportedLanguages: ["es", "en"],
+    fallbackLanguage: "en",
+    async findLocale(request) {
+      let user = await db.getUser(request);
+      return user.locale;
+    },
+  },
+});
+```
+
+Note that every call to `getLocale` and `getFixedT` will call `findLocale` so it's important to keep it as fast as possible.
+
+If you need both the locale and the `t` function, you can call `getLocale`, and pass the result to `getFixedT`.
