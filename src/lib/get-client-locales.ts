@@ -29,10 +29,10 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
 	if (!acceptLanguage) return undefined;
 
 	let parsedLocales = parse(acceptLanguage)
-	.filter((lang) => lang.code !== "*")
-	.map(formatLanguageString);
+		.filter((lang) => lang.code !== "*")
+		.map(formatLanguageString);
 
-	let validLocales: string[] = []
+	let validLocales: string[] = [];
 
 	for (let locale of parsedLocales) {
 		try {
@@ -41,13 +41,13 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
 
 			// If we get here, the locale is valid
 			validLocales.push(locale);
-		} catch {}
+		} catch {
+			// We want to ignore errors here
+		}
 	}
 
 	let locale = pick(
-		Intl.DateTimeFormat.supportedLocalesOf(
-			validLocales,
-		),
+		Intl.DateTimeFormat.supportedLocalesOf(validLocales),
 		acceptLanguage,
 	);
 

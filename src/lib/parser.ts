@@ -1,6 +1,7 @@
 import { formatLanguageString } from "./format-language-string.js";
 
-let REGEX = /[ ]*((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;[ ]*q=[0-1](\.[0-9]+)?[ ]*)?)*/g;
+let REGEX =
+	/[ ]*((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;[ ]*q=[0-1](\.[0-9]+)?[ ]*)?)*/g;
 
 export interface Language {
 	code: string;
@@ -39,7 +40,7 @@ export function parse(acceptLanguage?: string): Language[] {
 			region: hasScript ? ietf[2] : ietf[1],
 			quality: bits[1]
 				? // biome-ignore lint/style/noNonNullAssertion: We know this is not null
-					Number.parseFloat(bits[1]!.split("=")[1]!) ?? 1.0
+					(Number.parseFloat(bits[1]!.split("=")[1]!) ?? 1.0)
 				: 1.0,
 		});
 	}
