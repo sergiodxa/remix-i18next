@@ -98,6 +98,26 @@ describe(RemixI18Next.name, () => {
 			expect(await i18n.getLocale(request)).toBe("es");
 		});
 
+		test("should get the locale using the findLocale method", async () => {
+			let request = new Request("https://example.com/dashboard", {
+				headers: {
+					"Accept-Language": "es-AR,es;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5",
+				},
+			});
+
+			let i18n = new RemixI18Next({
+				detection: {
+					supportedLanguages: ["es", "en"],
+					fallbackLanguage: "en",
+					async findLocale(request) {
+						return "es";
+					},
+				},
+			});
+
+			expect(await i18n.getLocale(request)).toBe("es");
+		});
+
 		test("should use the fallback language if search param, cookie and request headers are not there", async () => {
 			let request = new Request("https://example.com/dashboard");
 
