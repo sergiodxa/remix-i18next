@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 export function useLocale(localeKey = "locale"): string {
 	let matches = useMatches();
 	// biome-ignore lint/style/noNonNullAssertion: There's always a root match
-	let rootMatch = matches.at(0)!;
+	let rootMatch = matches[0]!;
 	let { [localeKey]: locale } =
 		(rootMatch.data as Record<string, string>) ?? {};
 	if (!locale) throw new Error("Missing locale returned by the root loader.");
