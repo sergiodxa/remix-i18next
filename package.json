@@ -13,12 +13,7 @@
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.17.0",
 		"@biomejs/biome": "^1.9.2",
-		"@remix-run/cloudflare": "^2.0.0",
-		"@remix-run/deno": "^2.0.0",
-		"@remix-run/dev": "^2.12.1",
-		"@remix-run/node": "^2.0.0",
-		"@remix-run/react": "^2.0.0",
-		"@remix-run/server-runtime": "^2.12.1",
+		"@react-router/dev": "^7.0.0-pre.6",
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/accept-language-parser": "^1.5.6",
 		"@types/bun": "^1.1.9",
@@ -27,15 +22,15 @@
 		"i18next": "^23.1.0",
 		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
 		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0",
+		"react-router": "7.0.0-pre.6",
 		"typedoc": "^0.26.7",
 		"typedoc-plugin-mdn-links": "^3.3.0",
 		"typescript": "^5.6.2"
 	},
 	"peerDependencies": {
-		"@remix-run/cloudflare": "^2.0.0",
-		"@remix-run/deno": "^2.0.0",
-		"@remix-run/node": "^2.0.0",
-		"@remix-run/react": "^2.0.0",
+		"react-router": ">=7.0.0-pre.0",
+		"@react-router/cloudflare": ">=7.0.0-pre.0",
+		"@react-router/node": ">=7.0.0-pre.0",
 		"i18next": "^23.1.0",
 		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
 		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0"
@@ -55,22 +50,13 @@
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": [
-		"remix",
-		"i18n",
-		"i18next",
-		"ssr",
-		"csr"
-	],
+	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
 	"license": "MIT",
 	"peerDependenciesMeta": {
-		"@remix-run/cloudflare": {
+		"@react-router/cloudflare": {
 			"optional": true
 		},
-		"@remix-run/deno": {
-			"optional": true
-		},
-		"@remix-run/node": {
+		"@react-router/node": {
 			"optional": true
 		}
 	},

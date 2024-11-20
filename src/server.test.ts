@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createCookie, createMemorySessionStorage } from "@remix-run/node";
 import type { BackendModule, FormatterModule } from "i18next";
+import { createCookie, createMemorySessionStorage } from "react-router";
 import { RemixI18Next } from "./server.js";
 
 describe(RemixI18Next.name, () => {
