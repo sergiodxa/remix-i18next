@@ -41,7 +41,7 @@
 	"bugs": {
 		"url": "https://github.com/sergiodxa/remix-i18next/issues"
 	},
-	"description": "The easiest way to translate your Remix apps",
+	"description": "The easiest way to translate your FullStack React Router apps",
 	"engines": {
 		"node": ">=20.0.0"
 	},
