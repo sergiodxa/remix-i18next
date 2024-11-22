@@ -1,6 +1,6 @@
-import { useMatches } from "@remix-run/react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
+import { useMatches } from "react-router";
 
 /**
  * Get the locale returned by the root route loader under the `locale` key.

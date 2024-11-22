@@ -1,8 +1,3 @@
-import type {
-	Cookie,
-	EntryContext,
-	SessionStorage,
-} from "@remix-run/server-runtime";
 import {
 	type BackendModule,
 	type DefaultNamespace,
@@ -15,6 +10,7 @@ import {
 	type TFunction,
 	createInstance,
 } from "i18next";
+import type { Cookie, EntryContext, SessionStorage } from "react-router";
 import { getClientLocales } from "./lib/get-client-locales.js";
 import { pick } from "./lib/parser.js";
 
