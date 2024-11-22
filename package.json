@@ -49,14 +49,6 @@
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
 	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
 	"license": "MIT",
-	"peerDependenciesMeta": {
-		"@react-router/cloudflare": {
-			"optional": true
-		},
-		"@react-router/node": {
-			"optional": true
-		}
-	},
 	"scripts": {
 		"build": "tsc",
 		"typecheck": "tsc --noEmit",
