@@ -1,6 +1,6 @@
 {
 	"name": "remix-i18next",
-	"version": "7.0.1",
+	"version": "7.0.2",
 	"author": {
 		"name": "Sergio Xalambrí",
 		"url": "https://sergiodxa.com",
@@ -47,7 +47,13 @@
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": ["remix", "i18n", "i18next", "ssr", "csr"],
+	"keywords": [
+		"remix",
+		"i18n",
+		"i18next",
+		"ssr",
+		"csr"
+	],
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
@@ -57,6 +63,11 @@
 		"exports": "bun run ./scripts/exports.ts"
 	},
 	"sideEffects": false,
-	"files": ["build", "src", "package.json", "README.md"],
+	"files": [
+		"build",
+		"src",
+		"package.json",
+		"README.md"
+	],
 	"type": "module"
 }
