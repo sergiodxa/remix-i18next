@@ -11,25 +11,25 @@
 		"url": "git+https://github.com/sergiodxa/remix-i18next.git"
 	},
 	"devDependencies": {
-		"@arethetypeswrong/cli": "^0.17.0",
+		"@arethetypeswrong/cli": "^0.17.2",
 		"@biomejs/biome": "^1.9.2",
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/accept-language-parser": "^1.5.6",
-		"@types/bun": "^1.1.9",
-		"@types/react": "^19.0.1",
-		"consola": "^3.2.3",
-		"i18next": "^24.0.0",
-		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0",
-		"react-router": "^7.0.0",
-		"typedoc": "^0.27.2",
-		"typedoc-plugin-mdn-links": "^4.0.1",
-		"typescript": "^5.6.2"
+		"@types/bun": "^1.1.14",
+		"@types/react": "^19.0.2",
+		"consola": "^3.3.3",
+		"i18next": "^24.2.0",
+		"react": "^19.0.0",
+		"react-i18next": "^15.4.0",
+		"react-router": "^7.1.1",
+		"typedoc": "^0.27.6",
+		"typedoc-plugin-mdn-links": "^4.0.6",
+		"typescript": "^5.7.2"
 	},
 	"peerDependencies": {
 		"react-router": "^7.0.0",
 		"i18next": "^24.0.0",
-		"react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+		"react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
 		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0"
 	},
 	"exports": {
