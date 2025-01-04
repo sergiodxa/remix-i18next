@@ -42,7 +42,7 @@ async function main() {
 	);
 
 	if (entrypointsWithProblems.length > 0) {
-		console.error("Entrypoints with problems:");
+		console.error("Entrypoints with problems:", entrypointsWithProblems);
 		process.exit(1);
 	}
 }
