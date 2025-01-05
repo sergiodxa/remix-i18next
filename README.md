@@ -1,11 +1,14 @@
 # remix-i18next
 
-**The easiest way to translate your Remix apps.**
+**The easiest way to translate your React Router framework mode apps.**
+
+> [!IMPORTANT]
+> If you're still on Remix v2, keep using [remix-i18next v6](https://github.com/sergiodxa/remix-i18next/tree/v6.4.1) as the v7 is only compatible with React Router v7.
 
 ## Why remix-i18next?
 
 - Easy to set up, easy to use: setup only takes a few steps, and configuration is simple.
-- No other requirements: `remix-i18next` simplifies internationalisation for your Remix app without extra dependencies.
+- No other requirements: `remix-i18next` simplifies internationalisation for your React Router app without extra dependencies.
 - Production ready: `remix-i18next` supports passing translations and configuration options into routes from the loader.
 - Take the control: `remix-i18next` doesn't hide the configuration so you can add any plugin you want or configure as pleased.
 
