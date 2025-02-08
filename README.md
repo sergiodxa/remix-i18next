@@ -104,7 +104,7 @@ export default i18next;
 Now in your `entry.client.tsx` replace the default code with this:
 
 ```tsx
-import { RemixBrowser } from "@remix-run/react";
+import {HydratedRouter} from "react-router/dom";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import i18n from "./i18n";
@@ -138,11 +138,11 @@ async function hydrate() {
   startTransition(() => {
     hydrateRoot(
       document,
-      <I18nextProvider i18n={i18next}>
-        <StrictMode>
-          <RemixBrowser />
-        </StrictMode>
-      </I18nextProvider>
+        <I18nextProvider i18n={i18next}>
+            <StrictMode>
+                <HydratedRouter/>
+            </StrictMode>
+        </I18nextProvider>
     );
   });
 }
@@ -161,82 +161,94 @@ if (window.requestIdleCallback) {
 And in your `entry.server.tsx` replace the code with this:
 
 ```tsx
-import { PassThrough } from "stream";
-import {
-  createReadableStreamFromReadable,
-  type EntryContext,
-} from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
-import { isbot } from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
-import { createInstance } from "i18next";
-import i18next from "./i18next.server";
-import { I18nextProvider, initReactI18next } from "react-i18next";
+import {PassThrough} from "node:stream";
+
+import type {AppLoadContext, EntryContext} from "react-router";
+import {ServerRouter} from "react-router";
+import {createReadableStreamFromReadable} from "@react-router/node";
+import {isbot} from "isbot";
+import type {RenderToPipeableStreamOptions} from "react-dom/server";
+import {renderToPipeableStream} from "react-dom/server";
+import {createInstance} from "i18next";
+import i18nextServer from "~/modules/translation/server-config.server"
+import {I18nextProvider, initReactI18next} from "react-i18next";
 import Backend from "i18next-fs-backend";
-import i18n from "./i18n"; // your i18n configuration file
-import { resolve } from "node:path";
+import {resolve as resolvePath} from "node:path";
+import { clientConfig } from "./modules/translation/client-config";
 
-const ABORT_DELAY = 5000;
 
-export default async function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext
+export const streamTimeout = 5_000;
+
+export default function handleRequest(
+    request: Request,
+    responseStatusCode: number,
+    responseHeaders: Headers,
+    routerContext: EntryContext,
+    loadContext: AppLoadContext
 ) {
-  let callbackName = isbot(request.headers.get("user-agent"))
-    ? "onAllReady"
-    : "onShellReady";
+    return new Promise(async (resolve, reject) => {
+        const i18nextInstance = createInstance();
+        const lng = await i18nextServer.getLocale(request);
+        const namespaces = i18nextServer.getRouteNamespaces(routerContext);
 
-  let instance = createInstance();
-  let lng = await i18next.getLocale(request);
-  let ns = i18next.getRouteNamespaces(remixContext);
+        await i18nextInstance.use(initReactI18next).use(Backend).init({
+            ...clientConfig,
+            lng,
+            ns: namespaces,
+            backend: {
+                loadPath: resolvePath("../../public/locales/{{lng}}/{{ns}}.json"),
+            }
+        })
+        let shellRendered = false;
+        let userAgent = request.headers.get("user-agent");
 
-  await instance
-    .use(initReactI18next) // Tell our instance to use react-i18next
-    .use(Backend) // Setup our backend
-    .init({
-      ...i18n, // spread the configuration
-      lng, // The locale we detected above
-      ns, // The namespaces the routes about to render wants to use
-      backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
+        // Ensure requests from bots and SPA Mode renders wait for all content to load before responding
+        // https://react.dev/reference/react-dom/server/renderToPipeableStream#waiting-for-all-content-to-load-for-crawlers-and-static-generation
+        let readyOption: keyof RenderToPipeableStreamOptions =
+            (userAgent && isbot(userAgent)) || routerContext.isSpaMode
+                ? "onAllReady"
+                : "onShellReady";
+
+        const {pipe, abort} = renderToPipeableStream(
+            <I18nextProvider i18n={i18nextInstance}>
+                <ServerRouter context={routerContext} url={request.url}/>,
+            </I18nextProvider>,
+            {
+                [readyOption]() {
+                    shellRendered = true;
+                    const body = new PassThrough();
+                    const stream = createReadableStreamFromReadable(body);
+
+                    responseHeaders.set("Content-Type", "text/html");
+
+                    resolve(
+                        new Response(stream, {
+                            headers: responseHeaders,
+                            status: responseStatusCode,
+                        })
+                    );
+
+                    pipe(body);
+                },
+                onShellError(error: unknown) {
+                    reject(error);
+                },
+                onError(error: unknown) {
+                    responseStatusCode = 500;
+                    // Log streaming rendering errors from inside the shell.  Don't log
+                    // errors encountered during initial shell rendering since they'll
+                    // reject and get logged in handleDocumentRequest.
+                    if (shellRendered) {
+                        console.error(error);
+                    }
+                },
+            }
+        );
+
+        // Abort the rendering stream after the `streamTimeout` so it has time to
+        // flush down the rejected boundaries
+        setTimeout(abort, streamTimeout + 1000);
     });
-
-  return new Promise((resolve, reject) => {
-    let didError = false;
-
-    let { pipe, abort } = renderToPipeableStream(
-      <I18nextProvider i18n={instance}>
-        <RemixServer context={remixContext} url={request.url} />
-      </I18nextProvider>,
-      {
-        [callbackName]: () => {
-          let body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
-          responseHeaders.set("Content-Type", "text/html");
-
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: didError ? 500 : responseStatusCode,
-            })
-          );
-
-          pipe(body);
-        },
-        onShellError(error: unknown) {
-          reject(error);
-        },
-        onError(error: unknown) {
-          didError = true;
-
-          console.error(error);
-        },
-      }
-    );
-
-    setTimeout(abort, ABORT_DELAY);
-  });
 }
 ```
 
@@ -248,8 +260,9 @@ Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't 
 import { useChangeLanguage } from "remix-i18next/react";
 import { useTranslation } from "react-i18next";
 import i18next from "~/i18next.server";
+import type {Route} from "./+types/root";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   let locale = await i18next.getLocale(request);
   return json({ locale });
 }
@@ -342,7 +355,7 @@ And that's it, repeat the last step for each route you want to translate, remix-
 If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get a `t` function.
 
 ```ts
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   let t = await i18n.getFixedT(request);
   let title = t("My page title");
   return json({ title });
