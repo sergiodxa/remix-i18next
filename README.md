@@ -161,7 +161,7 @@ if (window.requestIdleCallback) {
 And in your `entry.server.tsx` replace the code with this:
 
 ```tsx
-import {PassThrough} from "node:stream";
+import {PassThrough} from "stream";
 
 import type {AppLoadContext, EntryContext} from "react-router";
 import {ServerRouter} from "react-router";
@@ -170,11 +170,11 @@ import {isbot} from "isbot";
 import type {RenderToPipeableStreamOptions} from "react-dom/server";
 import {renderToPipeableStream} from "react-dom/server";
 import {createInstance} from "i18next";
-import i18nextServer from "~/modules/translation/server-config.server"
+import i18next from "./i18next.server";
 import {I18nextProvider, initReactI18next} from "react-i18next";
 import Backend from "i18next-fs-backend";
 import {resolve as resolvePath} from "node:path";
-import { clientConfig } from "./modules/translation/client-config";
+import i18n from "./i18n"; // your i18n configuration file
 
 
 export const streamTimeout = 5_000;
@@ -187,16 +187,16 @@ export default function handleRequest(
     loadContext: AppLoadContext
 ) {
     return new Promise(async (resolve, reject) => {
-        const i18nextInstance = createInstance();
-        const lng = await i18nextServer.getLocale(request);
-        const namespaces = i18nextServer.getRouteNamespaces(routerContext);
+        let i18nextInstance = createInstance();
+        let lng = await i18nextServer.getLocale(request);
+        let namespaces = i18nextServer.getRouteNamespaces(routerContext);
 
         await i18nextInstance.use(initReactI18next).use(Backend).init({
-            ...clientConfig,
+            ...i18n,
             lng,
             ns: namespaces,
             backend: {
-                loadPath: resolvePath("../../public/locales/{{lng}}/{{ns}}.json"),
+                loadPath: resolvePath("./public/locales/{{lng}}/{{ns}}.json"),
             }
         })
         let shellRendered = false;
