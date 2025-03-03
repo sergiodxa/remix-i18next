@@ -23,7 +23,7 @@
 		"react-i18next": "^15.4.0",
 		"react-router": "^7.1.1",
 		"typedoc": "^0.27.6",
-		"typedoc-plugin-mdn-links": "^4.0.6",
+		"typedoc-plugin-mdn-links": "^5.0.1",
 		"typescript": "^5.7.2"
 	},
 	"peerDependencies": {
