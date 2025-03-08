@@ -438,3 +438,47 @@ export let i18n = new RemixI18Next({
 Note that every call to `getLocale` and `getFixedT` will call `findLocale` so it's important to keep it as fast as possible.
 
 If you need both the locale and the `t` function, you can call `getLocale`, and pass the result to `getFixedT`.
+
+## Middleware (unstable)
+
+> [!CAUTION]
+> This depends on `react-router@7.3.0` or later, and it's considered unstable until React Router middleware feature itself is considered stable. Breaking changes may happen in minor versions.
+
+Since React Router v7.3.0 you can use middlewares to run code before and after the routes loaders and actions. In remix-i18next a (unstable) middleware is provided to help you with using `getLocale` and `getFixedT`.
+
+To use the middleware you need to create a middleware instance and pass it to the `RemixI18Next` instance.
+
+```tsx
+import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { i18n } from "~/i18next.server";
+
+export const [i18nextMiddleware, getFixedT, getLocal] =
+  unstable_createI18nextMiddleware(i18n);
+```
+
+Then in your root add the middleware.
+
+```tsx
+import { i18nextMiddleware } from "~/middlewares/i18next";
+export const unstable_middleware = [i18nextMiddleware];
+```
+
+And in the root loader also return the locale.
+
+```tsx
+export async function loader({ context }: Route.LoaderArgs) {
+  return { locale: getLocale(context) };
+}
+```
+
+From now, you can call `getLocale` or `getFixedT` in your loaders and actions.
+
+```tsx
+// a random route loader
+export async function loader({ context }: Route.LoaderArgs) {
+  // namespace and keyPrefix are both optional
+  let t = await getFixedT(context, namespace, keyPrefix);
+  let title = t("My page title");
+  return { title };
+}
+```
