@@ -1,4 +1,4 @@
-import { Namespace, TFunction } from "i18next";
+import type { Namespace, TFunction } from "i18next";
 import {
 	type unstable_MiddlewareFunction,
 	type unstable_RouterContextProvider,

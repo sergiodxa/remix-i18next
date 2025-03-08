@@ -5,6 +5,7 @@
 		"src/client.ts",
 		"src/react.tsx",
 		"src/server.ts",
+		"src/middleware.ts",
 		"src/lib/**/*.tsx"
 	],
 	"compilerOptions": {
