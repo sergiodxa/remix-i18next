@@ -16,9 +16,9 @@
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/accept-language-parser": "^1.5.6",
 		"@types/bun": "^1.1.14",
-		"@types/react": "^19.0.2",
+		"@types/react": "^19.1.0",
 		"consola": "^3.3.3",
-		"i18next": "^24.2.0",
+		"i18next": "^24.2.2",
 		"react": "^19.0.0",
 		"react-i18next": "^15.4.0",
 		"react-router": "^7.3.0",
@@ -42,19 +42,13 @@
 	"bugs": {
 		"url": "https://github.com/sergiodxa/remix-i18next/issues"
 	},
-	"description": "The easiest way to translate your FullStack React Router apps",
+	"description": "The easiest way to translate your Full Stack React Router apps",
 	"engines": {
 		"node": ">=20.0.0"
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": [
-		"remix",
-		"i18n",
-		"i18next",
-		"ssr",
-		"csr"
-	],
+	"keywords": ["remix", "i18n", "i18next", "ssr", "csr", "react-router"],
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
@@ -64,11 +58,6 @@
 		"exports": "bun run ./scripts/exports.ts"
 	},
 	"sideEffects": false,
-	"files": [
-		"build",
-		"src",
-		"package.json",
-		"README.md"
-	],
+	"files": ["build", "src", "package.json", "README.md"],
 	"type": "module"
 }
