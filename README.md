@@ -15,7 +15,7 @@
 ## Setup
 
 > [!TIP]
-> If you're using Remix with Vite, check https://github.com/sergiodxa/remix-vite-i18next for an example application, if you have an issue compare your setup with the example.
+> Check https://github.com/sergiodxa/remix-vite-i18next for an example application, if you have an issue compare your setup with the example.
 
 ### Installation
 
@@ -25,114 +25,222 @@ The first step is to install it in your project with
 npm install remix-i18next i18next react-i18next i18next-browser-languagedetector
 ```
 
-You will need to configure an i18next backend and language detector, in that case you can install them too, for the rest of the setup guide we'll use the http and fs backends.
+You will need to configure an i18next backend and language detector, in that case you can install them too, for the rest of the setup guide we'll use the fetch backend.
 
 ```sh
-npm install i18next-http-backend i18next-fs-backend
+npm install i18next-fetch-backend
 ```
 
-### Configuration
+### Localization files
 
-First let's create some translation files
-
-`public/locales/en/common.json`:
-
-```json
-{
-  "greeting": "Hello"
-}
-```
-
-`public/locales/es/common.json`:
-
-```json
-{
-  "greeting": "Hola"
-}
-```
-
-Next, set your [i18next configuration](https://www.i18next.com/overview/configuration-options).
-
-These two files can go somewhere in your app folder.
-
-For this example, we will create `app/i18n.ts`:
+First let's create some translation files in `app/locales`:
 
 ```ts
+// app/locales/en.ts
 export default {
-  // This is the list of languages your application supports
-  supportedLngs: ["en", "es"],
-  // This is the language you want to use in case
-  // if the user language is not in the supportedLngs
-  fallbackLng: "en",
-  // The default namespace of i18next is "translation", but you can customize it here
-  defaultNS: "common",
+  title: "remix-i18next (en)",
+  description: "A Remix + Vite + remix-i18next example",
 };
 ```
 
-And then create a file named `i18next.server.ts` with the following code:
-
 ```ts
-import Backend from "i18next-fs-backend";
-import { resolve } from "node:path";
-import { RemixI18Next } from "remix-i18next/server";
-import i18n from "~/i18n"; // your i18n configuration file
+// app/locales/es.ts
+import type en from "./en";
 
-let i18next = new RemixI18Next({
-  detection: {
-    supportedLanguages: i18n.supportedLngs,
-    fallbackLanguage: i18n.fallbackLng,
-  },
-  // This is the configuration for i18next used
-  // when translating messages server-side only
-  i18next: {
-    ...i18n,
-    backend: {
-      loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json"),
-    },
-  },
-  // The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.
-  // E.g. The Backend plugin for loading translations from the file system
-  // Tip: You could pass `resources` to the `i18next` configuration and avoid a backend here
-  plugins: [Backend],
-});
-
-export default i18next;
+export default {
+  title: "remix-i18next (es)",
+  description: "Un ejemplo de Remix + Vite + remix-i18next",
+} satisfies typeof en;
 ```
 
-### Client-side configuration
+The type import and the `satisfies` are optional, but it will help us ensure that if we add or remove a key from the `en` locale (our default one) we will get a type error in the `es` locale so we can keep them in sync.
+
+### Setup the Middleware
+
+Create a file named `app/middleware/i18next.ts` with the following code:
+
+> [!CAUTION]
+> This depends on `react-router@7.3.0` or later, and it's considered unstable until React Router middleware feature itself is considered stable. Breaking changes may happen in minor versions.
+> Check older versions of the README for a guide on how to use RemixI18next class instead if you are using an older version of React Router or don't want to use the middleware.
+
+```ts
+import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import en from "~/locales/en";
+import es from "~/locales/es";
+
+export const [i18nextMiddleware, getLocale, getInstance] =
+  unstable_createI18nextMiddleware({
+    detection: {
+      supportedLanguages: ["en", "es"],
+      fallbackLanguage: "en",
+    },
+    i18next: {
+      resources: { en: { translation: en }, es: { translation: es } },
+      // Other i18next options are available here
+    },
+  });
+```
+
+Then in your `app/root.tsx` setup the middleware:
+
+```ts
+import { i18nextMiddleware } from "~/middleware/i18next";
+
+export const unstable_middleware = [i18nextMiddleware];
+```
+
+With this, on every request, the middleware will run, detect the language and set it in the router context.
+
+You can access the language in your loaders and actions using `getLocale(context)` function.
+
+If you need access to the underlying i18next instance, you can use `getInstance(context)`. This is useful if you want to call the `t` function or any other i18next method.
+
+### Get the locale
+
+From this point, you can go to any loader and get the locale using the `getLocale` function.
+
+```ts
+import { getLocale } from "~/middleware/i18next";
+
+export async function loader({ context }: Route.LoaderArgs) {
+  let locale = getLocale(context);
+  let date = new Date().toLocaleDateString(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return { date };
+}
+```
+
+### Send translated text to the UI
+
+To send translated text to the UI, you can use the `t` function from i18next. You can get it from the context using `getInstance(context)`.
+
+```ts
+import { getInstance } from "~/middleware/i18next";
+
+export async function loader({ context }: Route.LoaderArgs) {
+  let i18next = getInstance(context);
+  return { title: i18next.t("title"), description: i18next.t("description") };
+}
+```
+
+The `TFunction` accessible from the i18next instance is already configured with the locale detected by the middleware.
+
+If you want to use a different locale, you can use the `i18next.getFixedT` method.
+
+```ts
+import { getInstance } from "~/middleware/i18next";
+
+export async function loader({ context }: Route.LoaderArgs) {
+  let i18next = getInstance(context);
+  let t = i18next.getFixedT("es");
+  return { title: t("title"), description: t("description") };
+}
+```
+
+This will return a new `TFunction` instance with the locale set to `es`.
+
+### Usage with react-i18next
+
+So far this has configured the i18next instance to inside React Router loaders and actions, but in many casees we will need to use it directly in our React components.
+
+To do this, we need to setup react-i18next.
+
+Let's start by updating the `entry.client.tsx` and `entry.server.tsx` files to use the i18next instance created in the middleware.
+
+> [!TIP]
+> If you don't have these files, run `npx react-router reveal` to generate them. They are hidden by default.
+
+### Update the root route
+
+First of all, we want to send the locale detected serevr-side by the middleware to the UI. To do this, we will return the locale from the `app/root.tsx` route.
+
+```tsx
+import {
+  data,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "react-router";
+import { useChangeLanguage } from "remix-i18next/react";
+import type { Route } from "./+types/root";
+import {
+  getLocale,
+  i18nextMiddleware,
+  localeCookie,
+} from "./middleware/i18next";
+import { useTranslation } from "react-i18next";
+
+export const unstable_middleware = [i18nextMiddleware];
+
+export async function loader({ context }: Route.LoaderArgs) {
+  let locale = getLocale(context);
+  return data(
+    { locale },
+    { headers: { "Set-Cookie": await localeCookie.serialize(locale) } }
+  );
+}
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  let { i18n } = useTranslation();
+
+  return (
+    <html lang={i18n.language} dir={i18n.dir(i18n.language)}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App({ loaderData }: Route.ComponentProps) {
+  useChangeLanguage(loaderData.locale);
+  return <Outlet />;
+}
+```
+
+We made a few changes here:
+
+1. We added a `loader` that gets the locale from the context (set by the middleware) and returns it to the UI.
+2. In the root Layout component, we use the `useTranslation` hook to get the i18n instance and set the `lang` attribute of the `<html>` tag, along the `dir` attribute.
+3. We added the `useChangeLanguage` hook to set the language in the i18next instance, this will keep the language in sync with the locale detected by the middleware after a refresh of the loader data.
+
+#### Client-side configuration
 
 Now in your `entry.client.tsx` replace the default code with this:
 
 ```tsx
-import { RemixBrowser } from "@remix-run/react";
+import Fetch from "i18next-fetch-backend";
+import i18next from "i18next";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-import i18n from "./i18n";
-import i18next from "i18next";
 import { I18nextProvider, initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import Backend from "i18next-http-backend";
+import { HydratedRouter } from "react-router/dom";
+import I18nextBrowserLanguageDetector from "i18next-browser-languagedetector";
 import { getInitialNamespaces } from "remix-i18next/client";
 
-async function hydrate() {
+async function main() {
   await i18next
-    .use(initReactI18next) // Tell i18next to use the react-i18next plugin
-    .use(LanguageDetector) // Setup a client-side language detector
-    .use(Backend) // Setup your backend
+    .use(initReactI18next)
+    .use(Fetch)
+    .use(I18nextBrowserLanguageDetector)
     .init({
-      ...i18n, // spread the configuration
-      // This function detects the namespaces your routes rendered while SSR use
+      fallbackLng: "en",
       ns: getInitialNamespaces(),
-      backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
-      detection: {
-        // Here only enable htmlTag detection, we'll detect the language only
-        // server-side with remix-i18next, by using the `<html lang>` attribute
-        // we can communicate to the client the language detected server-side
-        order: ["htmlTag"],
-        // Because we only use htmlTag, there's no reason to cache the language
-        // on the browser, so we disable it
-        caches: [],
-      },
+      detection: { order: ["htmlTag"], caches: [] },
+      backend: { loadPath: "/api/locales/{{lng}}/{{ns}}" },
     });
 
   startTransition(() => {
@@ -140,85 +248,141 @@ async function hydrate() {
       document,
       <I18nextProvider i18n={i18next}>
         <StrictMode>
-          <RemixBrowser />
+          <HydratedRouter />
         </StrictMode>
       </I18nextProvider>
     );
   });
 }
 
-if (window.requestIdleCallback) {
-  window.requestIdleCallback(hydrate);
-} else {
-  // Safari doesn't support requestIdleCallback
-  // https://caniuse.com/requestidlecallback
-  window.setTimeout(hydrate, 1);
+main().catch((error) => console.error(error));
+```
+
+The `getInitialNamespaces` function from `remix-i18next/client` will return the namespaces that were used in the server-side rendering. This way, we can load them on the client-side before rendering the app.
+
+We're also configuring `i18next-browser-languagedetector` to detect the language based on the `lang` attribute of the `<html>` tag. This way, we can use the same language detected by the middleware server-side.
+
+### API for locales
+
+The `app/entry.client.tsx` has the i18next backend configured to load the locales from the path `/api/locales/{{lng}}/{{ns}}`. Feel free to customize this but for this guide we will use that path.
+
+Now we need to create a route to serve the locales. So let's create a file `app/routes/locales.ts` and add the following code:
+
+```ts
+import { data } from "react-router";
+import { cacheHeader } from "pretty-cache-header";
+import { z } from "zod";
+import enTranslation from "~/locales/en";
+import esTranslation from "~/locales/es";
+import type { Route } from "./+types/locales";
+
+const resources = {
+  en: { translation: enTranslation },
+  es: { translation: esTranslation },
+};
+
+export async function loader({ params }: Route.LoaderArgs) {
+  const lng = z
+    .string()
+    .refine((lng): lng is keyof typeof resources =>
+      Object.keys(resources).includes(lng)
+    )
+    .safeParse(params.lng);
+
+  if (lng.error) return data({ error: lng.error }, { status: 400 });
+
+  const namespaces = resources[lng.data];
+
+  const ns = z
+    .string()
+    .refine((ns): ns is keyof typeof namespaces => {
+      return Object.keys(resources[lng.data]).includes(ns);
+    })
+    .safeParse(params.ns);
+
+  if (ns.error) return data({ error: ns.error }, { status: 400 });
+
+  const headers = new Headers();
+
+  // On production, we want to add cache headers to the response
+  if (process.env.NODE_ENV === "production") {
+    headers.set(
+      "Cache-Control",
+      cacheHeader({
+        maxAge: "5m", // Cache in the browser for 5 minutes
+        sMaxage: "1d", // Cache in the CDN for 1 day
+        // Serve stale content while revalidating for 7 days
+        staleWhileRevalidate: "7d",
+        // Serve stale content if there's an error for 7 days
+        staleIfError: "7d",
+      })
+    );
+  }
+
+  return data(namespaces[ns.data], { headers });
 }
 ```
 
+This file introduces two dependencies
+
+1. [Zod](https://zod.dev/) for validating the parameters passed to the route.
+2. [pretty-cache-header](https://npm.im/pretty-cache-header) for generating cache headers.
+
+They are not hard requirements, but they are useful for our example, feel free to change them or remove them.
+
 ### Server-side configuration
 
-And in your `entry.server.tsx` replace the code with this:
+Now in your `entry.server.tsx` replace the default code with this:
 
 ```tsx
-import { PassThrough } from "stream";
-import {
-  createReadableStreamFromReadable,
-  type EntryContext,
-} from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
+import { PassThrough } from "node:stream";
+
+import type {
+  EntryContext,
+  unstable_RouterContextProvider,
+} from "react-router";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
+import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
-import { createInstance } from "i18next";
-import i18next from "./i18next.server";
-import { I18nextProvider, initReactI18next } from "react-i18next";
-import Backend from "i18next-fs-backend";
-import i18n from "./i18n"; // your i18n configuration file
-import { resolve } from "node:path";
+import { I18nextProvider } from "react-i18next";
+import { getInstance } from "./middleware/i18next";
 
-const ABORT_DELAY = 5000;
+export const streamTimeout = 5_000;
 
-export default async function handleRequest(
+export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext
+  entryContext: EntryContext,
+  routerContext: unstable_RouterContextProvider
 ) {
-  let callbackName = isbot(request.headers.get("user-agent"))
-    ? "onAllReady"
-    : "onShellReady";
-
-  let instance = createInstance();
-  let lng = await i18next.getLocale(request);
-  let ns = i18next.getRouteNamespaces(remixContext);
-
-  await instance
-    .use(initReactI18next) // Tell our instance to use react-i18next
-    .use(Backend) // Setup our backend
-    .init({
-      ...i18n, // spread the configuration
-      lng, // The locale we detected above
-      ns, // The namespaces the routes about to render wants to use
-      backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
-    });
-
   return new Promise((resolve, reject) => {
-    let didError = false;
+    let shellRendered = false;
+    let userAgent = request.headers.get("user-agent");
+
+    let readyOption: keyof RenderToPipeableStreamOptions =
+      (userAgent && isbot(userAgent)) || entryContext.isSpaMode
+        ? "onAllReady"
+        : "onShellReady";
 
     let { pipe, abort } = renderToPipeableStream(
-      <I18nextProvider i18n={instance}>
-        <RemixServer context={remixContext} url={request.url} />
+      <I18nextProvider i18n={getInstance(routerContext)}>
+        <ServerRouter context={entryContext} url={request.url} />
       </I18nextProvider>,
       {
-        [callbackName]: () => {
+        [readyOption]() {
+          shellRendered = true;
           let body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
+          let stream = createReadableStreamFromReadable(body);
+
           responseHeaders.set("Content-Type", "text/html");
 
           resolve(
             new Response(stream, {
               headers: responseHeaders,
-              status: didError ? 500 : responseStatusCode,
+              status: responseStatusCode,
             })
           );
 
@@ -228,197 +392,51 @@ export default async function handleRequest(
           reject(error);
         },
         onError(error: unknown) {
-          didError = true;
-
-          console.error(error);
+          responseStatusCode = 500;
+          if (shellRendered) console.error(error);
         },
       }
     );
 
-    setTimeout(abort, ABORT_DELAY);
+    setTimeout(abort, streamTimeout + 1000);
   });
 }
 ```
 
-### Usage
+Here we are using the `getInstance` function from the middleware to get the i18next instance.
 
-Now, in your `app/root.tsx` or `app/root.jsx` file create a loader if you don't have one with the following code.
+This way, we can re-use the instance created in the middleware and avoid creating a new one. And since the instance is already configured with the language we detected, we can use it directly in the `I18nextProvider`.
 
-```tsx
-import { useChangeLanguage } from "remix-i18next/react";
-import { useTranslation } from "react-i18next";
-import i18next from "~/i18next.server";
-
-export async function loader({ request }: LoaderArgs) {
-  let locale = await i18next.getLocale(request);
-  return json({ locale });
-}
-
-export let handle = {
-  // In the handle export, we can add a i18n key with namespaces our route
-  // will need to load. This key can be a single string or an array of strings.
-  // TIP: In most cases, you should set this to your defaultNS from your i18n config
-  // or if you did not set one, set it to the i18next default namespace "translation"
-  i18n: "common",
-};
-
-export default function Root() {
-  // Get the locale from the loader
-  let { locale } = useLoaderData<typeof loader>();
-
-  let { i18n } = useTranslation();
-
-  // This hook will change the i18n instance language to the current locale
-  // detected by the loader, this way, when we do something to change the
-  // language, this locale will change and i18next will load the correct
-  // translation files
-  useChangeLanguage(locale);
-
-  return (
-    <html lang={locale} dir={i18n.dir()}>
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
-}
-```
-
-Finally, in any route you want to translate, you can use the `t()` function, as per the [i18next documentation](https://www.i18next.com/overview/api#t) and use translations from the default namespace.
-
-```tsx
-import { useTranslation } from "react-i18next";
-
-export default function Component() {
-  let { t } = useTranslation();
-  return <h1>{t("greeting")}</h1>;
-}
-```
-
-If you wish to split up your translation files, you create new translation files
-like:
-
-`public/locales/en/home.json`
-
-```json
-{
-  "title": "remix-i18n is awesome"
-}
-```
-
-`public/locales/es/home.json`
-
-```json
-{
-  "title": "remix-i18n es increíble"
-}
-```
-
-And use them in your routes:
-
-```tsx
-import { useTranslation } from "react-i18next";
-
-// This tells remix to load the "home" namespace
-export let handle = { i18n: "home" };
-
-export default function Component() {
-  let { t } = useTranslation("home");
-  return <h1>{t("title")}</h1>;
-}
-```
-
-And that's it, repeat the last step for each route you want to translate, remix-i18next will automatically let i18next what namespaces and language to use and this one will load the correct translation files using your configured backend.
-
-#### Translating text inside loaders or actions
-
-If you need to get translated texts inside a loader or action function, for example to translate the page title used later in a MetaFunction, you can use the `i18n.getFixedT` method to get a `t` function.
-
-```ts
-export async function loader({ request }: LoaderArgs) {
-  let t = await i18n.getFixedT(request);
-  let title = t("My page title");
-  return json({ title });
-}
-
-export let meta: MetaFunction = ({ data }) => {
-  return { title: data.title };
-};
-```
-
-The `getFixedT` function can be called using a combination of parameters:
-
-- `getFixedT(request)`: will use the request to get the locale and the `defaultNS` set in the config or `translation` (the [i18next default namespace](https://www.i18next.com/overview/configuration-options#languages-namespaces-resources))
-- `getFixedT("es")`: will use the specified `es` locale and the `defaultNS` set in config, or `translation` (the [i18next default namespace](https://www.i18next.com/overview/configuration-options#languages-namespaces-resources))
-- `getFixedT(request, "common")` will use the request to get the locale and the specified `common` namespace to get the translations.
-- `getFixedT("es", "common")` will use the specified `es` locale and the specified `common` namespace to get the translations.
-- `getFixedT(request, "common", { keySeparator: false })` will use the request to get the locale and the `common` namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
-- `getFixedT("es", "common", { keySeparator: false })` will use the specified `es` locale and the `common` namespace to get the translations, also use the options of the third argument to initialize the i18next instance.
-
-If you always need to set the same i18next options, you can pass them to RemixI18Next when creating the new instance.
-
-```ts
-export let i18n = new RemixI18Next({
-  detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
-  // The config here will be used for getFixedT
-  i18next: {
-    backend: { loadPath: resolve("./public/locales/{{lng}}/{{ns}}.json") },
-  },
-  // This backend will be used by getFixedT
-  backend: Backend,
-});
-```
-
-This options will be overwritten by the options provided to `getFixedT`.
-
-#### Using the `keyPrefix` option with `getFixedT`
-
-The `getFixedT` function now supports a `keyPrefix` option, allowing you to prepend a prefix to your translation keys. This is particularly useful when you want to namespace your translations without having to specify the full key path every time.
-
-Here's how you can use it:
-
-```ts
-export async function loader({ request }: LoaderArgs) {
-  // Assuming "greetings" namespace and "welcome" keyPrefix
-  let t = await i18n.getFixedT(request, "greetings", { keyPrefix: "welcome" });
-  let message = t("user"); // This will look for the "welcome.user" key in your "greetings" namespace
-  return json({ message });
-}
-```
-
-This feature simplifies working with deeply nested translation keys and enhances the organization of your translation files.
-
-#### Finding the locale from the request URL pathname
+## Finding the locale from the request URL pathname
 
 If you want to keep the user locale on the pathname, you have two possible options.
 
-First option is to pass the param from the loader/action params to `getFixedT`. This way you will stop using the language detection features of remix-i18next.
+First option is to ignore the locale detected by the middleware and manually grab the locale from the URL pathname.
 
-Second options is to pass a `findLocale` function to the detection options in RemixI18Next.
+Second options is to pass a `findLocale` function to the detection options in the middleware.
 
 ```ts
-export let i18n = new RemixI18Next({
-  detection: {
-    supportedLanguages: ["es", "en"],
-    fallbackLanguage: "en",
-    async findLocale(request) {
-      let locale = request.url.pathname.split("/").at(1);
-      return locale;
+import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+
+export const [i18nextMiddleware, getLocale, getInstance] =
+  unstable_createI18nextMiddleware({
+    detection: {
+      supportedLanguages: ["es", "en"],
+      fallbackLanguage: "en",
+      findLocale(request) {
+        let locale = request.url.pathname.split("/").at(1);
+        return locale;
+      },
     },
-  },
-});
+    i18next: {
+      resources: { en: { translation: en }, es: { translation: es } },
+    },
+  });
 ```
 
 The locale returned by `findLocale` will be validated against the list of supported locales, in case it's not valid the fallback locale will be used.
 
-#### Querying the locale from the database
+## Querying the locale from the database
 
 If your application stores the user locale in the database, you can use `findLocale` function to query the database and return the locale.
 
@@ -435,50 +453,113 @@ export let i18n = new RemixI18Next({
 });
 ```
 
-Note that every call to `getLocale` and `getFixedT` will call `findLocale` so it's important to keep it as fast as possible.
+## Store the locale in a cookie
 
-If you need both the locale and the `t` function, you can call `getLocale`, and pass the result to `getFixedT`.
+If you want to store the locale in a cookie, you can create a cookie using `createCookie` helper from React Router and pass the Cookie object to the middleware.
 
-## Middleware (unstable)
+```ts
+import { createCookie } from "react-router";
 
-> [!CAUTION]
-> This depends on `react-router@7.3.0` or later, and it's considered unstable until React Router middleware feature itself is considered stable. Breaking changes may happen in minor versions.
+export const localeCookie = createCookie("lng", {
+  path: "/",
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+  httpOnly: true,
+});
+```
 
-Since React Router v7.3.0 you can use middlewares to run code before and after the routes loaders and actions. In remix-i18next a (unstable) middleware is provided to help you with using `getLocale` and `getFixedT`.
+Then you can pass the cookie to the middleware:
 
-To use the middleware you need to create a middleware instance and pass it to the `RemixI18Next` instance.
-
-```tsx
+```ts
 import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
-import { i18n } from "~/i18next.server";
+import { localeCookie } from "~/cookies";
 
-export const [i18nextMiddleware, getFixedT, getLocal] =
-  unstable_createI18nextMiddleware(i18n);
+export const [i18nextMiddleware, getLocale, getInstance] =
+  unstable_createI18nextMiddleware({
+    detection: {
+      supportedLanguages: ["es", "en"],
+      fallbackLanguage: "en",
+      cookie: localeCookie,
+    },
+    i18next: {
+      resources: { en: { translation: en }, es: { translation: es } },
+    },
+  });
 ```
 
-Then in your root add the middleware.
+now the middleware will read the locale from the cookie, if it exists, and set it in the context. If the cookie doesn't exist, it will use the Accept-Language header or the fallback language.
 
-```tsx
-import { i18nextMiddleware } from "~/middlewares/i18next";
-export const unstable_middleware = [i18nextMiddleware];
-```
+Then in your routes, you can use this cookie to save the user preference, a simple way is to navigate the user to the same URL with `?lng=es` (replacing `es` with the desired language) and then in the `app/root.tsx` route set the cookie with the new value.
 
-And in the root loader also return the locale.
+```ts
+import { data } from "react-router";
+import { localeCookie } from "~/cookies";
+import { getLocale } from "~/middleware/i18next";
 
-```tsx
 export async function loader({ context }: Route.LoaderArgs) {
-  return { locale: getLocale(context) };
+  let locale = getLocale(context);
+  return data(
+    { locale },
+    { headers: { "Set-Cookie": await localeCookie.serialize(locale) } }
+  );
 }
 ```
 
-From now, you can call `getLocale` or `getFixedT` in your loaders and actions.
+## Store the locale in the session
 
-```tsx
-// a random route loader
-export async function loader({ context }: Route.LoaderArgs) {
-  // namespace and keyPrefix are both optional
-  let t = await getFixedT(context, namespace, keyPrefix);
-  let title = t("My page title");
-  return { title };
+Similarly to the cookie, you can store the locale in the session. To do this, you can create a session using `createSessionStorage` helpers from React Router and pass the SessionStorage object to the middleware.
+
+```ts
+import { createCookieSessionStorage } from "react-router";
+
+export const sessionStorage = createCookieSessionStorage({
+  cookie: {
+    name: "session",
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+  },
+});
+```
+
+Then you can pass the session to the middleware:
+
+```ts
+import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { sessionStorage } from "~/session";
+
+export const [i18nextMiddleware, getLocale, getInstance] =
+  unstable_createI18nextMiddleware({
+    detection: {
+      supportedLanguages: ["es", "en"],
+      fallbackLanguage: "en",
+      sessionStorage,
+    },
+    i18next: {
+      resources: { en: { translation: en }, es: { translation: es } },
+    },
+  });
+```
+
+Now the middleware will read the locale from the session, if it exists, and set it in the context. If the session doesn't exist, it will use the Accept-Language header or the fallback language.
+
+Then in your routes, you can use this session to save the user preference, a simple way is to navigate the user to the same URL with `?lng=es` (replacing `es` with the desired language) and then in the `app/root.tsx` route set the session with the new value.
+
+```ts
+import { data } from "react-router";
+import { sessionStorage } from "~/session";
+import { getLocale } from "~/middleware/i18next";
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  let locale = getLocale(context);
+
+  let session = await sessionStorage.getSession(request.headers.get("Cookie"));
+  session.set("lng", locale);
+
+  return data(
+    { locale },
+    { headers: { "Set-Cookie": await sessionStorage.commitSession(session) } }
+  );
 }
 ```
