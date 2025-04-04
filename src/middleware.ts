@@ -39,7 +39,7 @@ export namespace unstable_createI18nextMiddleware {
 		/**
 		 * The i18next options used to initialize the internal i18next instance.
 		 */
-		i18next?: Omit<InitOptions, "react" | "detection">;
+		i18next?: Omit<InitOptions, "detection">;
 		/**
 		 * The i18next plugins used to extend the internal i18next instance
 		 * when creating a new TFunction.
