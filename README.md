@@ -15,7 +15,7 @@
 ## Setup
 
 > [!TIP]
-> Check https://github.com/sergiodxa/remix-vite-i18next for an example application, if you have an issue compare your setup with the example.
+> Check https://github.com/sergiodxa/react-router-i18next-example for an example application, if you have an issue compare your setup with the example.
 
 ### Installation
 
