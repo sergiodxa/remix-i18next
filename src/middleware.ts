@@ -1,50 +1,56 @@
-import type { Namespace, TFunction } from "i18next";
-import {
-	type unstable_MiddlewareFunction,
-	type unstable_RouterContextProvider,
-	unstable_createContext,
+import type { InitOptions, Module, NewableModule, i18n } from "i18next";
+import { createInstance } from "i18next";
+import type {
+	unstable_MiddlewareFunction,
+	unstable_RouterContextProvider,
 } from "react-router";
-import { RemixI18Next } from "./server.js";
+import { unstable_createContext } from "react-router";
+import type { LanguageDetectorOption } from "./lib/language-detector.js";
+import { LanguageDetector } from "./lib/language-detector.js";
 
-export type unstable_GetFixedTFunction<
-	Ns extends Namespace = "translation",
-	KPrefix = undefined,
-> = (
-	context: unstable_RouterContextProvider,
-	namespaces?: Ns,
-	keyPrefix?: KPrefix,
-) => Promise<TFunction<Ns, KPrefix>>;
+export function unstable_createI18nextMiddleware({
+	detection,
+	i18next = {},
+	plugins = [],
+}: unstable_createI18nextMiddleware.Options): unstable_createI18nextMiddleware.ReturnType {
+	let localeContext = unstable_createContext<string>();
+	let i18nextContext = unstable_createContext<i18n>();
+	let languageDetector = new LanguageDetector(detection);
 
-export type unstable_GetLocaleFunction = (
-	context: unstable_RouterContextProvider,
-) => string;
-
-export type unstable_createI18nextMiddlewareReturnType<
-	Ns extends Namespace = "translation",
-	KPrefix = undefined,
-> = [
-	unstable_MiddlewareFunction<Response>,
-	unstable_GetFixedTFunction<Ns, KPrefix>,
-	unstable_GetLocaleFunction,
-];
-
-export function unstable_createI18nextMiddleware(
-	i18n: RemixI18Next,
-): unstable_createI18nextMiddlewareReturnType {
-	const localeContext = unstable_createContext<string>();
 	return [
 		async function i18nextMiddleware({ request, context }, next) {
-			let locale = await i18n.getLocale(request);
-			context.set(localeContext, locale);
+			let lng = await languageDetector.detect(request);
+			context.set(localeContext, lng);
+
+			let instance = createInstance(i18next);
+			for (const plugin of plugins ?? []) instance.use(plugin);
+			await instance.init({ lng });
+			context.set(i18nextContext, instance);
+
 			return await next();
 		},
+		(context) => context.get(localeContext),
+		(context) => context.get(i18nextContext),
+	];
+}
 
-		async function getFixedT(context, ns, keyPrefix) {
-			return i18n.getFixedT(context.get(localeContext), ns, { keyPrefix });
-		},
+export namespace unstable_createI18nextMiddleware {
+	export interface Options {
+		/**
+		 * The i18next options used to initialize the internal i18next instance.
+		 */
+		i18next?: Omit<InitOptions, "react" | "detection">;
+		/**
+		 * The i18next plugins used to extend the internal i18next instance
+		 * when creating a new TFunction.
+		 */
+		plugins?: NewableModule<Module>[] | Module[];
+		detection: LanguageDetectorOption;
+	}
 
-		function getLocale(context) {
-			return context.get(localeContext);
-		},
+	export type ReturnType = [
+		unstable_MiddlewareFunction<Response>,
+		(context: unstable_RouterContextProvider) => string,
+		(context: unstable_RouterContextProvider) => i18n,
 	];
 }

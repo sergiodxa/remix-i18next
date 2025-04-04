@@ -1,58 +1,84 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 
 import { unstable_RouterContextProvider } from "react-router";
+import { runMiddleware } from "./lib/test-helper";
 import { unstable_createI18nextMiddleware } from "./middleware";
-import { RemixI18Next } from "./server";
 
 describe(unstable_createI18nextMiddleware.name, () => {
-	let i18n = new RemixI18Next({
-		detection: {
-			supportedLanguages: ["es", "en"],
-			fallbackLanguage: "en",
-		},
-		i18next: {
-			resources: {
-				en: { translation: { hello: "Hello" } },
-				es: { translation: { hello: "Hola" } },
+	test("sets the locale in context", async () => {
+		let [middleware, getLocale] = unstable_createI18nextMiddleware({
+			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
+		});
+
+		let context = new unstable_RouterContextProvider();
+		await runMiddleware(middleware, { context });
+
+		expect(getLocale(context)).toBe("en");
+	});
+
+	test("detects locale from request and saves it in context", async () => {
+		let [middleware, getLocale] = unstable_createI18nextMiddleware({
+			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
+		});
+
+		let request = new Request("http://example.com", {
+			headers: { "Accept-Language": "es" },
+		});
+
+		let context = new unstable_RouterContextProvider();
+
+		await runMiddleware(middleware, { request, context });
+
+		expect(getLocale(context)).toBe("es");
+	});
+
+	test("can access i18next instance", async () => {
+		let [middleware, , getInstance] = unstable_createI18nextMiddleware({
+			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
+		});
+
+		let context = new unstable_RouterContextProvider();
+		await runMiddleware(middleware, { context });
+
+		let instance = getInstance(context);
+
+		expect(instance).toBeDefined();
+		expect(instance.isInitialized).toBe(true);
+	});
+
+	test("can access TFunction from instance", async () => {
+		let [middleware, , getInstance] = unstable_createI18nextMiddleware({
+			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
+			i18next: {
+				resources: { en: { translation: { key: "value" } } },
 			},
-		},
-	});
-
-	test("returns an array with three functions", () => {
-		let result = unstable_createI18nextMiddleware(i18n);
-		expect(result).toBeArray();
-		expect(result).toHaveLength(3);
-		expect(result[0]).toBeFunction();
-		expect(result[1]).toBeFunction();
-	});
-
-	test("loaders the locale from the context", async () => {
-		let [middleware, _, getLocale] = unstable_createI18nextMiddleware(i18n);
-
-		let context = new unstable_RouterContextProvider();
-		let request = new Request("https://remix.i18next");
-		let next = mock().mockImplementation(() => {
-			let locale = getLocale(context);
-			return Response.json(locale);
 		});
 
-		let response = await middleware({ request, context, params: {} }, next);
+		let context = new unstable_RouterContextProvider();
+		await runMiddleware(middleware, { context });
 
-		expect(response.json()).resolves.toBe("en");
+		expect(getInstance(context).t("key")).toBe("value");
 	});
 
-	test("loaders can get a TFunction", async () => {
-		let [middleware, getFixedT] = unstable_createI18nextMiddleware(i18n);
+	test("the instance has the detected locale configured", async () => {
+		let [middleware, getLocale, getInstance] = unstable_createI18nextMiddleware(
+			{
+				detection: {
+					fallbackLanguage: "en",
+					supportedLanguages: ["es", "en"],
+				},
+			},
+		);
 
-		let context = new unstable_RouterContextProvider();
-		let request = new Request("https://remix.i18next?lng=es");
-		let next = mock().mockImplementation(async () => {
-			let t = await getFixedT(context);
-			return Response.json(t("hello"));
+		let request = new Request("http://example.com", {
+			headers: { "Accept-Language": "es" },
 		});
 
-		let response = await middleware({ request, context, params: {} }, next);
+		let context = new unstable_RouterContextProvider();
 
-		expect(response.json()).resolves.toBe("Hola");
+		await runMiddleware(middleware, { request, context });
+
+		expect(getLocale(context)).toBe("es");
+		expect(getInstance(context).language).toBe("es");
 	});
 });
