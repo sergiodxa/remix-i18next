@@ -48,14 +48,7 @@
 	},
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": [
-		"remix",
-		"i18n",
-		"i18next",
-		"ssr",
-		"csr",
-		"react-router"
-	],
+	"keywords": ["remix", "i18n", "i18next", "ssr", "csr", "react-router"],
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
@@ -65,11 +58,6 @@
 		"exports": "bun run ./scripts/exports.ts"
 	},
 	"sideEffects": false,
-	"files": [
-		"build",
-		"src",
-		"package.json",
-		"README.md"
-	],
+	"files": ["build", "src", "package.json", "README.md"],
 	"type": "module"
 }
