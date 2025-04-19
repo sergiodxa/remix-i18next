@@ -144,7 +144,7 @@ This will return a new `TFunction` instance with the locale set to `es`.
 
 ### Usage with react-i18next
 
-So far this has configured the i18next instance to inside React Router loaders and actions, but in many casees we will need to use it directly in our React components.
+So far this has configured the i18next instance to inside React Router loaders and actions, but in many cases we will need to use it directly in our React components.
 
 To do this, we need to setup react-i18next.
 
