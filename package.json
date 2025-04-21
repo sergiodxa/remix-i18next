@@ -18,7 +18,7 @@
 		"@types/bun": "^1.1.14",
 		"@types/react": "^19.1.0",
 		"consola": "^3.3.3",
-		"i18next": "^24.2.2",
+		"i18next": "^25.0.1",
 		"react": "^19.0.0",
 		"react-i18next": "^15.4.0",
 		"react-router": "^7.3.0",
