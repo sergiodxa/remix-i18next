@@ -424,7 +424,7 @@ export const [i18nextMiddleware, getLocale, getInstance] =
       supportedLanguages: ["es", "en"],
       fallbackLanguage: "en",
       findLocale(request) {
-        let locale = request.url.pathname.split("/").at(1);
+        let locale = new URL(request.url).pathname.split("/").at(1);
         return locale;
       },
     },
