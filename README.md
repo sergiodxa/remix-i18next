@@ -155,7 +155,7 @@ Let's start by updating the `entry.client.tsx` and `entry.server.tsx` files to u
 
 ### Update the root route
 
-First of all, we want to send the locale detected serevr-side by the middleware to the UI. To do this, we will return the locale from the `app/root.tsx` route.
+First of all, we want to send the locale detected server-side by the middleware to the UI. To do this, we will return the locale from the `app/root.tsx` route.
 
 ```tsx
 import {
