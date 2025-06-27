@@ -1,4 +1,4 @@
-import type { InitOptions, Module, NewableModule, i18n } from "i18next";
+import type { InitOptions, i18n, Module, NewableModule } from "i18next";
 import { createInstance } from "i18next";
 import type {
 	unstable_MiddlewareFunction,

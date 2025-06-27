@@ -1,5 +1,6 @@
 import {
 	type BackendModule,
+	createInstance,
 	type DefaultNamespace,
 	type FlatNamespace,
 	type InitOptions,
@@ -8,7 +9,6 @@ import {
 	type Namespace,
 	type NewableModule,
 	type TFunction,
-	createInstance,
 } from "i18next";
 import type { EntryContext } from "react-router";
 import {

@@ -109,7 +109,7 @@ describe(RemixI18Next.name, () => {
 				detection: {
 					supportedLanguages: ["es", "en"],
 					fallbackLanguage: "en",
-					async findLocale(request) {
+					async findLocale(_request) {
 						return "es";
 					},
 				},
