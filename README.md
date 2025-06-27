@@ -330,6 +330,8 @@ This file introduces two dependencies
 
 They are not hard requirements, but they are useful for our example, feel free to change them or remove them.
 
+Finally, ensure the route is configured in your `app/routes.ts` file. You can set the path to `/api/locales/:lng/:ns` so it matches the path used in the `entry.client.tsx` file, if you use something else remember to update the `loadPath` in the i18next configuration.
+
 ### Server-side configuration
 
 Now in your `entry.server.tsx` replace the default code with this:
