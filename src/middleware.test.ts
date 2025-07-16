@@ -81,4 +81,25 @@ describe(unstable_createI18nextMiddleware.name, () => {
 		expect(getLocale(context)).toBe("es");
 		expect(getInstance(context).language).toBe("es");
 	});
+
+	test("supports async function for i18next options", async () => {
+		let [middleware, , getInstance] = unstable_createI18nextMiddleware({
+			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
+			i18next: async () => {
+				// Simulate async operation (e.g., fetching from API/database)
+				return {
+					resources: { en: { translation: { asyncKey: "asyncValue" } } },
+				};
+			},
+		});
+
+		let context = new unstable_RouterContextProvider();
+		await runMiddleware(middleware, { context });
+
+		let instance = getInstance(context);
+
+		expect(instance).toBeDefined();
+		expect(instance.isInitialized).toBe(true);
+		expect(instance.t("asyncKey")).toBe("asyncValue");
+	});
 });

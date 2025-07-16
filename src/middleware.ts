@@ -22,7 +22,8 @@ export function unstable_createI18nextMiddleware({
 			let lng = await languageDetector.detect(request);
 			context.set(localeContext, lng);
 
-			let instance = createInstance(i18next);
+			let options = typeof i18next === "function" ? await i18next() : i18next;
+			let instance = createInstance(options);
 			for (const plugin of plugins ?? []) instance.use(plugin);
 			await instance.init({ lng });
 			context.set(i18nextContext, instance);
@@ -38,8 +39,11 @@ export namespace unstable_createI18nextMiddleware {
 	export interface Options {
 		/**
 		 * The i18next options used to initialize the internal i18next instance.
+		 * Can be an object or an async function that returns the options.
 		 */
-		i18next?: Omit<InitOptions, "detection">;
+		i18next?:
+			| Omit<InitOptions, "detection">
+			| (() => Promise<Omit<InitOptions, "detection">>);
 		/**
 		 * The i18next plugins used to extend the internal i18next instance
 		 * when creating a new TFunction.
