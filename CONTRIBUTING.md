@@ -10,4 +10,6 @@ Run the code quality checker with `bun run quality`.
 
 Run the typechecker with `bun run typecheck`.
 
+Run the build with `bun run build`.
+
 Run the exports checker with `bun run exports`.
