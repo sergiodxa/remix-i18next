@@ -4,20 +4,6 @@ import { unstable_RouterContextProvider } from "react-router";
 import { runMiddleware } from "./lib/test-helper";
 import { unstable_createI18nextMiddleware } from "./middleware";
 
-declare module "i18next" {
-	interface CustomTypeOptions {
-		resources: {
-			translation: {
-				key: string;
-			};
-			common: {
-				hello: string;
-				user: { age: string };
-			};
-		};
-	}
-}
-
 describe(unstable_createI18nextMiddleware.name, () => {
 	test("sets the locale in context", async () => {
 		let [middleware, getLocale] = unstable_createI18nextMiddleware({

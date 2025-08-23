@@ -5,6 +5,20 @@ import {
 	unstable_RouterContextProvider,
 } from "react-router";
 
+declare module "i18next" {
+	interface CustomTypeOptions {
+		resources: {
+			translation: {
+				key: string;
+			};
+			common: {
+				hello: string;
+				user: { age: string };
+			};
+		};
+	}
+}
+
 const defaultNext = mock().mockImplementation(() => Response.json(null));
 
 interface RunMiddlewareOptions<T = Response> {
