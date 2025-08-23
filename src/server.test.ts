@@ -417,14 +417,3 @@ describe(RemixI18Next.name, () => {
 		});
 	});
 });
-
-declare module "i18next" {
-	interface CustomTypeOptions {
-		resources: {
-			common: {
-				hello: string;
-				user: { age: string };
-			};
-		};
-	}
-}
