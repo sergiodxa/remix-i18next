@@ -50,7 +50,7 @@ export namespace unstable_createI18nextMiddleware {
 
 	export type ReturnType = [
 		unstable_MiddlewareFunction<Response>,
-		(context: unstable_RouterContextProvider) => string,
-		(context: unstable_RouterContextProvider) => i18n,
+		(context: Readonly<unstable_RouterContextProvider>) => string,
+		(context: Readonly<unstable_RouterContextProvider>) => i18n,
 	];
 }

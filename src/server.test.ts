@@ -3,6 +3,20 @@ import type { BackendModule, FormatterModule } from "i18next";
 import { createCookie, createMemorySessionStorage } from "react-router";
 import { RemixI18Next } from "./server.js";
 
+declare module "i18next" {
+	interface CustomTypeOptions {
+		resources: {
+			translation: {
+				key: string;
+			};
+			common: {
+				hello: string;
+				user: { age: string };
+			};
+		};
+	}
+}
+
 describe(RemixI18Next.name, () => {
 	describe("getLocale", () => {
 		test("should get the locale from the search param ?lng", async () => {
@@ -417,14 +431,3 @@ describe(RemixI18Next.name, () => {
 		});
 	});
 });
-
-declare module "i18next" {
-	interface CustomTypeOptions {
-		resources: {
-			common: {
-				hello: string;
-				user: { age: string };
-			};
-		};
-	}
-}
