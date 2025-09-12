@@ -22,13 +22,13 @@
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"react-i18next": "^15.7.1",
-		"react-router": "^7.8.2",
+		"react-router": "^7.9.1",
 		"typedoc": "^0.28.6",
 		"typedoc-plugin-mdn-links": "^5.0.1",
 		"typescript": "^5.7.2"
 	},
 	"peerDependencies": {
-		"react-router": "^7.0.0",
+		"react-router": "^7.9.1",
 		"i18next": "^24.0.0 || ^25.0.0",
 		"react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
 		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0"
