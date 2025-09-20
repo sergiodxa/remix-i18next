@@ -1,8 +1,8 @@
 import { mock } from "bun:test";
 import {
+	type MiddlewareFunction,
 	type Params,
-	type unstable_MiddlewareFunction,
-	unstable_RouterContextProvider,
+	RouterContextProvider,
 } from "react-router";
 
 declare module "i18next" {
@@ -24,15 +24,15 @@ const defaultNext = mock().mockImplementation(() => Response.json(null));
 interface RunMiddlewareOptions<T = Response> {
 	request?: Request;
 	params?: Params;
-	context?: Readonly<unstable_RouterContextProvider>;
+	context?: Readonly<RouterContextProvider>;
 	next?: () => Promise<T>;
 }
 
 export async function runMiddleware<T = Response>(
-	middleware: unstable_MiddlewareFunction<T>,
+	middleware: MiddlewareFunction<T>,
 	{
 		request = new Request("https://remix.utils"),
-		context = new unstable_RouterContextProvider(),
+		context = new RouterContextProvider(),
 		params = {},
 		next = defaultNext,
 	}: RunMiddlewareOptions<T> = {},

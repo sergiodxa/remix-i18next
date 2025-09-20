@@ -1,20 +1,17 @@
 import type { InitOptions, i18n, Module, NewableModule } from "i18next";
 import { createInstance } from "i18next";
-import type {
-	unstable_MiddlewareFunction,
-	unstable_RouterContextProvider,
-} from "react-router";
-import { unstable_createContext } from "react-router";
+import type { MiddlewareFunction, RouterContextProvider } from "react-router";
+import { createContext } from "react-router";
 import type { LanguageDetectorOption } from "./lib/language-detector.js";
 import { LanguageDetector } from "./lib/language-detector.js";
 
-export function unstable_createI18nextMiddleware({
+export function createI18nextMiddleware({
 	detection,
 	i18next = {},
 	plugins = [],
-}: unstable_createI18nextMiddleware.Options): unstable_createI18nextMiddleware.ReturnType {
-	let localeContext = unstable_createContext<string>();
-	let i18nextContext = unstable_createContext<i18n>();
+}: createI18nextMiddleware.Options): createI18nextMiddleware.ReturnType {
+	let localeContext = createContext<string>();
+	let i18nextContext = createContext<i18n>();
 	let languageDetector = new LanguageDetector(detection);
 
 	return [
@@ -34,7 +31,7 @@ export function unstable_createI18nextMiddleware({
 	];
 }
 
-export namespace unstable_createI18nextMiddleware {
+export namespace createI18nextMiddleware {
 	export interface Options {
 		/**
 		 * The i18next options used to initialize the internal i18next instance.
@@ -49,8 +46,8 @@ export namespace unstable_createI18nextMiddleware {
 	}
 
 	export type ReturnType = [
-		unstable_MiddlewareFunction<Response>,
-		(context: Readonly<unstable_RouterContextProvider>) => string,
-		(context: Readonly<unstable_RouterContextProvider>) => i18n,
+		MiddlewareFunction<Response>,
+		(context: Readonly<RouterContextProvider>) => string,
+		(context: Readonly<RouterContextProvider>) => i18n,
 	];
 }

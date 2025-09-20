@@ -60,19 +60,22 @@ The type import and the `satisfies` are optional, but it will help us ensure tha
 
 ### Setup the Middleware
 
+Ensure middleware is enabled in your React Router config so the middleware can run.
+See the React Router middleware documentation for details: https://reactrouter.com/how-to/middleware
+
 Create a file named `app/middleware/i18next.ts` with the following code:
 
 > [!CAUTION]
-> This depends on `react-router@7.3.0` or later, and it's considered unstable until React Router middleware feature itself is considered stable. Breaking changes may happen in minor versions.
+> This depends on `react-router@7.9.0` or later
 > Check older versions of the README for a guide on how to use RemixI18next class instead if you are using an older version of React Router or don't want to use the middleware.
 
 ```ts
-import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next/middleware";
 import en from "~/locales/en";
 import es from "~/locales/es";
 
 export const [i18nextMiddleware, getLocale, getInstance] =
-  unstable_createI18nextMiddleware({
+  createI18nextMiddleware({
     detection: {
       supportedLanguages: ["en", "es"],
       fallbackLanguage: "en",
@@ -89,7 +92,7 @@ Then in your `app/root.tsx` setup the middleware:
 ```ts
 import { i18nextMiddleware } from "~/middleware/i18next";
 
-export const unstable_middleware = [i18nextMiddleware];
+export const middleware = [i18nextMiddleware];
 ```
 
 With this, on every request, the middleware will run, detect the language and set it in the router context.
@@ -178,7 +181,7 @@ import {
 } from "./middleware/i18next";
 import { useTranslation } from "react-i18next";
 
-export const unstable_middleware = [i18nextMiddleware];
+export const middleware = [i18nextMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
   let locale = getLocale(context);
@@ -340,7 +343,7 @@ import { PassThrough } from "node:stream";
 
 import type {
   EntryContext,
-  unstable_RouterContextProvider,
+  RouterContextProvider,
 } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
@@ -357,7 +360,7 @@ export default function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   entryContext: EntryContext,
-  routerContext: unstable_RouterContextProvider
+  routerContext: RouterContextProvider
 ) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;
@@ -417,10 +420,10 @@ First option is to ignore the locale detected by the middleware and manually gra
 Second options is to pass a `findLocale` function to the detection options in the middleware.
 
 ```ts
-import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next/middleware";
 
 export const [i18nextMiddleware, getLocale, getInstance] =
-  unstable_createI18nextMiddleware({
+  createI18nextMiddleware({
     detection: {
       supportedLanguages: ["es", "en"],
       fallbackLanguage: "en",
@@ -472,11 +475,11 @@ export const localeCookie = createCookie("lng", {
 Then you can pass the cookie to the middleware:
 
 ```ts
-import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next/middleware";
 import { localeCookie } from "~/cookies";
 
 export const [i18nextMiddleware, getLocale, getInstance] =
-  unstable_createI18nextMiddleware({
+  createI18nextMiddleware({
     detection: {
       supportedLanguages: ["es", "en"],
       fallbackLanguage: "en",
@@ -527,11 +530,11 @@ export const sessionStorage = createCookieSessionStorage({
 Then you can pass the session to the middleware:
 
 ```ts
-import { unstable_createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next/middleware";
 import { sessionStorage } from "~/session";
 
 export const [i18nextMiddleware, getLocale, getInstance] =
-  unstable_createI18nextMiddleware({
+  createI18nextMiddleware({
     detection: {
       supportedLanguages: ["es", "en"],
       fallbackLanguage: "en",
