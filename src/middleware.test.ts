@@ -1,23 +1,23 @@
 import { describe, expect, test } from "bun:test";
 
-import { unstable_RouterContextProvider } from "react-router";
+import { RouterContextProvider } from "react-router";
 import { runMiddleware } from "./lib/test-helper";
-import { unstable_createI18nextMiddleware } from "./middleware";
+import { createI18nextMiddleware } from "./middleware";
 
-describe(unstable_createI18nextMiddleware.name, () => {
+describe(createI18nextMiddleware.name, () => {
 	test("sets the locale in context", async () => {
-		let [middleware, getLocale] = unstable_createI18nextMiddleware({
+		let [middleware, getLocale] = createI18nextMiddleware({
 			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
 		});
 
-		let context = new unstable_RouterContextProvider();
+		let context = new RouterContextProvider();
 		await runMiddleware(middleware, { context });
 
 		expect(getLocale(context)).toBe("en");
 	});
 
 	test("detects locale from request and saves it in context", async () => {
-		let [middleware, getLocale] = unstable_createI18nextMiddleware({
+		let [middleware, getLocale] = createI18nextMiddleware({
 			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
 		});
 
@@ -25,7 +25,7 @@ describe(unstable_createI18nextMiddleware.name, () => {
 			headers: { "Accept-Language": "es" },
 		});
 
-		let context = new unstable_RouterContextProvider();
+		let context = new RouterContextProvider();
 
 		await runMiddleware(middleware, { request, context });
 
@@ -33,11 +33,11 @@ describe(unstable_createI18nextMiddleware.name, () => {
 	});
 
 	test("can access i18next instance", async () => {
-		let [middleware, , getInstance] = unstable_createI18nextMiddleware({
+		let [middleware, , getInstance] = createI18nextMiddleware({
 			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
 		});
 
-		let context = new unstable_RouterContextProvider();
+		let context = new RouterContextProvider();
 		await runMiddleware(middleware, { context });
 
 		let instance = getInstance(context);
@@ -47,34 +47,32 @@ describe(unstable_createI18nextMiddleware.name, () => {
 	});
 
 	test("can access TFunction from instance", async () => {
-		let [middleware, , getInstance] = unstable_createI18nextMiddleware({
+		let [middleware, , getInstance] = createI18nextMiddleware({
 			detection: { fallbackLanguage: "en", supportedLanguages: ["es", "en"] },
 			i18next: {
 				resources: { en: { translation: { key: "value" } } },
 			},
 		});
 
-		let context = new unstable_RouterContextProvider();
+		let context = new RouterContextProvider();
 		await runMiddleware(middleware, { context });
 
 		expect(getInstance(context).t("key")).toBe("value");
 	});
 
 	test("the instance has the detected locale configured", async () => {
-		let [middleware, getLocale, getInstance] = unstable_createI18nextMiddleware(
-			{
-				detection: {
-					fallbackLanguage: "en",
-					supportedLanguages: ["es", "en"],
-				},
+		let [middleware, getLocale, getInstance] = createI18nextMiddleware({
+			detection: {
+				fallbackLanguage: "en",
+				supportedLanguages: ["es", "en"],
 			},
-		);
+		});
 
 		let request = new Request("http://example.com", {
 			headers: { "Accept-Language": "es" },
 		});
 
-		let context = new unstable_RouterContextProvider();
+		let context = new RouterContextProvider();
 
 		await runMiddleware(middleware, { request, context });
 
