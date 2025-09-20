@@ -60,19 +60,14 @@ The type import and the `satisfies` are optional, but it will help us ensure tha
 
 ### Setup the Middleware
 
-Enable middleware in your react-router.config.ts:
-
-```ts
-import type { Config } from "@react-router/dev/config";
-
-export default {
-  future: {
-    v8_middleware: true,
-  },
-} satisfies Config;
-```
+Ensure middleware is enabled in your React Router config so the middleware can run.
+See the React Router middleware documentation for details: https://reactrouter.com/how-to/middleware
 
 Create a file named `app/middleware/i18next.ts` with the following code:
+
+> [!CAUTION]
+> This depends on `react-router@7.9.0` or later
+> Check older versions of the README for a guide on how to use RemixI18next class instead if you are using an older version of React Router or don't want to use the middleware.
 
 ```ts
 import { createI18nextMiddleware } from "remix-i18next/middleware";
