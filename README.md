@@ -69,7 +69,7 @@ export default { translation } satisfies ResourceLanguage;
 
 The `satisfies typeof import("~/locales/en/translation").default` is optional, but it will help to ensure that if we add or remove a key from the `en` locale (the default one) we will get a type error in the `es` locale so we can keep them in sync.
 
-Then re-export them all the locales in `app/locales/index.ts`:
+Then re-export all the locales in `app/locales/index.ts`:
 
 ```ts
 import type { Resource } from "i18next";
