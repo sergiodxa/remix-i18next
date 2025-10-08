@@ -27,8 +27,8 @@ export function useLocale(localeKey = "locale"): string {
  * Detect when the locale returned by the root route loader changes and call
  * `i18n.changeLanguage` with the new locale.
  * This will ensure translations are loaded automatically.
- * @deprecated Use `useTranslation().i18n.changeLanguage` with your root loader
- * locale instead.
+ * @deprecated Pass the locale value from your root loader data to `i18n.changeLanguage(locale)`.
+ * For example: `i18n.changeLanguage(loaderData.locale)`.
  */
 export function useChangeLanguage(locale: string) {
 	let { i18n } = useTranslation();
