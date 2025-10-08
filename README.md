@@ -19,6 +19,7 @@
 
 > [!TIP]
 > Check https://github.com/sergiodxa/react-router-i18next-example for an example application, if you have an issue compare your setup with the example.
+> If you're using the `@react-router/fs-routes` package to define your routes, check the `fs-routes` branch on the same repo.
 
 ### Installation
 
