@@ -54,7 +54,7 @@ export default { translation } satisfies ResourceLanguage;
 ```
 
 ```ts
-// app/locales/en/translation.ts
+// app/locales/es/translation.ts
 export default {
   title: "remix-i18next (es)",
   description: "Un ejemplo de React Router + remix-i18next",
