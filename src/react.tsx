@@ -4,6 +4,7 @@ import { useMatches } from "react-router";
 
 /**
  * Get the locale returned by the root route loader under the `locale` key.
+ * @deprecated Use `useTranslation().i18n.language` instead.
  * @example
  * let locale = useLocale()
  * let formattedDate = date.toLocaleDateString(locale);
@@ -26,6 +27,8 @@ export function useLocale(localeKey = "locale"): string {
  * Detect when the locale returned by the root route loader changes and call
  * `i18n.changeLanguage` with the new locale.
  * This will ensure translations are loaded automatically.
+ * @deprecated Pass the locale value from your root loader data to `i18n.changeLanguage(locale)`.
+ * For example: `i18n.changeLanguage(loaderData.locale)`.
  */
 export function useChangeLanguage(locale: string) {
 	let { i18n } = useTranslation();
