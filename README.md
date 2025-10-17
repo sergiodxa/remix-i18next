@@ -6,7 +6,7 @@
 > If you're still on Remix v2, keep using [remix-i18next v6](https://github.com/sergiodxa/remix-i18next/tree/v6.4.1) as the v7 is only compatible with React Router v7.
 
 > [!NOTE]
-> If you're using React Router SPA Mode, use react-i18next directly, this package if focused on being used server-side.
+> If you're using React Router SPA Mode, use react-i18next directly, this package is focused on being used server-side.
 
 ## Why remix-i18next?
 
@@ -368,71 +368,44 @@ Finally, ensure the route is configured in your `app/routes.ts` file. You can se
 
 #### Server-side configuration
 
-Now in your `entry.server.tsx` replace the default code with this:
+Apply the following changes to your `entry.server.tsx`
 
-```tsx
+```patch
 import { PassThrough } from "node:stream";
-import type { EntryContext, RouterContextProvider } from "react-router";
-import { createReadableStreamFromReadable } from "@react-router/node";
-import { ServerRouter } from "react-router";
-import { isbot } from "isbot";
-import type { RenderToPipeableStreamOptions } from "react-dom/server";
-import { renderToPipeableStream } from "react-dom/server";
-import { I18nextProvider } from "react-i18next";
-import { getInstance } from "./middleware/i18next";
-
-export const streamTimeout = 5_000;
-
-export default function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  entryContext: EntryContext,
-  routerContext: RouterContextProvider,
-) {
-  return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    let userAgent = request.headers.get("user-agent");
-
-    let readyOption: keyof RenderToPipeableStreamOptions =
-      (userAgent && isbot(userAgent)) || entryContext.isSpaMode
-        ? "onAllReady"
-        : "onShellReady";
-
-    let { pipe, abort } = renderToPipeableStream(
-      <I18nextProvider i18n={getInstance(routerContext)}>
-        <ServerRouter context={entryContext} url={request.url} />
-      </I18nextProvider>,
-      {
-        [readyOption]() {
-          shellRendered = true;
-          let body = new PassThrough();
-          let stream = createReadableStreamFromReadable(body);
-
-          responseHeaders.set("Content-Type", "text/html");
-
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: responseStatusCode,
-            }),
-          );
-
-          pipe(body);
-        },
-        onShellError(error: unknown) {
-          reject(error);
-        },
-        onError(error: unknown) {
-          responseStatusCode = 500;
-          if (shellRendered) console.error(error);
-        },
-      },
-    );
-
-    setTimeout(abort, streamTimeout + 1000);
-  });
-}
+ 
+-import type { AppLoadContext, EntryContext } from "react-router";
++import type { RouterContextProvider, EntryContext } from "react-router";
+ import { createReadableStreamFromReadable } from "@react-router/node";
+ import { ServerRouter } from "react-router";
+ import { isbot } from "isbot";
+ import type { RenderToPipeableStreamOptions } from "react-dom/server";
+ import { renderToPipeableStream } from "react-dom/server";
++import {I18nextProvider} from "react-i18next"
++import {getInstance} from "~/middleware/i18next"
++
+ 
+ export const streamTimeout = 5_000;
+ 
+@@ -14,9 +17,7 @@ export default function handleRequest(
+   responseStatusCode: number,
+   responseHeaders: Headers,
+   routerContext: EntryContext,
+-  loadContext: AppLoadContext,
+-  // If you have middleware enabled:
+-  // loadContext: RouterContextProvider
++  loadContext: RouterContextProvider
+ ) {
+   return new Promise((resolve, reject) => {
+     let shellRendered = false;
+@@ -37,7 +38,9 @@ export default function handleRequest(
+     );
+ 
+     const { pipe, abort } = renderToPipeableStream(
+-      <ServerRouter context={routerContext} url={request.url} />,
++      <I18nextProvider i18n={getInstance(loadContext)}>
++        <ServerRouter context={routerContext} url={request.url} />
++      </I18nextProvider>,
+       {
 ```
 
 Here we are using the `getInstance` function from the middleware to get the i18next instance.
