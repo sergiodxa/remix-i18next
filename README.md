@@ -380,8 +380,8 @@ import { PassThrough } from "node:stream";
  import { isbot } from "isbot";
  import type { RenderToPipeableStreamOptions } from "react-dom/server";
  import { renderToPipeableStream } from "react-dom/server";
-+import {I18nextProvider} from "react-i18next"
-+import {getInstance} from "~/middleware/i18next"
++import {I18nextProvider} from "react-i18next";
++import {getInstance} from "~/middleware/i18next";
 +
  
  export const streamTimeout = 5_000;
