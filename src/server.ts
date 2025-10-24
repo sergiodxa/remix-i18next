@@ -10,7 +10,7 @@ import {
 	type NewableModule,
 	type TFunction,
 } from "i18next";
-import type { EntryContext } from "react-router";
+import type { EntryContext, RouterContextProvider } from "react-router";
 import {
 	LanguageDetector,
 	type LanguageDetectorOption,
@@ -58,8 +58,8 @@ export class RemixI18Next {
 	 * - header
 	 * And finally the fallback language.
 	 */
-	public async getLocale(request: Request): Promise<string> {
-		return this.detector.detect(request);
+	public async getLocale(request: Request, context?: Readonly<RouterContextProvider>): Promise<string> {
+		return this.detector.detect(request, context);
 	}
 
 	/**
@@ -109,6 +109,7 @@ export class RemixI18Next {
 		locale: string,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
+        context?: Readonly<RouterContextProvider>
 	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
 	async getFixedT<
 		N extends
@@ -119,6 +120,7 @@ export class RemixI18Next {
 		request: Request,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
+        context?: Readonly<RouterContextProvider>
 	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
 	async getFixedT<
 		N extends
@@ -129,12 +131,13 @@ export class RemixI18Next {
 		requestOrLocale: Request | string,
 		namespaces?: N,
 		options: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix } = {},
+        context?: Readonly<RouterContextProvider>
 	): Promise<TFunction<FallbackNs<N>, KPrefix>> {
 		let [instance, locale] = await Promise.all([
 			this.createInstance({ ...this.options.i18next, ...options }),
 			typeof requestOrLocale === "string"
 				? requestOrLocale
-				: this.getLocale(requestOrLocale),
+				: this.getLocale(requestOrLocale, context),
 		]);
 
 		await instance.changeLanguage(locale);

@@ -1,4 +1,4 @@
-import type { Cookie, SessionStorage } from "react-router";
+import type { Cookie, RouterContextProvider, SessionStorage } from "react-router";
 import { getClientLocales } from "./get-client-locales.js";
 import { pick } from "./parser.js";
 
@@ -57,7 +57,7 @@ export interface LanguageDetectorOption {
 	 * from the database or fetch it from an API.
 	 * @param request The request object received by the server.
 	 */
-	findLocale?(request: Request): Promise<string | Array<string> | null>;
+	findLocale?(request: Request, context?: Readonly<RouterContextProvider>): Promise<string | Array<string> | null>;
 }
 
 /**
@@ -95,7 +95,7 @@ export class LanguageDetector {
 		}
 	}
 
-	public async detect(request: Request): Promise<string> {
+	public async detect(request: Request, context?: Readonly<RouterContextProvider>): Promise<string> {
 		let order = this.options.order ?? this.defaultOrder;
 
 		for (let method of order) {
@@ -118,7 +118,7 @@ export class LanguageDetector {
 			}
 
 			if (method === "custom") {
-				locale = await this.fromCustom(request);
+				locale = await this.fromCustom(request, context);
 			}
 
 			if (locale) return locale;
@@ -176,13 +176,13 @@ export class LanguageDetector {
 		return this.fromSupported(locales);
 	}
 
-	private async fromCustom(request: Request): Promise<string | null> {
+	private async fromCustom(request: Request, context?: Readonly<RouterContextProvider>): Promise<string | null> {
 		if (!this.options.findLocale) {
 			throw new ReferenceError(
 				"You tried to find a locale using `findLocale` but it iss not defined. Change your order to not include `custom` or provide a findLocale functions.",
 			);
 		}
-		let locales = await this.options.findLocale(request);
+		let locales = await this.options.findLocale(request, context);
 		if (!locales) return null;
 		if (Array.isArray(locales)) return this.fromSupported(locales.join(","));
 		return this.fromSupported(locales);

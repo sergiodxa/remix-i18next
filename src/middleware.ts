@@ -16,7 +16,7 @@ export function createI18nextMiddleware({
 
 	return [
 		async function i18nextMiddleware({ request, context }, next) {
-			let lng = await languageDetector.detect(request);
+			let lng = await languageDetector.detect(request, context);
 			context.set(localeContext, lng);
 
 			let instance = createInstance(i18next);
