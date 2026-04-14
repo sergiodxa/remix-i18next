@@ -9,8 +9,9 @@
 		"src/lib/**/*.tsx"
 	],
 	"compilerOptions": {
+		"types": ["bun"],
 		"jsx": "react",
 		"outDir": "./build",
-		"rootDir": "."
+		"rootDir": "./src"
 	}
 }
