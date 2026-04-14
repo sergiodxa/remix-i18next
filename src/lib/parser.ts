@@ -53,7 +53,7 @@ export function pick<T extends string>(
 	acceptLanguage: string | Language[],
 	options: PickOptions = { loose: false },
 ): T | null {
-	if (!supportedLanguages || !supportedLanguages.length || !acceptLanguage) {
+	if (!supportedLanguages?.length || !acceptLanguage) {
 		return null;
 	}
 

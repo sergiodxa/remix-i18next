@@ -163,5 +163,5 @@ export class RemixI18Next {
 	}
 }
 
-export { LanguageDetector };
 export type { LanguageDetectorOption };
+export { LanguageDetector };
