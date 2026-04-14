@@ -372,7 +372,7 @@ Apply the following changes to your `entry.server.tsx`
 
 ```patch
 import { PassThrough } from "node:stream";
- 
+
 -import type { AppLoadContext, EntryContext } from "react-router";
 +import type { RouterContextProvider, EntryContext } from "react-router";
  import { createReadableStreamFromReadable } from "@react-router/node";
@@ -383,27 +383,27 @@ import { PassThrough } from "node:stream";
 +import {I18nextProvider} from "react-i18next";
 +import {getInstance} from "~/middleware/i18next";
 +
- 
+
  export const streamTimeout = 5_000;
- 
+
 @@ -14,9 +17,7 @@ export default function handleRequest(
    responseStatusCode: number,
    responseHeaders: Headers,
-   routerContext: EntryContext,
+   entryContext: EntryContext,
 -  loadContext: AppLoadContext,
 -  // If you have middleware enabled:
--  // loadContext: RouterContextProvider
-+  loadContext: RouterContextProvider
+-  // routerContext: RouterContextProvider
++  routerContext: RouterContextProvider
  ) {
    return new Promise((resolve, reject) => {
      let shellRendered = false;
 @@ -37,7 +38,9 @@ export default function handleRequest(
      );
- 
+
      const { pipe, abort } = renderToPipeableStream(
 -      <ServerRouter context={routerContext} url={request.url} />,
-+      <I18nextProvider i18n={getInstance(loadContext)}>
-+        <ServerRouter context={routerContext} url={request.url} />
++      <I18nextProvider i18n={getInstance(routerContext)}>
++        <ServerRouter context={entryContext} url={request.url} />
 +      </I18nextProvider>,
        {
 ```
