@@ -73,7 +73,7 @@
 		"README.md"
 	],
 	"type": "module",
-  "publishConfig": {
-    "access": "public"
-  }
+	"publishConfig": {
+		"access": "public"
+	}
 }
