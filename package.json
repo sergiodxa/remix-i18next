@@ -7,8 +7,8 @@
 		"email": "hello@sergiodxa.com"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sergiodxa/remix-i18next.git"
+		"type": "https",
+		"url": "https://github.com/sergiodxa/remix-i18next"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.2",
@@ -72,5 +72,8 @@
 		"package.json",
 		"README.md"
 	],
-	"type": "module"
+	"type": "module",
+  "publishConfig": {
+    "access": "public"
+  }
 }
