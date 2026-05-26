@@ -603,4 +603,4 @@ Without this route, any not found request will not run the middleware in root, c
 
 ## Related examples
 
-- [locize/locize-react-router-example](https://github.com/locize/locize-react-router-example) — remix-i18next with a translation management backend: SSR-bundled translations via [`locize-cli`](https://github.com/locize/locize-cli), client-side CDN fetch + `saveMissing` via [`i18next-locize-backend`](https://github.com/locize/i18next-locize-backend), and the Locize InContext editor wired through `locizePlugin`. Walkthrough: [Adding Locize to your React Router + remix-i18next app](https://www.locize.com/blog/react-router-i18next).
+- [with Locize](https://github.com/locize/locize-react-router-example) - Use remix-i18next with Locize as backend.
