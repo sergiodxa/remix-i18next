@@ -600,3 +600,7 @@ export default function Component() {
 If you're using `@react-router/fs-routes` package, you can create a file named `app/routes/$.tsx` and it will be used automatically. If you're configuring your routes manually, create a file `app/routes/not-found.tsx` and add `route("*", "./routes/not-found.tsx")` to your routes configuration.
 
 Without this route, any not found request will not run the middleware in root, causing `entry.server.tsx` to not have the i18next instance configured, resulting in an error.
+
+## Related examples
+
+- [with Locize](https://github.com/locize/locize-react-router-example) - Use remix-i18next with Locize as backend.
