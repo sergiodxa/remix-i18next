@@ -14,7 +14,7 @@
 - Easy to set up, easy to use: setup only takes a few steps, and configuration is simple.
 - No other requirements: `remix-i18next` simplifies internationalisation for your React Router app without extra dependencies.
 - Production ready: `remix-i18next` supports passing translations and configuration options into routes from the loader.
-- Take the control: `remix-i18next` doesn't hide the configuration so you can add any plugin you want or configure as pleased.
+- Take control: `remix-i18next` doesn't hide the configuration so you can add any plugin you want or configure as pleased.
 
 ## Setup
 
@@ -398,7 +398,7 @@ If you want to keep the user locale on the pathname, you have two possible optio
 
 First option is to ignore the locale detected by the middleware and manually grab the locale from the URL pathname.
 
-Second options is to pass a `findLocale` function to the detection options in the middleware.
+Second option is to pass a `findLocale` function to the detection options in the middleware.
 
 ```ts
 import { createI18nextMiddleware } from "remix-i18next/middleware";
