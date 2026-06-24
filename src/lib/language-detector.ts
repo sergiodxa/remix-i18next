@@ -72,11 +72,7 @@ export class LanguageDetector {
 	}
 
 	private isSessionOnly(options: LanguageDetectorOption) {
-		if (
-			options.order?.length === 1 &&
-			options.order[0] === "session" &&
-			!options.sessionStorage
-		) {
+		if (options.order?.length === 1 && options.order[0] === "session" && !options.sessionStorage) {
 			throw new Error(
 				"You need a sessionStorage if you want to only get the locale from the session",
 			);
@@ -84,14 +80,8 @@ export class LanguageDetector {
 	}
 
 	private isCookieOnly(options: LanguageDetectorOption) {
-		if (
-			options.order?.length === 1 &&
-			options.order[0] === "cookie" &&
-			!options.cookie
-		) {
-			throw new Error(
-				"You need a cookie if you want to only get the locale from the cookie",
-			);
+		if (options.order?.length === 1 && options.order[0] === "cookie" && !options.cookie) {
+			throw new Error("You need a cookie if you want to only get the locale from the cookie");
 		}
 	}
 
@@ -128,9 +118,12 @@ export class LanguageDetector {
 	}
 
 	private get defaultOrder() {
-		let order: Array<
-			"searchParams" | "cookie" | "session" | "header" | "custom"
-		> = ["searchParams", "cookie", "session", "header"];
+		let order: Array<"searchParams" | "cookie" | "session" | "header" | "custom"> = [
+			"searchParams",
+			"cookie",
+			"session",
+			"header",
+		];
 		if (this.options.findLocale) order.unshift("custom");
 		return order;
 	}
@@ -140,9 +133,7 @@ export class LanguageDetector {
 		if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) {
 			return null;
 		}
-		return this.fromSupported(
-			url.searchParams.get(this.options.searchParamKey ?? "lng"),
-		);
+		return this.fromSupported(url.searchParams.get(this.options.searchParamKey ?? "lng"));
 	}
 
 	private async fromCookie(request: Request): Promise<string | null> {
@@ -158,9 +149,7 @@ export class LanguageDetector {
 	private async fromSessionStorage(request: Request): Promise<string | null> {
 		if (!this.options.sessionStorage) return null;
 
-		let session = await this.options.sessionStorage.getSession(
-			request.headers.get("Cookie"),
-		);
+		let session = await this.options.sessionStorage.getSession(request.headers.get("Cookie"));
 
 		let lng = session.get(this.options.sessionKey ?? "lng");
 
@@ -190,16 +179,12 @@ export class LanguageDetector {
 
 	private fromSupported(language: string | null) {
 		return (
-			pick(
-				this.options.supportedLanguages,
-				language ?? this.options.fallbackLanguage,
-				{ loose: false },
-			) ||
-			pick(
-				this.options.supportedLanguages,
-				language ?? this.options.fallbackLanguage,
-				{ loose: true },
-			)
+			pick(this.options.supportedLanguages, language ?? this.options.fallbackLanguage, {
+				loose: false,
+			}) ||
+			pick(this.options.supportedLanguages, language ?? this.options.fallbackLanguage, {
+				loose: true,
+			})
 		);
 	}
 }

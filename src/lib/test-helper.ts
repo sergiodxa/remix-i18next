@@ -1,9 +1,5 @@
 import { mock } from "bun:test";
-import {
-	type MiddlewareFunction,
-	type Params,
-	RouterContextProvider,
-} from "react-router";
+import { type MiddlewareFunction, type Params, RouterContextProvider } from "react-router";
 
 declare module "i18next" {
 	interface CustomTypeOptions {

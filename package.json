@@ -1,24 +1,69 @@
 {
 	"name": "remix-i18next",
 	"version": "7.5.0",
+	"description": "The easiest way to translate your Full Stack React Router apps",
+	"keywords": [
+		"csr",
+		"i18n",
+		"i18next",
+		"react-router",
+		"remix",
+		"ssr"
+	],
+	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
+	"bugs": {
+		"url": "https://github.com/sergiodxa/remix-i18next/issues"
+	},
+	"license": "MIT",
 	"author": {
 		"name": "Sergio Xalambrí",
-		"url": "https://sergiodxa.com",
-		"email": "hello@sergiodxa.com"
+		"email": "hello@sergiodxa.com",
+		"url": "https://sergiodxa.com"
 	},
 	"repository": {
 		"type": "https",
 		"url": "https://github.com/sergiodxa/remix-i18next"
 	},
+	"funding": "https://github.com/sponsors/sergiodxa",
+	"files": [
+		"build",
+		"src",
+		"package.json",
+		"README.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		"./package.json": "./package.json",
+		"./client": "./build/client.js",
+		"./server": "./build/server.js",
+		"./react": "./build/react.js",
+		"./middleware": "./build/middleware.js"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc",
+		"typecheck": "tsc --noEmit",
+		"lint": "oxlint --ignore-path .gitignore --deny-warnings .",
+		"lint:fix": "oxlint --ignore-path .gitignore --deny-warnings --fix .",
+		"format": "oxfmt --check .",
+		"format:fix": "oxfmt .",
+		"quality": "bun run lint && bun run format",
+		"quality:fix": "bun run lint:fix && bun run format:fix",
+		"exports": "bun run ./scripts/exports.ts"
+	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.4",
-		"@biomejs/biome": "2.5.1",
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/accept-language-parser": "^1.5.6",
 		"@types/bun": "^1.2.17",
 		"@types/react": "^19.1.11",
 		"consola": "^3.3.3",
 		"i18next": "26.3.2",
+		"oxfmt": "0.37.0",
+		"oxlint": "1.52.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.2.5",
 		"react-i18next": "^17.0.3",
@@ -28,52 +73,12 @@
 		"typescript": "^6.0.2"
 	},
 	"peerDependencies": {
-		"react-router": "^8.0.0",
 		"i18next": "^24.0.0 || ^25.0.0 || ^26.0.0",
 		"react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
-		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0"
+		"react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0",
+		"react-router": "^8.0.0"
 	},
-	"exports": {
-		"./package.json": "./package.json",
-		"./client": "./build/client.js",
-		"./server": "./build/server.js",
-		"./react": "./build/react.js",
-		"./middleware": "./build/middleware.js"
-	},
-	"bugs": {
-		"url": "https://github.com/sergiodxa/remix-i18next/issues"
-	},
-	"description": "The easiest way to translate your Full Stack React Router apps",
 	"engines": {
 		"node": ">=20.0.0"
-	},
-	"funding": "https://github.com/sponsors/sergiodxa",
-	"homepage": "https://github.com/sergiodxa/remix-i18next#readme",
-	"keywords": [
-		"remix",
-		"i18n",
-		"i18next",
-		"ssr",
-		"csr",
-		"react-router"
-	],
-	"license": "MIT",
-	"scripts": {
-		"build": "tsc",
-		"typecheck": "tsc --noEmit",
-		"quality": "biome check .",
-		"quality:fix": "biome check . --write --unsafe",
-		"exports": "bun run ./scripts/exports.ts"
-	},
-	"sideEffects": false,
-	"files": [
-		"build",
-		"src",
-		"package.json",
-		"README.md"
-	],
-	"type": "module",
-	"publishConfig": {
-		"access": "public"
 	}
 }

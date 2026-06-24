@@ -46,10 +46,7 @@ export function getClientLocales(requestOrHeaders: Request | Headers): Locales {
 		}
 	}
 
-	let locale = pick(
-		Intl.DateTimeFormat.supportedLocalesOf(validLocales),
-		acceptLanguage,
-	);
+	let locale = pick(Intl.DateTimeFormat.supportedLocalesOf(validLocales), acceptLanguage);
 
 	return locale ?? undefined;
 }

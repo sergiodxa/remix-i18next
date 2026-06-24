@@ -42,8 +42,8 @@ First let's create some translation files in `app/locales`:
 ```ts
 // app/locales/en/translation.ts
 export default {
-  title: "remix-i18next (en)",
-  description: "A React Router + remix-i18next example",
+	title: "remix-i18next (en)",
+	description: "A React Router + remix-i18next example",
 };
 
 // app/locales/en/index.ts
@@ -56,8 +56,8 @@ export default { translation } satisfies ResourceLanguage;
 ```ts
 // app/locales/es/translation.ts
 export default {
-  title: "remix-i18next (es)",
-  description: "Un ejemplo de React Router + remix-i18next",
+	title: "remix-i18next (es)",
+	description: "Un ejemplo de React Router + remix-i18next",
 } satisfies typeof import("~/locales/en/translation").default;
 
 // app/locales/es/index.ts
@@ -99,29 +99,28 @@ import "i18next";
 
 // This cookie will be used to store the user locale preference
 export const localeCookie = createCookie("lng", {
-  path: "/",
-  sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
-  httpOnly: true,
+	path: "/",
+	sameSite: "lax",
+	secure: process.env.NODE_ENV === "production",
+	httpOnly: true,
 });
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      supportedLanguages: ["es", "en"], // Your supported languages, the fallback should be last
-      fallbackLanguage: "en", // Your fallback language
-      cookie: localeCookie, // The cookie to store the user preference
-    },
-    i18next: { resources }, // Your locales
-    plugins: [initReactI18next], // Plugins you may need, like react-i18next
-  });
+export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
+	detection: {
+		supportedLanguages: ["es", "en"], // Your supported languages, the fallback should be last
+		fallbackLanguage: "en", // Your fallback language
+		cookie: localeCookie, // The cookie to store the user preference
+	},
+	i18next: { resources }, // Your locales
+	plugins: [initReactI18next], // Plugins you may need, like react-i18next
+});
 
 // This adds type-safety to the `t` function
 declare module "i18next" {
-  interface CustomTypeOptions {
-    defaultNS: "translation";
-    resources: typeof resources.en; // Use `en` as source of truth for the types
-  }
+	interface CustomTypeOptions {
+		defaultNS: "translation";
+		resources: typeof resources.en; // Use `en` as source of truth for the types
+	}
 }
 ```
 
@@ -147,13 +146,13 @@ From this point, you can go to any loader and get the locale using the `getLocal
 import { getLocale } from "~/middleware/i18next";
 
 export async function loader({ context }: Route.LoaderArgs) {
-  let locale = getLocale(context);
-  let date = new Date().toLocaleDateString(locale, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  return { date };
+	let locale = getLocale(context);
+	let date = new Date().toLocaleDateString(locale, {
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	});
+	return { date };
 }
 ```
 
@@ -165,8 +164,8 @@ To send translated text to the UI, you can use the `t` function from i18next. Yo
 import { getInstance } from "~/middleware/i18next";
 
 export async function loader({ context }: Route.LoaderArgs) {
-  let i18next = getInstance(context);
-  return { title: i18next.t("title"), description: i18next.t("description") };
+	let i18next = getInstance(context);
+	return { title: i18next.t("title"), description: i18next.t("description") };
 }
 ```
 
@@ -178,9 +177,9 @@ If you want to use a different locale, you can use the `i18next.getFixedT` metho
 import { getInstance } from "~/middleware/i18next";
 
 export async function loader({ context }: Route.LoaderArgs) {
-  let i18next = getInstance(context);
-  let t = i18next.getFixedT("es");
-  return { title: t("title"), description: t("description") };
+	let i18next = getInstance(context);
+	let t = i18next.getFixedT("es");
+	return { title: t("title"), description: t("description") };
 }
 ```
 
@@ -202,59 +201,48 @@ Let's start by updating the `entry.client.tsx` and `entry.server.tsx` files to u
 First of all, we want to send the locale detected server-side by the middleware to the UI. To do this, we will return the locale from the `app/root.tsx` route.
 
 ```tsx
-import {
-  data,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "react-router";
+import { data, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { useEffect } from "react";
 import type { Route } from "./+types/root";
-import {
-  getLocale,
-  i18nextMiddleware,
-  localeCookie,
-} from "./middleware/i18next";
+import { getLocale, i18nextMiddleware, localeCookie } from "./middleware/i18next";
 import { useTranslation } from "react-i18next";
 
 export const middleware = [i18nextMiddleware];
 
 export async function loader({ context }: Route.LoaderArgs) {
-  let locale = getLocale(context);
-  return data(
-    { locale }, // Return the locale to the UI
-    { headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
-  );
+	let locale = getLocale(context);
+	return data(
+		{ locale }, // Return the locale to the UI
+		{ headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
+	);
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  let { i18n } = useTranslation();
+	let { i18n } = useTranslation();
 
-  return (
-    <html lang={i18n.language} dir={i18n.dir(i18n.language)}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
+	return (
+		<html lang={i18n.language} dir={i18n.dir(i18n.language)}>
+			<head>
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<Meta />
+				<Links />
+			</head>
+			<body>
+				{children}
+				<ScrollRestoration />
+				<Scripts />
+			</body>
+		</html>
+	);
 }
 
 export default function App({ loaderData: { locale } }: Route.ComponentProps) {
-  let { i18n } = useTranslation();
-  useEffect(() => {
-    if (i18n.language !== locale) i18n.changeLanguage(locale);
-  }, [locale, i18n]);
-  return <Outlet />;
+	let { i18n } = useTranslation();
+	useEffect(() => {
+		if (i18n.language !== locale) i18n.changeLanguage(locale);
+	}, [locale, i18n]);
+	return <Outlet />;
 }
 ```
 
@@ -278,29 +266,29 @@ import { HydratedRouter } from "react-router/dom";
 import I18nextBrowserLanguageDetector from "i18next-browser-languagedetector";
 
 async function main() {
-  await i18next
-    .use(initReactI18next)
-    .use(Fetch)
-    .use(I18nextBrowserLanguageDetector)
-    .init({
-      fallbackLng: "en", // Change this to your default language
-      // Here we only want to detect the language from the html tag
-      // since the middleware already detected the language server-side
-      detection: { order: ["htmlTag"], caches: [] },
-      // Update this to the path where your locales will be served
-      backend: { loadPath: "/api/locales/{{lng}}/{{ns}}" },
-    });
+	await i18next
+		.use(initReactI18next)
+		.use(Fetch)
+		.use(I18nextBrowserLanguageDetector)
+		.init({
+			fallbackLng: "en", // Change this to your default language
+			// Here we only want to detect the language from the html tag
+			// since the middleware already detected the language server-side
+			detection: { order: ["htmlTag"], caches: [] },
+			// Update this to the path where your locales will be served
+			backend: { loadPath: "/api/locales/{{lng}}/{{ns}}" },
+		});
 
-  startTransition(() => {
-    hydrateRoot(
-      document,
-      <I18nextProvider i18n={i18next}>
-        <StrictMode>
-          <HydratedRouter />
-        </StrictMode>
-      </I18nextProvider>,
-    );
-  });
+	startTransition(() => {
+		hydrateRoot(
+			document,
+			<I18nextProvider i18n={i18next}>
+				<StrictMode>
+					<HydratedRouter />
+				</StrictMode>
+			</I18nextProvider>,
+		);
+	});
 }
 
 main().catch((error) => console.error(error));
@@ -322,38 +310,34 @@ import resources from "~/locales";
 import type { Route } from "./+types/locales";
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const lng = z
-    .enum(Object.keys(resources) as Array<keyof typeof resources>)
-    .safeParse(params.lng);
+	const lng = z.enum(Object.keys(resources) as Array<keyof typeof resources>).safeParse(params.lng);
 
-  if (lng.error) return data({ error: lng.error }, { status: 400 });
+	if (lng.error) return data({ error: lng.error }, { status: 400 });
 
-  const namespaces = resources[lng.data];
+	const namespaces = resources[lng.data];
 
-  const ns = z
-    .enum(Object.keys(namespaces) as Array<keyof typeof namespaces>)
-    .safeParse(params.ns);
+	const ns = z.enum(Object.keys(namespaces) as Array<keyof typeof namespaces>).safeParse(params.ns);
 
-  if (ns.error) return data({ error: ns.error }, { status: 400 });
+	if (ns.error) return data({ error: ns.error }, { status: 400 });
 
-  const headers = new Headers();
+	const headers = new Headers();
 
-  // On production, we want to add cache headers to the response
-  if (process.env.NODE_ENV === "production") {
-    headers.set(
-      "Cache-Control",
-      cacheHeader({
-        maxAge: "5m", // Cache in the browser for 5 minutes
-        sMaxage: "1d", // Cache in the CDN for 1 day
-        // Serve stale content while revalidating for 7 days
-        staleWhileRevalidate: "7d",
-        // Serve stale content if there's an error for 7 days
-        staleIfError: "7d",
-      }),
-    );
-  }
+	// On production, we want to add cache headers to the response
+	if (process.env.NODE_ENV === "production") {
+		headers.set(
+			"Cache-Control",
+			cacheHeader({
+				maxAge: "5m", // Cache in the browser for 5 minutes
+				sMaxage: "1d", // Cache in the CDN for 1 day
+				// Serve stale content while revalidating for 7 days
+				staleWhileRevalidate: "7d",
+				// Serve stale content if there's an error for 7 days
+				staleIfError: "7d",
+			}),
+		);
+	}
 
-  return data(namespaces[ns.data], { headers });
+	return data(namespaces[ns.data], { headers });
 }
 ```
 
@@ -425,20 +409,19 @@ Second options is to pass a `findLocale` function to the detection options in th
 ```ts
 import { createI18nextMiddleware } from "remix-i18next/middleware";
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      supportedLanguages: ["es", "en"],
-      fallbackLanguage: "en",
-      findLocale(request) {
-        let locale = new URL(request.url).pathname.split("/").at(1);
-        return locale;
-      },
-    },
-    i18next: {
-      resources: { en: { translation: en }, es: { translation: es } },
-    },
-  });
+export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
+	detection: {
+		supportedLanguages: ["es", "en"],
+		fallbackLanguage: "en",
+		findLocale(request) {
+			let locale = new URL(request.url).pathname.split("/").at(1);
+			return locale;
+		},
+	},
+	i18next: {
+		resources: { en: { translation: en }, es: { translation: es } },
+	},
+});
 ```
 
 The locale returned by `findLocale` will be validated against the list of supported locales, in case it's not valid the fallback locale will be used.
@@ -449,14 +432,14 @@ If your application stores the user locale in the database, you can use `findLoc
 
 ```ts
 export let i18n = new RemixI18Next({
-  detection: {
-    supportedLanguages: ["es", "en"],
-    fallbackLanguage: "en",
-    async findLocale(request) {
-      let user = await db.getUser(request);
-      return user.locale;
-    },
-  },
+	detection: {
+		supportedLanguages: ["es", "en"],
+		fallbackLanguage: "en",
+		async findLocale(request) {
+			let user = await db.getUser(request);
+			return user.locale;
+		},
+	},
 });
 ```
 
@@ -468,10 +451,10 @@ If you want to store the locale in a cookie, you can create a cookie using `crea
 import { createCookie } from "react-router";
 
 export const localeCookie = createCookie("lng", {
-  path: "/",
-  sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
-  httpOnly: true,
+	path: "/",
+	sameSite: "lax",
+	secure: process.env.NODE_ENV === "production",
+	httpOnly: true,
 });
 ```
 
@@ -481,17 +464,16 @@ Then you can pass the cookie to the middleware:
 import { createI18nextMiddleware } from "remix-i18next/middleware";
 import { localeCookie } from "~/cookies";
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      supportedLanguages: ["es", "en"],
-      fallbackLanguage: "en",
-      cookie: localeCookie,
-    },
-    i18next: {
-      resources: { en: { translation: en }, es: { translation: es } },
-    },
-  });
+export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
+	detection: {
+		supportedLanguages: ["es", "en"],
+		fallbackLanguage: "en",
+		cookie: localeCookie,
+	},
+	i18next: {
+		resources: { en: { translation: en }, es: { translation: es } },
+	},
+});
 ```
 
 now the middleware will read the locale from the cookie, if it exists, and set it in the context. If the cookie doesn't exist, it will use the Accept-Language header or the fallback language.
@@ -504,11 +486,8 @@ import { localeCookie } from "~/cookies";
 import { getLocale } from "~/middleware/i18next";
 
 export async function loader({ context }: Route.LoaderArgs) {
-  let locale = getLocale(context);
-  return data(
-    { locale },
-    { headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
-  );
+	let locale = getLocale(context);
+	return data({ locale }, { headers: { "Set-Cookie": await localeCookie.serialize(locale) } });
 }
 ```
 
@@ -520,13 +499,13 @@ Similarly to the cookie, you can store the locale in the session. To do this, yo
 import { createCookieSessionStorage } from "react-router";
 
 export const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "session",
-    path: "/",
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-  },
+	cookie: {
+		name: "session",
+		path: "/",
+		sameSite: "lax",
+		secure: process.env.NODE_ENV === "production",
+		httpOnly: true,
+	},
 });
 ```
 
@@ -536,17 +515,16 @@ Then you can pass the session to the middleware:
 import { createI18nextMiddleware } from "remix-i18next/middleware";
 import { sessionStorage } from "~/session";
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      supportedLanguages: ["es", "en"],
-      fallbackLanguage: "en",
-      sessionStorage,
-    },
-    i18next: {
-      resources: { en: { translation: en }, es: { translation: es } },
-    },
-  });
+export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
+	detection: {
+		supportedLanguages: ["es", "en"],
+		fallbackLanguage: "en",
+		sessionStorage,
+	},
+	i18next: {
+		resources: { en: { translation: en }, es: { translation: es } },
+	},
+});
 ```
 
 Now the middleware will read the locale from the session, if it exists, and set it in the context. If the session doesn't exist, it will use the Accept-Language header or the fallback language.
@@ -559,15 +537,15 @@ import { sessionStorage } from "~/session";
 import { getLocale } from "~/middleware/i18next";
 
 export async function loader({ request, context }: Route.LoaderArgs) {
-  let locale = getLocale(context);
+	let locale = getLocale(context);
 
-  let session = await sessionStorage.getSession(request.headers.get("Cookie"));
-  session.set("lng", locale);
+	let session = await sessionStorage.getSession(request.headers.get("Cookie"));
+	session.set("lng", locale);
 
-  return data(
-    { locale },
-    { headers: { "Set-Cookie": await sessionStorage.commitSession(session) } },
-  );
+	return data(
+		{ locale },
+		{ headers: { "Set-Cookie": await sessionStorage.commitSession(session) } },
+	);
 }
 ```
 
@@ -580,20 +558,20 @@ import { useTranslation } from "react-i18next";
 import { data, href, Link } from "react-router";
 
 export async function loader() {
-  return data(null, { status: 404 }); // Set the status to 404
+	return data(null, { status: 404 }); // Set the status to 404
 }
 
 export default function Component() {
-  let { t } = useTranslation("notFound");
+	let { t } = useTranslation("notFound");
 
-  return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>{t("title")}</h1>
-      <p>{t("description")}</p>
+	return (
+		<div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+			<h1>{t("title")}</h1>
+			<p>{t("description")}</p>
 
-      <Link to={href("/")}>{t("backToHome")}</Link>
-    </div>
-  );
+			<Link to={href("/")}>{t("backToHome")}</Link>
+		</div>
+	);
 }
 ```
 
