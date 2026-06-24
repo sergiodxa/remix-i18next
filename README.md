@@ -474,7 +474,7 @@ export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddlewa
 });
 ```
 
-now the middleware will read the locale from the cookie, if it exists, and set it in the context. If the cookie doesn't exist, it will use the Accept-Language header or the fallback language.
+Now the middleware will read the locale from the cookie, if it exists, and set it in the context. If the cookie doesn't exist, it will use the Accept-Language header or the fallback language.
 
 Then in your routes, you can use this cookie to save the user preference, a simple way is to navigate the user to the same URL with `?lng=es` (replacing `es` with the desired language) and then in the `app/root.tsx` route set the cookie with the new value.
 
@@ -575,7 +575,8 @@ export default function Component() {
 
 If you're using `@react-router/fs-routes` package, you can create a file named `app/routes/$.tsx` and it will be used automatically. If you're configuring your routes manually, create a file `app/routes/not-found.tsx` and add `route("*", "./routes/not-found.tsx")` to your routes configuration.
 
-Without this route, any not found request will not run the middleware in root, causing `entry.server.tsx` to not have the i18next instance configured, resulting in an error.
+> [!IMPORTANT]
+> Without this route, any not found request will not run the middleware in root, causing `entry.server.tsx` to not have the i18next instance configured, resulting in an error.
 
 ## Related examples
 
