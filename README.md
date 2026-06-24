@@ -12,7 +12,7 @@
 ## Why remix-i18next?
 
 - Easy to set up, easy to use: setup only takes a few steps, and configuration is simple.
-- No other requirements: `remix-i18next` simplifies internationalisation for your React Router app without extra dependencies.
+- No extra requirements: `remix-i18next` simplifies internationalisation for your React Router app.
 - Production ready: `remix-i18next` supports passing translations and configuration options into routes from the loader.
 - Take control: `remix-i18next` doesn't hide the configuration so you can add any plugin you want or configure as pleased.
 
@@ -118,7 +118,7 @@ declare module "i18next" {
 }
 ```
 
-Then in your `app/root.tsx` setup the middleware:
+Then set up the middleware in your `app/root.tsx`:
 
 ```ts
 import { i18nextMiddleware } from "~/middleware/i18next";
@@ -134,7 +134,7 @@ If you need access to the underlying i18next instance, you can use `getInstance(
 
 ### Get the locale
 
-From this point, you can go to any loader and get the locale using the `getLocale` function.
+From here, you can get the locale in any loader using `getLocale`.
 
 ```ts
 import { getLocale } from "~/middleware/i18next";
@@ -165,7 +165,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 The `TFunction` accessible from the i18next instance is already configured with the locale detected by the middleware.
 
-If you want to use a different locale, you can use the `i18next.getFixedT` method.
+If you need a different locale, use `i18next.getFixedT`.
 
 ```ts
 import { getInstance } from "~/middleware/i18next";
@@ -177,11 +177,11 @@ export async function loader({ context }: Route.LoaderArgs) {
 }
 ```
 
-This will return a new `TFunction` instance with the locale set to `es`.
+This returns a new `TFunction` instance with the locale set to `es`.
 
 ### Usage with react-i18next
 
-So far this has configured the i18next instance to use inside React Router loaders and actions, but in many cases we will need to use it directly in our React components.
+At this point, i18next is configured for React Router loaders and actions, but in many cases you will also use it directly in React components.
 
 To do this, we need to setup react-i18next.
 
@@ -192,7 +192,7 @@ Let's start by updating the `entry.client.tsx` and `entry.server.tsx` files to u
 
 #### Update the root route
 
-First of all, we want to send the locale detected server-side by the middleware to the UI. To do this, we will return the locale from the `app/root.tsx` route.
+First, send the locale detected server-side by the middleware to the UI by returning it from the `app/root.tsx` route.
 
 ```tsx
 import { data, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
@@ -248,7 +248,7 @@ We made a few changes here:
 
 #### Client-side configuration
 
-Now in your `entry.client.tsx` replace the default code with this:
+In `entry.client.tsx`, replace the default code with this:
 
 ```tsx
 import Fetch from "i18next-fetch-backend";
@@ -394,7 +394,7 @@ This way, we can re-use the instance created in the middleware and avoid creatin
 
 ### Finding the locale from the request URL pathname
 
-If you want to keep the user locale on the pathname, you have two possible options.
+If you want to keep the user locale in the pathname, you have two options.
 
 First option is to ignore the locale detected by the middleware and manually grab the locale from the URL pathname.
 
@@ -443,7 +443,7 @@ Then use `getLocale(context)` in your route loaders and actions.
 
 ### Store the locale in a cookie
 
-If you want to store the locale in a cookie, you can create a cookie using `createCookie` helper from React Router and pass the Cookie object to the middleware.
+If you want to store the locale in a cookie, create one with React Router's `createCookie` helper and pass it to the middleware.
 
 ```ts
 import { createCookie } from "react-router";
@@ -476,7 +476,7 @@ export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddlewa
 
 Now the middleware will read the locale from the cookie, if it exists, and set it in the context. If the cookie doesn't exist, it will use the Accept-Language header or the fallback language.
 
-Then in your routes, you can use this cookie to save the user preference, a simple way is to navigate the user to the same URL with `?lng=es` (replacing `es` with the desired language) and then in the `app/root.tsx` route set the cookie with the new value.
+Then, in your routes, you can save the user preference with this cookie. One simple approach is to navigate to the same URL with `?lng=es` (replacing `es` with the desired language) and set the cookie in `app/root.tsx`.
 
 ```ts
 import { data } from "react-router";
@@ -491,7 +491,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 ### Store the locale in the session
 
-Similarly to the cookie, you can store the locale in the session. To do this, you can create a session using `createSessionStorage` helpers from React Router and pass the SessionStorage object to the middleware.
+You can also store the locale in the session. To do that, create a session with React Router's `createSessionStorage` helper and pass the `SessionStorage` object to the middleware.
 
 ```ts
 import { createCookieSessionStorage } from "react-router";
@@ -527,7 +527,7 @@ export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddlewa
 
 Now the middleware will read the locale from the session, if it exists, and set it in the context. If the session doesn't exist, it will use the Accept-Language header or the fallback language.
 
-Then in your routes, you can use this session to save the user preference, a simple way is to navigate the user to the same URL with `?lng=es` (replacing `es` with the desired language) and then in the `app/root.tsx` route set the session with the new value.
+Then, in your routes, you can save the user preference with this session. One simple approach is to navigate to the same URL with `?lng=es` (replacing `es` with the desired language) and set the session in `app/root.tsx`.
 
 ```ts
 import { data } from "react-router";
@@ -549,7 +549,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 
 ### Handle Not Found Errors
 
-If you want to handle not found errors and show a custom internationalized 404 page, you can create a route with the path `*` and render your custom 404 page there.
+If you want to handle not found errors and show a custom internationalized 404 page, create a route with the path `*` and render it there.
 
 ```tsx
 import { useTranslation } from "react-i18next";
