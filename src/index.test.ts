@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { RouterContextProvider } from "react-router";
 import { runMiddleware } from "./lib/test-helper";
-import { createI18nextMiddleware } from "./middleware";
+import { createI18nextMiddleware } from "./index";
 
 describe(createI18nextMiddleware.name, () => {
 	test("sets the locale in context", async () => {

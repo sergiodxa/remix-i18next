@@ -87,7 +87,7 @@ Create a file named `app/middleware/i18next.ts` with the following code:
 ```ts
 import { initReactI18next } from "react-i18next";
 import { createCookie } from "react-router";
-import { createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next";
 import resources from "~/locales"; // Import your locales
 import "i18next";
 
@@ -401,7 +401,7 @@ First option is to ignore the locale detected by the middleware and manually gra
 Second option is to pass a `findLocale` function to the detection options in the middleware.
 
 ```ts
-import { createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next";
 
 export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
 	detection: {
@@ -425,7 +425,7 @@ The locale returned by `findLocale` will be validated against the list of suppor
 If your application stores the user locale in the database, query it in the middleware and pass it to `createI18nextMiddleware`.
 
 ```ts
-import { createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next";
 
 export const [i18nextMiddleware, getLocale] = createI18nextMiddleware({
 	detection: {
@@ -459,7 +459,7 @@ export const localeCookie = createCookie("lng", {
 Then you can pass the cookie to the middleware:
 
 ```ts
-import { createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next";
 import { localeCookie } from "~/cookies";
 
 export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
@@ -510,7 +510,7 @@ export const sessionStorage = createCookieSessionStorage({
 Then you can pass the session to the middleware:
 
 ```ts
-import { createI18nextMiddleware } from "remix-i18next/middleware";
+import { createI18nextMiddleware } from "remix-i18next";
 import { sessionStorage } from "~/session";
 
 export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
