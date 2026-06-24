@@ -1,13 +1,7 @@
 {
 	/* Change to `@total-typescript/tsconfig/tsc/dom/library` for DOM usage */
 	"extends": "@total-typescript/tsconfig/tsc/dom/library",
-	"include": [
-		"src/client.ts",
-		"src/react.tsx",
-		"src/server.ts",
-		"src/middleware.ts",
-		"src/lib/**/*.tsx"
-	],
+	"include": ["src/middleware.ts", "src/lib/**/*.tsx"],
 	"compilerOptions": {
 		"types": ["bun"],
 		"jsx": "react",

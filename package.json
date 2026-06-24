@@ -35,7 +35,6 @@
 	"sideEffects": false,
 	"exports": {
 		"./package.json": "./package.json",
-		"./server": "./build/server.js",
 		"./middleware": "./build/middleware.js"
 	},
 	"publishConfig": {
