@@ -15,14 +15,14 @@ export function createI18nextMiddleware({
 	let languageDetector = new LanguageDetector(detection);
 
 	return [
-		async function i18nextMiddleware({ request, context }, next) {
-			let lng = await languageDetector.detect(request);
-			context.set(localeContext, lng);
+		async function i18nextMiddleware(args, next) {
+			let lng = await languageDetector.detect(args);
+			args.context.set(localeContext, lng);
 
 			let instance = createInstance(i18next);
 			for (const plugin of plugins ?? []) instance.use(plugin);
 			await instance.init({ lng });
-			context.set(i18nextContext, instance);
+			args.context.set(i18nextContext, instance);
 
 			return await next();
 		},

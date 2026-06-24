@@ -11,7 +11,11 @@ import {
 	type TFunction,
 } from "i18next";
 import type { EntryContext } from "react-router";
-import { LanguageDetector, type LanguageDetectorOption } from "./lib/language-detector.js";
+import {
+	LanguageDetector,
+	type LanguageDetectorArgs,
+	type LanguageDetectorOption,
+} from "./lib/language-detector.js";
 
 type FallbackNs<Ns> = Ns extends undefined
 	? DefaultNamespace
@@ -55,8 +59,8 @@ export class RemixI18Next {
 	 * - header
 	 * And finally the fallback language.
 	 */
-	public async getLocale(request: Request): Promise<string> {
-		return this.detector.detect(request);
+	public async getLocale(args: LanguageDetectorArgs): Promise<string> {
+		return this.detector.detect(args);
 	}
 
 	/**
@@ -93,7 +97,7 @@ export class RemixI18Next {
 	 * Return a TFunction that can be used to translate strings server-side.
 	 * This function is fixed to a specific namespace.
 	 *
-	 * @param requestOrLocale The request object or the locale string already detected
+	 * @param argsOrLocale The middleware args object or the locale string already detected
 	 * @param namespaces The namespaces to use for the T function. (Default: `translation`).
 	 * @param options The i18next init options and the key prefix to prepend to translation keys.
 	 */
@@ -109,7 +113,7 @@ export class RemixI18Next {
 		N extends FlatNamespace | readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
 		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
 	>(
-		request: Request,
+		args: LanguageDetectorArgs,
 		namespaces?: N,
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
 	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
@@ -117,13 +121,13 @@ export class RemixI18Next {
 		N extends FlatNamespace | readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
 		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
 	>(
-		requestOrLocale: Request | string,
+		argsOrLocale: LanguageDetectorArgs | string,
 		namespaces?: N,
 		options: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix } = {},
 	): Promise<TFunction<FallbackNs<N>, KPrefix>> {
 		let [instance, locale] = await Promise.all([
 			this.createInstance({ ...this.options.i18next, ...options }),
-			typeof requestOrLocale === "string" ? requestOrLocale : this.getLocale(requestOrLocale),
+			typeof argsOrLocale === "string" ? argsOrLocale : this.getLocale(argsOrLocale),
 		]);
 
 		await instance.changeLanguage(locale);

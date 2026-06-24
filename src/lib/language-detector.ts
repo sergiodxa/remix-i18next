@@ -1,6 +1,11 @@
 import type { Cookie, SessionStorage } from "react-router";
 import { getClientLocales } from "./get-client-locales.js";
 import { pick } from "./parser.js";
+import type { MiddlewareFunction } from "react-router";
+
+type MiddlewareArgs = Parameters<MiddlewareFunction<Response>>[0];
+
+export interface LanguageDetectorArgs extends MiddlewareArgs {}
 
 export interface LanguageDetectorOption {
 	/**
@@ -51,13 +56,11 @@ export interface LanguageDetectorOption {
 	 */
 	order?: Array<"searchParams" | "cookie" | "session" | "header" | "custom">;
 	/**
-	 * A function that can be used to find the locale based on the request object
-	 * using any custom logic you want.
+	 * A function that can be used to find the locale using the full route args.
 	 * This can be useful to get the locale from the URL pathname, or to query it
 	 * from the database or fetch it from an API.
-	 * @param request The request object received by the server.
 	 */
-	findLocale?(request: Request): Promise<string | Array<string> | null>;
+	findLocale?(args: LanguageDetectorArgs): Promise<string | Array<string> | null>;
 }
 
 /**
@@ -85,30 +88,30 @@ export class LanguageDetector {
 		}
 	}
 
-	public async detect(request: Request): Promise<string> {
+	public async detect(args: LanguageDetectorArgs): Promise<string> {
 		let order = this.options.order ?? this.defaultOrder;
 
 		for (let method of order) {
 			let locale: string | null = null;
 
 			if (method === "searchParams") {
-				locale = this.fromSearchParams(request);
+				locale = this.fromSearchParams(args.request);
 			}
 
 			if (method === "cookie") {
-				locale = await this.fromCookie(request);
+				locale = await this.fromCookie(args.request);
 			}
 
 			if (method === "session") {
-				locale = await this.fromSessionStorage(request);
+				locale = await this.fromSessionStorage(args.request);
 			}
 
 			if (method === "header") {
-				locale = this.fromHeader(request);
+				locale = this.fromHeader(args.request);
 			}
 
 			if (method === "custom") {
-				locale = await this.fromCustom(request);
+				locale = await this.fromCustom(args);
 			}
 
 			if (locale) return locale;
@@ -165,13 +168,13 @@ export class LanguageDetector {
 		return this.fromSupported(locales);
 	}
 
-	private async fromCustom(request: Request): Promise<string | null> {
+	private async fromCustom(args: LanguageDetectorArgs): Promise<string | null> {
 		if (!this.options.findLocale) {
 			throw new ReferenceError(
 				"You tried to find a locale using `findLocale` but it iss not defined. Change your order to not include `custom` or provide a findLocale functions.",
 			);
 		}
-		let locales = await this.options.findLocale(request);
+		let locales = await this.options.findLocale(args);
 		if (!locales) return null;
 		if (Array.isArray(locales)) return this.fromSupported(locales.join(","));
 		return this.fromSupported(locales);

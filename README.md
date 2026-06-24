@@ -431,7 +431,7 @@ export const [i18nextMiddleware, getLocale] = createI18nextMiddleware({
 	detection: {
 		supportedLanguages: ["es", "en"],
 		fallbackLanguage: "en",
-		async findLocale(request) {
+		async findLocale({ request }) {
 			let user = await db.getUser(request);
 			return user.locale;
 		},

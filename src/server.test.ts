@@ -1,7 +1,24 @@
 import { describe, expect, test } from "bun:test";
 import type { BackendModule, FormatterModule } from "i18next";
-import { createCookie, createMemorySessionStorage } from "react-router";
+import {
+	RouterContextProvider,
+	createCookie,
+	createMemorySessionStorage,
+	type MiddlewareFunction,
+} from "react-router";
 import { RemixI18Next } from "./server.js";
+
+type MiddlewareArgs = Parameters<MiddlewareFunction<Response>>[0];
+
+function createArgs(request: Request): MiddlewareArgs {
+	return {
+		request,
+		url: new URL(request.url),
+		params: {},
+		pattern: "",
+		context: new RouterContextProvider(),
+	};
+}
 
 describe(RemixI18Next.name, () => {
 	describe("getLocale", () => {
@@ -12,7 +29,7 @@ describe(RemixI18Next.name, () => {
 				detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should get the locale from the cookie", async () => {
@@ -30,7 +47,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should get the locale from the Session", async () => {
@@ -53,7 +70,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should get the locale from the Session using a different key", async () => {
@@ -78,7 +95,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should get the locale from the request header", async () => {
@@ -95,7 +112,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should get the locale using the findLocale method", async () => {
@@ -115,7 +132,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should use the fallback language if search param, cookie and request headers are not there", async () => {
@@ -128,7 +145,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("en");
+			expect(await i18n.getLocale(createArgs(request))).toBe("en");
 		});
 
 		test("should use the fallback language if the expected one is not supported", async () => {
@@ -141,7 +158,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("en");
+			expect(await i18n.getLocale(createArgs(request))).toBe("en");
 		});
 
 		test("should prefer search params over cookie, session and header", async () => {
@@ -172,7 +189,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es");
 		});
 
 		test("should prefer cookie over session and header", async () => {
@@ -193,7 +210,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("jp");
+			expect(await i18n.getLocale(createArgs(request))).toBe("jp");
 		});
 
 		test("should prefer session over header", async () => {
@@ -219,7 +236,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("jp");
+			expect(await i18n.getLocale(createArgs(request))).toBe("jp");
 		});
 
 		test("allow changing the order", async () => {
@@ -251,7 +268,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("en");
+			expect(await i18n.getLocale(createArgs(request))).toBe("en");
 		});
 
 		test("return the specific locale if there are multiple variants", async () => {
@@ -264,7 +281,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			expect(await i18n.getLocale(request)).toBe("es-MX");
+			expect(await i18n.getLocale(createArgs(request))).toBe("es-MX");
 		});
 	});
 
@@ -317,7 +334,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			// @ts-expect-error - We're not using the typed resources here
 			expect(t("Hello {{name}}", { name: "Remix" })).toBe("Bonjour Remix");
@@ -334,7 +351,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			expect(t("hello", { name: "Remix" })).toBe("Hello Remix");
 		});
@@ -350,7 +367,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			expect(t("hello", { name: "Remix" })).toBe("Hello Remix");
 		});
@@ -366,7 +383,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
 		});
@@ -383,7 +400,7 @@ describe(RemixI18Next.name, () => {
 				},
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
 		});
@@ -397,7 +414,7 @@ describe(RemixI18Next.name, () => {
 				detection: { supportedLanguages: ["en"], fallbackLanguage: "en" },
 			});
 
-			let t = await i18n.getFixedT(request, "common", { keyPrefix: "user" });
+			let t = await i18n.getFixedT(createArgs(request), "common", { keyPrefix: "user" });
 
 			expect(t("age", { number: 25 })).toBe("My age is 25");
 		});
@@ -411,7 +428,7 @@ describe(RemixI18Next.name, () => {
 				detection: { supportedLanguages: ["es", "en"], fallbackLanguage: "en" },
 			});
 
-			let t = await i18n.getFixedT(request, "common");
+			let t = await i18n.getFixedT(createArgs(request), "common");
 
 			expect(t("hello", { name: "Remix" })).toBe("Hello REMIX");
 		});
