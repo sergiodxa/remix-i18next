@@ -82,9 +82,6 @@ export default { en, es } satisfies Resource;
 
 ### Setup the Middleware
 
-Ensure middleware is enabled in your React Router config so the middleware can run.
-See the React Router middleware documentation for details: https://reactrouter.com/how-to/middleware
-
 Create a file named `app/middleware/i18next.ts` with the following code:
 
 ```ts
