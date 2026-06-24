@@ -13,10 +13,16 @@ export interface PickOptions {
 	loose?: boolean | undefined;
 }
 
+/**
+ * Check whether a value is a string.
+ */
 function isString(value: unknown): value is string {
 	return typeof value === "string";
 }
 
+/**
+ * Parse an `Accept-Language` header into sorted language entries.
+ */
 export function parse(acceptLanguage?: string): Language[] {
 	let strings = (acceptLanguage || "").match(REGEX);
 	if (!strings) throw new Error("Invalid Accept-Language header");
@@ -47,6 +53,9 @@ export function parse(acceptLanguage?: string): Language[] {
 	return languages.sort((a, b) => b.quality - a.quality);
 }
 
+/**
+ * Pick the best supported language for a given `Accept-Language` value.
+ */
 export function pick<T extends string>(
 	supportedLanguages: readonly T[],
 	acceptLanguage: string | Language[],

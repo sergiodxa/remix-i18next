@@ -69,11 +69,17 @@ export interface LanguageDetectorOption {
  * Headers.
  */
 export class LanguageDetector {
+	/**
+	 * Create a language detector with the provided detection options.
+	 */
 	constructor(private options: LanguageDetectorOption) {
 		this.isSessionOnly(options);
 		this.isCookieOnly(options);
 	}
 
+	/**
+	 * Ensure session-only mode has a session storage configured.
+	 */
 	private isSessionOnly(options: LanguageDetectorOption) {
 		if (options.order?.length === 1 && options.order[0] === "session" && !options.sessionStorage) {
 			throw new Error(
@@ -82,12 +88,18 @@ export class LanguageDetector {
 		}
 	}
 
+	/**
+	 * Ensure cookie-only mode has a cookie configured.
+	 */
 	private isCookieOnly(options: LanguageDetectorOption) {
 		if (options.order?.length === 1 && options.order[0] === "cookie" && !options.cookie) {
 			throw new Error("You need a cookie if you want to only get the locale from the cookie");
 		}
 	}
 
+	/**
+	 * Detect the best language for the current request.
+	 */
 	public async detect(args: LanguageDetectorArgs): Promise<string> {
 		let order = this.options.order ?? this.defaultOrder;
 
@@ -120,6 +132,9 @@ export class LanguageDetector {
 		return this.options.fallbackLanguage;
 	}
 
+	/**
+	 * Build the default detection order.
+	 */
 	private get defaultOrder() {
 		let order: Array<"searchParams" | "cookie" | "session" | "header" | "custom"> = [
 			"searchParams",
@@ -131,6 +146,9 @@ export class LanguageDetector {
 		return order;
 	}
 
+	/**
+	 * Read the locale from the URL search params.
+	 */
 	private fromSearchParams(request: Request): string | null {
 		let url = new URL(request.url);
 		if (!url.searchParams.has(this.options.searchParamKey ?? "lng")) {
@@ -139,6 +157,9 @@ export class LanguageDetector {
 		return this.fromSupported(url.searchParams.get(this.options.searchParamKey ?? "lng"));
 	}
 
+	/**
+	 * Read the locale from a cookie.
+	 */
 	private async fromCookie(request: Request): Promise<string | null> {
 		if (!this.options.cookie) return null;
 
@@ -149,6 +170,9 @@ export class LanguageDetector {
 		return this.fromSupported(lng);
 	}
 
+	/**
+	 * Read the locale from session storage.
+	 */
 	private async fromSessionStorage(request: Request): Promise<string | null> {
 		if (!this.options.sessionStorage) return null;
 
@@ -161,6 +185,9 @@ export class LanguageDetector {
 		return this.fromSupported(lng);
 	}
 
+	/**
+	 * Read the locale from the `Accept-Language` header.
+	 */
 	private fromHeader(request: Request): string | null {
 		let locales = getClientLocales(request);
 		if (!locales) return null;
@@ -168,10 +195,13 @@ export class LanguageDetector {
 		return this.fromSupported(locales);
 	}
 
+	/**
+	 * Read the locale from the custom locale finder.
+	 */
 	private async fromCustom(args: LanguageDetectorArgs): Promise<string | null> {
 		if (!this.options.findLocale) {
 			throw new ReferenceError(
-				"You tried to find a locale using `findLocale` but it iss not defined. Change your order to not include `custom` or provide a findLocale functions.",
+				"You tried to find a locale using `findLocale` but it is not defined. Change your order to not include `custom` or provide a findLocale functions.",
 			);
 		}
 		let locales = await this.options.findLocale(args);
@@ -180,6 +210,9 @@ export class LanguageDetector {
 		return this.fromSupported(locales);
 	}
 
+	/**
+	 * Match a locale against the configured supported languages.
+	 */
 	private fromSupported(language: string | null) {
 		return (
 			pick(this.options.supportedLanguages, language ?? this.options.fallbackLanguage, {

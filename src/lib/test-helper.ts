@@ -24,6 +24,9 @@ interface RunMiddlewareOptions<T = Response> {
 	next?: () => Promise<T>;
 }
 
+/**
+ * Execute a middleware function with test defaults.
+ */
 export async function runMiddleware<T = Response>(
 	middleware: MiddlewareFunction<T>,
 	{
@@ -36,6 +39,9 @@ export async function runMiddleware<T = Response>(
 	return await middleware({ request, params, context }, next);
 }
 
+/**
+ * Return the response thrown or rejected by a promise.
+ */
 export async function catchResponse<T>(promise: Promise<T>) {
 	try {
 		await promise;
