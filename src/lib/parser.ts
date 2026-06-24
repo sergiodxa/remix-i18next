@@ -1,7 +1,6 @@
 import { formatLanguageString } from "./format-language-string.js";
 
-let REGEX =
-	/[ ]*((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;[ ]*q=[0-1](\.[0-9]+)?[ ]*)?)*/g;
+let REGEX = /[ ]*((([a-zA-Z]+(-[a-zA-Z0-9]+){0,2})|\*)(;[ ]*q=[0-1](\.[0-9]+)?[ ]*)?)*/g;
 
 export interface Language {
 	code: string;
@@ -57,9 +56,7 @@ export function pick<T extends string>(
 		return null;
 	}
 
-	let parsedAcceptLanguage = isString(acceptLanguage)
-		? parse(acceptLanguage)
-		: acceptLanguage;
+	let parsedAcceptLanguage = isString(acceptLanguage) ? parse(acceptLanguage) : acceptLanguage;
 
 	let supported = supportedLanguages.map((support) => {
 		let bits = support.split("-");

@@ -11,10 +11,7 @@ import {
 	type TFunction,
 } from "i18next";
 import type { EntryContext } from "react-router";
-import {
-	LanguageDetector,
-	type LanguageDetectorOption,
-} from "./lib/language-detector.js";
+import { LanguageDetector, type LanguageDetectorOption } from "./lib/language-detector.js";
 
 type FallbackNs<Ns> = Ns extends undefined
 	? DefaultNamespace
@@ -101,9 +98,7 @@ export class RemixI18Next {
 	 * @param options The i18next init options and the key prefix to prepend to translation keys.
 	 */
 	async getFixedT<
-		N extends
-			| FlatNamespace
-			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		N extends FlatNamespace | readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
 		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
 	>(
 		locale: string,
@@ -111,9 +106,7 @@ export class RemixI18Next {
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
 	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
 	async getFixedT<
-		N extends
-			| FlatNamespace
-			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		N extends FlatNamespace | readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
 		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
 	>(
 		request: Request,
@@ -121,9 +114,7 @@ export class RemixI18Next {
 		options?: Omit<InitOptions, "react"> & { keyPrefix?: KPrefix },
 	): Promise<TFunction<FallbackNs<N>, KPrefix>>;
 	async getFixedT<
-		N extends
-			| FlatNamespace
-			| readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
+		N extends FlatNamespace | readonly [FlatNamespace, ...FlatNamespace[]] = DefaultNamespace,
 		KPrefix extends KeyPrefix<FallbackNs<N>> = undefined,
 	>(
 		requestOrLocale: Request | string,
@@ -132,9 +123,7 @@ export class RemixI18Next {
 	): Promise<TFunction<FallbackNs<N>, KPrefix>> {
 		let [instance, locale] = await Promise.all([
 			this.createInstance({ ...this.options.i18next, ...options }),
-			typeof requestOrLocale === "string"
-				? requestOrLocale
-				: this.getLocale(requestOrLocale),
+			typeof requestOrLocale === "string" ? requestOrLocale : this.getLocale(requestOrLocale),
 		]);
 
 		await instance.changeLanguage(locale);
@@ -144,11 +133,7 @@ export class RemixI18Next {
 			await instance.loadNamespaces(instance.options.defaultNS);
 		} else await instance.loadNamespaces("translation" as DefaultNamespace);
 
-		return instance.getFixedT<N, KPrefix, N>(
-			locale,
-			namespaces,
-			options?.keyPrefix,
-		);
+		return instance.getFixedT<N, KPrefix, N>(locale, namespaces, options?.keyPrefix);
 	}
 
 	private async createInstance(options: Omit<InitOptions, "react"> = {}) {

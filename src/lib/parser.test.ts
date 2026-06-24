@@ -75,9 +75,7 @@ describe(parser.parse.name, () => {
 	});
 
 	test("should cope with random whitespace", () => {
-		let result = parser.parse(
-			"fr-CA, fr;q=0.8,  en-US;q=0.6,en;q=0.4,    *;q=0.1",
-		);
+		let result = parser.parse("fr-CA, fr;q=0.8,  en-US;q=0.6,en;q=0.4,    *;q=0.1");
 		expect(result).toEqual([
 			{ code: "fr", region: "CA", quality: 1.0, script: null },
 			{ code: "fr", quality: 0.8, script: null },
@@ -129,10 +127,7 @@ describe(parser.parse.name, () => {
 
 describe(parser.pick.name, () => {
 	test("should pick a specific regional language", () => {
-		let result = parser.pick(
-			["en-US", "fr-CA"],
-			"fr-CA,fr;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5",
-		);
+		let result = parser.pick(["en-US", "fr-CA"], "fr-CA,fr;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5");
 		expect(result).toEqual("fr-CA");
 	});
 
@@ -145,18 +140,12 @@ describe(parser.pick.name, () => {
 	});
 
 	test("should pick a specific script (if specified)", () => {
-		let result = parser.pick(
-			["zh-Hant-cn", "zh-cn"],
-			"zh-Hant-cn,zh-cn;q=0.6,zh;q=0.4",
-		);
+		let result = parser.pick(["zh-Hant-cn", "zh-cn"], "zh-Hant-cn,zh-cn;q=0.6,zh;q=0.4");
 		expect(result).toEqual("zh-Hant-cn");
 	});
 
 	test("should pick proper language regardless of casing", () => {
-		let result = parser.pick(
-			["eN-Us", "Fr-cA"],
-			"fR-Ca,fr;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5",
-		);
+		let result = parser.pick(["eN-Us", "Fr-cA"], "fR-Ca,fr;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5");
 		if (result === null) throw new Error("Result is null");
 		expect(result.toLowerCase()).toEqual("fr-ca");
 	});
@@ -172,10 +161,7 @@ describe(parser.pick.name, () => {
 	});
 
 	test("should return null if no matches are found", () => {
-		let result = parser.pick(
-			["ko-KR"],
-			"fr-CA,fr;q=0.8,en-US;q=0.6,en;q=0.4,*;q=0.1",
-		);
+		let result = parser.pick(["ko-KR"], "fr-CA,fr;q=0.8,en-US;q=0.6,en;q=0.4,*;q=0.1");
 		expect(result).toEqual(null);
 	});
 
