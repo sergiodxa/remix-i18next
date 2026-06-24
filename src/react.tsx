@@ -17,7 +17,7 @@ export function useLocale(localeKey = "locale"): string {
 	// biome-ignore lint/style/noNonNullAssertion: There's always a root match
 	let rootMatch = matches[0]!;
 	let { [localeKey]: locale } =
-		(rootMatch.data as Record<string, string>) ?? {};
+		(rootMatch as { data?: Record<string, string> }).data ?? {};
 	if (!locale) throw new Error("Missing locale returned by the root loader.");
 	if (typeof locale === "string") return locale;
 	throw new Error("Invalid locale returned by the root loader.");
