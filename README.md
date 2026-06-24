@@ -87,10 +87,6 @@ See the React Router middleware documentation for details: https://reactrouter.c
 
 Create a file named `app/middleware/i18next.ts` with the following code:
 
-> [!CAUTION]
-> This depends on `react-router@7.9.0` or later
-> Check older versions of the README for a guide on how to use RemixI18next class instead if you are using an older version of React Router or don't want to use the middleware.
-
 ```ts
 import { initReactI18next } from "react-i18next";
 import { createCookie } from "react-router";
