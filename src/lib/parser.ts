@@ -39,12 +39,11 @@ export function parse(acceptLanguage?: string): Language[] {
 		let hasScript = ietf.length === 3;
 
 		languages.push({
-			// biome-ignore lint/style/noNonNullAssertion: We know this is not null
 			code: ietf[0]!,
 			script: hasScript ? ietf[1] : null,
 			region: hasScript ? ietf[2] : ietf[1],
 			quality: bits[1]
-				? // biome-ignore lint/style/noNonNullAssertion: We know this is not null
+				?
 					(Number.parseFloat(bits[1]!.split("=")[1]!) ?? 1.0)
 				: 1.0,
 		});
@@ -72,7 +71,6 @@ export function pick<T extends string>(
 		let hasScript = bits.length === 3;
 
 		return {
-			// biome-ignore lint/style/noNonNullAssertion: We know this is not null
 			code: bits[0]!,
 			script: hasScript ? bits[1] : null,
 			region: (hasScript ? bits[2] : bits[1]) ?? undefined,
