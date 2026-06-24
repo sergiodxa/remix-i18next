@@ -4,6 +4,7 @@
 
 > [!IMPORTANT]
 > If you're still on Remix v2, keep using [remix-i18next v6](https://github.com/sergiodxa/remix-i18next/tree/v6.4.1) as the v7 is only compatible with React Router v7.
+> If you're still on React Router v7, keep using [remix-i18next v7](https://github.com/sergiodxa/remix-i18next/releases/tag/v7.5.0) as the v8 is only compatible with React Router v8.
 
 > [!NOTE]
 > If you're using React Router SPA Mode, use react-i18next directly, this package is focused on being used server-side.
