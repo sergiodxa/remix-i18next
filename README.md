@@ -422,10 +422,12 @@ The locale returned by `findLocale` will be validated against the list of suppor
 
 ### Querying the locale from the database
 
-If your application stores the user locale in the database, you can use `findLocale` function to query the database and return the locale.
+If your application stores the user locale in the database, query it in the middleware and pass it to `createI18nextMiddleware`.
 
 ```ts
-export let i18n = new RemixI18Next({
+import { createI18nextMiddleware } from "remix-i18next/middleware";
+
+export const [i18nextMiddleware, getLocale] = createI18nextMiddleware({
 	detection: {
 		supportedLanguages: ["es", "en"],
 		fallbackLanguage: "en",
@@ -436,6 +438,8 @@ export let i18n = new RemixI18Next({
 	},
 });
 ```
+
+Then use `getLocale(context)` in your route loaders and actions.
 
 ### Store the locale in a cookie
 
