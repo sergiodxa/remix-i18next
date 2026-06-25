@@ -42,6 +42,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
+		"build:docs": "typedoc",
 		"typecheck": "tsc --noEmit",
 		"lint": "oxlint --ignore-path .gitignore --deny-warnings .",
 		"lint:fix": "oxlint --ignore-path .gitignore --deny-warnings --fix .",
