@@ -410,6 +410,140 @@ export default function Component() {
 }
 ```
 
+### Middleware Troubleshooting
+
+The most common runtime error is `No value found for context`. It usually means the middleware was not registered, the route is not running through the root loader, or the server entry is not using the router context that the middleware populated.
+
+Make sure the middleware is exported from the root route.
+
+```ts
+import { i18nextMiddleware } from "~/middleware/i18next";
+
+export const middleware = [i18nextMiddleware];
+```
+
+Then make sure routes that need i18next data actually run through the root route. A custom 404 route is important here because unmatched requests can skip the normal root loader flow.
+
+The app needs a custom server entry so the server can render with the same i18next instance created by the middleware.
+
+```tsx
+<I18nextProvider i18n={getInstance(routerContext)}>
+	<ServerRouter context={routerContext} url={request.url} />
+</I18nextProvider>
+```
+
+### Namespace Loading
+
+As apps grow, it is common to split translations by feature or route instead of keeping everything in one namespace. That keeps locale files smaller and makes it easier to load only the translations each route needs.
+
+One simple pattern is to group namespaces by route and load only the namespaces that route needs. This is useful when the loader itself needs translated strings.
+
+```ts
+import { data } from "react-router";
+import { getInstance } from "~/middleware/i18next";
+
+export async function loader({ context }: Route.LoaderArgs) {
+	let i18next = getInstance(context);
+
+	await i18next.loadNamespaces(["dashboard", "common"]);
+
+	return data({
+		pageTitle: i18next.t("dashboard:title"),
+	});
+}
+```
+
+If you want to keep route namespaces in sync with your route tree, use a helper that maps route IDs to namespaces and call `loadNamespaces` in the root loader before rendering children.
+
+If you need those namespaces in React, call `useTranslation(namespace)` in the component. i18next will load the namespace and suspend the component until it is ready.
+
+### Language Switching
+
+Users often want to change language without manually editing cookies or sessions. The usual pattern is to make the switcher update the chosen locale in the URL or a form submission, then let your loader or action persist it.
+
+If you keep locale in a cookie, the switcher can submit the new locale and let the loader serialize it back.
+
+```tsx
+import { Form } from "react-router";
+
+export function LanguageSwitcher() {
+	return (
+		<Form method="post">
+			<button type="submit" name="lng" value="en">English</button>
+			<button type="submit" name="lng" value="es">Espanol</button>
+		</Form>
+	);
+}
+```
+
+If you keep locale in the pathname, switching languages usually means navigating to the same route with a different locale prefix.
+
+```tsx
+import { Link } from "react-router";
+
+export function LanguageSwitcher() {
+	return (
+		<nav>
+			<Link to="/en">English</Link>
+			<Link to="/es">Espanol</Link>
+		</nav>
+	);
+}
+```
+
+### SSR and Deployment
+
+The server runtime should be able to read the translation source of truth for your app. That can mean reading files from disk, fetching translation JSON from a URL, or loading resources from memory through the `resources` option in i18next.
+
+When you deploy to a platform with edge or serverless rendering, keep these rules in mind:
+
+1. Make sure the server runtime can access the translations it needs.
+2. Keep the client `loadPath` in sync with the source you use on the server.
+3. Use the server to resolve locale, then let the browser read `<html lang>` during hydration.
+
+If you cache translation responses, cache them by locale and namespace so the browser and CDN can reuse them safely.
+
+### Error Pages
+
+Translated error pages are worth documenting because they often need to work when the rest of the route tree does not. A custom 404 or error boundary should still be able to read the locale and render translated content.
+
+The root `ErrorBoundary` is a special case: if the root loader failed, you may not know the user locale anymore. In that case, treat it like a 500-level failure and fall back to a safe default locale. Ideally this boundary never renders.
+
+```tsx
+import { useTranslation } from "react-i18next";
+
+export function ErrorBoundary() {
+	let { t } = useTranslation("errors");
+
+	return <h1>{t("unexpected")}</h1>;
+}
+```
+
+### Meta
+
+If your titles and descriptions are localized, return the translated values from the loader and read them from `loaderData` inside `meta`.
+
+```ts
+import { data } from "react-router";
+import { getInstance } from "~/middleware/i18next";
+import type { Route } from "./+types/root";
+
+export async function loader({ context }: Route.LoaderArgs) {
+	let i18next = getInstance(context);
+	return data({
+		title: i18next.t("title"),
+		description: i18next.t("description"),
+	});
+}
+
+export function meta({ loaderData }: Route.MetaArgs) {
+	return [
+		{ title: loaderData?.title },
+		{ name: "description", content: loaderData?.description },
+	];
+}
+```
+
 ## Related examples
 
 - [with Locize](https://github.com/locize/locize-react-router-example) - Use remix-i18next with Locize as backend.
