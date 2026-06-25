@@ -42,10 +42,7 @@ export function parse(acceptLanguage?: string): Language[] {
 			code: ietf[0]!,
 			script: hasScript ? ietf[1] : null,
 			region: hasScript ? ietf[2] : ietf[1],
-			quality: bits[1]
-				?
-					(Number.parseFloat(bits[1]!.split("=")[1]!) ?? 1.0)
-				: 1.0,
+			quality: bits[1] ? (Number.parseFloat(bits[1]!.split("=")[1]!) ?? 1.0) : 1.0,
 		});
 	}
 
