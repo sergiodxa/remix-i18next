@@ -94,6 +94,14 @@ describe(parser.parse.name, () => {
 		]);
 	});
 
+	test("should ignore malformed entries and quality parameters", () => {
+		let result = parser.parse("!!!, ja;1=0.5, en;q=0.2");
+		expect(result).toEqual([
+			{ code: "ja", quality: 1.0, script: null },
+			{ code: "en", quality: 0.2, script: null },
+		]);
+	});
+
 	test("should sort based on quality value", () => {
 		let result = parser.parse("fr-CA,fr;q=0.2,en-US;q=0.6,en;q=0.4,*;q=0.5");
 		expect(result).toEqual([
