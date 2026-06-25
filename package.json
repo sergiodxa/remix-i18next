@@ -27,15 +27,21 @@
 	"funding": "https://github.com/sponsors/sergiodxa",
 	"files": [
 		"build",
-		"src",
+		"src/**/*.ts",
+		"!src/**/*.test.ts",
+		"!src/lib/test-helper.ts",
 		"package.json",
 		"README.md"
 	],
 	"type": "module",
 	"sideEffects": false,
+	"types": "./build/index.d.ts",
 	"exports": {
 		"./package.json": "./package.json",
-		".": "./build/index.js"
+		".": {
+			"types": "./build/index.d.ts",
+			"default": "./build/index.js"
+		}
 	},
 	"publishConfig": {
 		"access": "public"
