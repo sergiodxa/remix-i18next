@@ -469,8 +469,12 @@ import { Form } from "react-router";
 export function LanguageSwitcher() {
 	return (
 		<Form method="post">
-			<button type="submit" name="lng" value="en">English</button>
-			<button type="submit" name="lng" value="es">Espanol</button>
+			<button type="submit" name="lng" value="en">
+				English
+			</button>
+			<button type="submit" name="lng" value="es">
+				Espanol
+			</button>
 		</Form>
 	);
 }
@@ -537,10 +541,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
-	return [
-		{ title: loaderData?.title },
-		{ name: "description", content: loaderData?.description },
-	];
+	return [{ title: loaderData?.title }, { name: "description", content: loaderData?.description }];
 }
 ```
 
