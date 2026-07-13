@@ -59,7 +59,7 @@
 		"exports": "bun run ./scripts/exports.ts"
 	},
 	"devDependencies": {
-		"@arethetypeswrong/cli": "0.18.4",
+		"@arethetypeswrong/cli": "0.18.5",
 		"@total-typescript/tsconfig": "^1.0.4",
 		"@types/bun": "^1.2.17",
 		"@types/react": "^19.1.11",
