@@ -64,7 +64,7 @@
 		"@types/bun": "^1.2.17",
 		"@types/react": "^19.1.11",
 		"i18next": "26.3.3",
-		"oxfmt": "^0.58.0",
+		"oxfmt": "^0.59.0",
 		"oxlint": "^1.71.0",
 		"react-router": "^8.0.1",
 		"typedoc": "^0.28.6",
