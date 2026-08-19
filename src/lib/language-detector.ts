@@ -13,7 +13,7 @@ export interface LanguageDetectorOption {
 	 * the languages requested by the user is supported by the application.
 	 * This should be be same as the supportedLngs in the i18next options.
 	 */
-	supportedLanguages: string[];
+	supportedLanguages: readonly string[];
 	/**
 	 * Define the fallback language that it's going to be used in the case user
 	 * expected language is not supported.
